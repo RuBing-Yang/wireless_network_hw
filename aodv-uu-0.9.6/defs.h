@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 #ifndef _DEFS_H
@@ -108,6 +108,10 @@ struct host_info {
     u_int32_t rreq_id;		/* RREQ id */
     int nif;			/* Number of interfaces to broadcast on */
         struct dev_info devs[MAX_NR_INTERFACES+1]; /* Add +1 for returning as "error" in ifindex2devindex. */
+
+    // by fxj alex 19373311
+    u_int32_t node_stability;   // actually boolean, only {0, 1} allowed
+    // fxj
 };
 
 
