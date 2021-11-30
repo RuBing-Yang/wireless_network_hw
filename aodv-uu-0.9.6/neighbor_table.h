@@ -13,6 +13,15 @@ typedef struct nb_table nb_table_t;
 
 typedef u_int32_t hash_value;	/* A hash value */
 
+// by fxj
+#define NB_TABLESIZE 64		/* Must be a power of 2 */
+#define NB_TABLEMASK (NB_TABLESIZE - 1)
+struct dest_time {
+    struct in_addr dest;
+    struct time last_time;
+};
+// fxj_end
+
 /* neighbor table entries */
 struct nb_table {
     // public seg
@@ -47,7 +56,9 @@ struct nb_table {
     u_int32_t backup_valid;
     struct in_addr backup_addr;
     float backup_stability;
-    struct timeval backup_last_refresh_time;
+    struct time backup_last_refresh_time;
+    u_int32_t backup_dest_count;
+    list_t backup_dest_tbl[NB_TABLESIZE];   // for dest_time
     // fxj_end
 };
 
@@ -66,9 +77,6 @@ struct nb_table {
 #define VALID     1
 
 // by fxj
-#define NB_TABLESIZE 64		/* Must be a power of 2 */
-#define NB_TABLEMASK (NB_TABLESIZE - 1)
-
 struct neighbor_table {
     unsigned int num_entries;
     list_t tbl[NB_TABLESIZE];
