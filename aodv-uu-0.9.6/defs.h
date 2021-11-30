@@ -62,6 +62,7 @@
 
 #define AODV_UU_VERSION "0.9.6"
 #define DRAFT_VERSION "rfc3561"
+#define USE_OPTIMIZATION true
 
 #ifdef NS_PORT
 /* NS_PORT: Log filename split into prefix and suffix. */
