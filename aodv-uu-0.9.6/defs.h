@@ -109,9 +109,9 @@ struct host_info {
     int nif;			/* Number of interfaces to broadcast on */
         struct dev_info devs[MAX_NR_INTERFACES+1]; /* Add +1 for returning as "error" in ifindex2devindex. */
 
-    // by fxj alex 19373311
+    // by fxj
     u_int32_t node_stability;   // actually boolean, only {0, 1} allowed
-    // fxj
+    // fxj_end
 };
 
 
