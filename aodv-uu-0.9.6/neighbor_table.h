@@ -22,13 +22,24 @@ struct dest_time {
 };
 // fxj_end
 
+//by cyo
+#define A1 0
+#define B1 0
+#define C1 0
+#define K11 1.0//稳定时一步转移概率
+#define K01 0.5//不稳定(0,1)时一步转移概率
+#define K00 0.0//不稳定(0,0)时一步转移概率
+#if !defined(NUM_STATES)
+#define NUM_STATES 5//取多少个前面的状态用于马尔可夫模型
+#endif
+// cyo_end
 /* neighbor table entries */
 struct nb_table {
     // public seg
     list_t l;
     // by fxj
     struct in_addr neighbor_addr;
-    float link_stability;
+    float link_stability[3];//考虑多信道
 
     // todo: Set some notes on time and timeval here
     /*
