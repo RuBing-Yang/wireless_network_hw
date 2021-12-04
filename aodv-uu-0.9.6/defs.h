@@ -152,6 +152,7 @@ struct host_info {
     struct node_info sta_tbl[20][NUM_STATES];   //所有邻居结点的历史稳定性值
     struct node_info sta_self[NUM_STATES];//自身的稳定性
     int neighbor_sum;
+    int neighbor_sum_init;//仅用于nb_tbl_2初始加入ip地址时计数，防止neighbor_sum减小时发生错误
     int neighbor_change;
     struct hello_info hello_infos[20][3];
     struct nb_info nb_tbl_2[20][3];//邻居表
@@ -162,35 +163,35 @@ struct host_info {
 //by cyo
 void nb_add(in_addr ip_temp) {
     for (int i = 0; i < 20; i++) {
-        if (nb_tbl_2[i][0].isValid == ip_temp) {
+        if (this_host.nb_tbl_2[i][0].ipAddr == ip_temp) {
             return;
         }
     }
     for (int i = 0; i < 3; i++) {
-        nb_tbl_2[neighbor_sum][0].ipAddr = ip_temp;
-        nb_tbl_2[neighbor_sum][1].ipAddr = ip_temp;
-        nb_tbl_2[neighbor_sum][2].ipAddr = ip_temp;
-        nb_tbl_2[neighbor_sum][0].cost = INIT_COST;
-        nb_tbl_2[neighbor_sum][1].cost = INIT_COST;
-        nb_tbl_2[neighbor_sum][2].cost = INIT_COST;
-        nb_tbl_2[neighbor_sum][0].isValid = 1;
-        nb_tbl_2[neighbor_sum][1].isValid = 1;
-        nb_tbl_2[neighbor_sum][2].isValid = 1;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][0].ipAddr = ip_temp;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][1].ipAddr = ip_temp;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][2].ipAddr = ip_temp;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][0].cost = INIT_COST;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][1].cost = INIT_COST;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][2].cost = INIT_COST;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][0].isValid = 1;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][1].isValid = 1;
+        this_host.nb_tbl_2[this_host.neighbor_sum_init][2].isValid = 1;
     }
-    this_host.neighbor_sum++;
+    this_host.neighbor_sum_init++;
 }
-void nb_update(in_addr ip_temp,int channel,float cost_value){
+void nb_update(in_addr ip_temp,int channel,float cost_value){//仅在邻居表中存有该ip的时候才可有用，注意用法
     for(int i = 0;i<neighbor_sum;i++){
-        if(nb_tbl_2[i][channel].ipAddr == ip_temp){
-            nb_tbl_2[i][channel].cost = cost_value;
-            break;
+        if(this_host.nb_tbl_2[i][channel].ipAddr == ip_temp){
+                this_host.nb_tbl_2[i][channel].cost = cost_value;
+                break;
         }
     }
 }
 void nb_setIsValid(in_addr ip_temp,int channel,int isValid){
     for(int i = 0;i<neighbor_sum;i++){
-        if(nb_tbl_2[i][channel].ipAddr == ip_temp){
-            nb_tbl_2[i][channel].isValid = isValid;
+        if(this_host.nb_tbl_2[i][channel].ipAddr == ip_temp){
+            this_host.nb_tbl_2[i][channel].isValid = isValid;
             break;
         }
     }
@@ -262,13 +263,13 @@ void add_f_value(float f, in_addr ip_temp, int channel) {
     }
 }
 
-float getE(int A_send, int B_send, int A_recieved, int B_recieved) {
+float getE(int A_send, int B_send, int A_received, int B_received) {
     if (A_send == 0 or B_send == 0) {
         return INIT_E;
-    } else if (A_recieved == 0 or B_recieved == 0) {
+    } else if (A_received == 0 or B_received == 0) {
         return 0;
     }
-    return (float) (A_send * B_send) / (float) (A_recieved * B_recieved);
+    return (float) (A_send * B_send) / (float) (A_received * B_received);
 }
 
 float getF(in_addr ip_temp, int channel) {
@@ -327,8 +328,6 @@ float getG(const struct node_info historyStab[], int neighbor_sum, int neighbor_
 float updateCost(int E, int F, int G) {
     float result = A1 * E + B1 * F + C1 * G - (A1 + B1) * E * F - (A1 + C1) * E * G - (B1 + C1) * F * G +
                    (A1 + B1 + C1) * E * F * G;
-    hello_send_clear();
-    hello_received_clear();
     return result;
 }
 //cyo_end

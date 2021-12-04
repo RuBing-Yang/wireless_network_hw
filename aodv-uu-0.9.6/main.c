@@ -452,6 +452,7 @@ void host_init(char *ifname)
     //by cyo
     this_host.neighbor_sum = 0;
     this_host.neighbor_change = 0;
+    this_host.neighbor_sum_init = 0;
     for(i = 0;i<20;i++){
         for(j = 0;j<3;j++){
             this_host.hello_infos[i][j].hello_send = 0;
