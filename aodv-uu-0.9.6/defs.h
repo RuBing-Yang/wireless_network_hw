@@ -91,9 +91,21 @@
 #if !defined(IFNAMSIZ)
 #define IFNAMSIZ 16
 #endif
+//by cyo
+#define A1 0
+#define B1 0
+#define C1 0
+#define K11 1.0//稳定时一步转移概率
+#define K01 0.5//不稳定(0,1)时一步转移概率
+#define K00 0.0//不稳定(0,0)时一步转移概率
+#define INIT_E 0.5
+#define INIT_G 0.5
+#define INIT_F 0.5
+#define INIT_COST 0.8
 #if !defined(NUM_STATES)
 #define NUM_STATES 5
 #endif
+// cyo_end
 /* Data for a network device */
 struct dev_info {
     int enabled;        /* 1 if struct is used, else 0 */
@@ -107,7 +119,28 @@ struct dev_info {
     struct in_addr netmask;    /* The netmask we use */
     struct in_addr broadcast;
 };
-
+//by cyo
+struct nb_info {
+    float cost;
+    int isValid;
+    struct in_addr ipAddr;
+};
+struct node_info {
+    int node_sta;
+    int isValid;
+};
+struct hello_info {
+    in_addr ipAddr;
+    int hello_send;
+    int hello_received;
+    int isValid;
+};
+struct f_value {
+    in_addr ipAddr;
+    int count;
+    float f_history_value[20];
+};
+//cyo_end
 struct host_info {
     u_int32_t seqno;        /* Sequence number */
     struct timeval bcast_time;    /* The time of the last broadcast msg sent */
@@ -115,37 +148,188 @@ struct host_info {
     u_int32_t rreq_id;        /* RREQ id */
     int nif;            /* Number of interfaces to broadcast on */
     struct dev_info devs[MAX_NR_INTERFACES + 1]; /* Add +1 for returning as "error" in ifindex2devindex. */
-
-    // by fxj
-    u_int32_t node_stability[NUM_STATES];   // actually boolean, only {0, 1} allowed
-    // fxj_end
     //by cyo
+    struct node_info sta_tbl[20][NUM_STATES];   //所有邻居结点的历史稳定性值
+    struct node_info sta_self[NUM_STATES];//自身的稳定性
     int neighbor_sum;
     int neighbor_change;
-    int hello_received[3];
-    int hello_send[3];
+    struct hello_info hello_infos[20][3];
+    struct nb_info nb_tbl_2[20][3];//邻居表
+    struct f_value f_tbl[20][3];
     //cyo_end
 };
 
 //by cyo
-void hello_received_clear() {
-    this_host.hello_received[0] = 0;
-    this_host.hello_received[1] = 0;
-    this_host.hello_received[2] = 0;
+void nb_add(in_addr ip_temp) {
+    for (int i = 0; i < 20; i++) {
+        if (nb_tbl_2[i][0].isValid == ip_temp) {
+            return;
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        nb_tbl_2[neighbor_sum][0].ipAddr = ip_temp;
+        nb_tbl_2[neighbor_sum][1].ipAddr = ip_temp;
+        nb_tbl_2[neighbor_sum][2].ipAddr = ip_temp;
+        nb_tbl_2[neighbor_sum][0].cost = INIT_COST;
+        nb_tbl_2[neighbor_sum][1].cost = INIT_COST;
+        nb_tbl_2[neighbor_sum][2].cost = INIT_COST;
+        nb_tbl_2[neighbor_sum][0].isValid = 1;
+        nb_tbl_2[neighbor_sum][1].isValid = 1;
+        nb_tbl_2[neighbor_sum][2].isValid = 1;
+    }
+    this_host.neighbor_sum++;
+}
+void nb_update(in_addr ip_temp,int channel,float cost_value){
+    for(int i = 0;i<neighbor_sum;i++){
+        if(nb_tbl_2[i][channel].ipAddr == ip_temp){
+            nb_tbl_2[i][channel].cost = cost_value;
+            break;
+        }
+    }
+}
+void nb_setIsValid(in_addr ip_temp,int channel,int isValid){
+    for(int i = 0;i<neighbor_sum;i++){
+        if(nb_tbl_2[i][channel].ipAddr == ip_temp){
+            nb_tbl_2[i][channel].isValid = isValid;
+            break;
+        }
+    }
+}
+void hello_infos_clear() {
+    for (int i = 0; i < 20; i++) {
+        this_host.hello_infos[i][0].hello_received = 0;
+        this_host.hello_infos[i][1].hello_received = 0;
+        this_host.hello_infos[i][2].hello_received = 0;
+        this_host.hello_infos[i][0].hello_send = 0;
+        this_host.hello_infos[i][1].hello_send = 0;
+        this_host.hello_infos[i][2].hello_send = 0;
+    }
 }
 
-void hello_received_add(int i,int num) {
-    this_host.hello_received[i - 1] = num;
+void hello_received_add(in_addr ip_temp, int channel, int num) {
+    int i;
+    for (i = 0; i < 20; i++) {
+        if (this_host.hello_infos[i][channel].ipAddr == ip_temp) {
+            this_host.hello_infos[i][channel].hello_received += num;
+            break;
+        }
+    }
+    if (i == 20) {
+        for (int j = 0; j < 20; j++) {
+            if (this_host.hello_infos[j][channel].isValid == 0) {
+                this_host.hello_infos[j][channel].isValid = 1;
+                this_host.hello_infos[j][channel].ipAddr = ip_temp;
+                this_host.hello_infos[j][channel].hello_received += num;
+                break;
+            }
+        }
+    }
 }
 
-void hello_send_clear() {
-    this_host.hello_send[0] = 0;
-    this_host.hello_send[1] = 0;
-    this_host.hello_send[2] = 0;
+void hello_send_add(in_addr ip_temp, int channel, int num) {
+    int i;
+    for (i = 0; i < 20; i++) {
+        if (this_host.hello_infos[i][channel].ipAddr == ip_temp) {
+            this_host.hello_infos[i][channel].hello_send += num;
+            break;
+        }
+    }
+    if (i == 20) {
+        for (int j = 0; j < 20; j++) {
+            if (this_host.hello_infos[j][channel].isValid == 0) {
+                this_host.hello_infos[j][channel].isValid = 1;
+                this_host.hello_infos[j][channel].ipAddr = ip_temp;
+                this_host.hello_infos[j][channel].hello_send += num;
+                break;
+            }
+        }
+    }
 }
 
-void hello_send_add(int i,int num) {
-    this_host.hello_send[i - 1] = num;
+void add_f_value(float f, in_addr ip_temp, int channel) {
+    for (int i = 0; i < 20; i++) {
+        if (this_host.f_tbl[i][channel].ipAddr == ip_temp) {
+            if (this_host.f_tbl[i][channel].count == 20) {
+                for (int j = 18; j >= 0; j--) {
+                    this_host.f_tbl[i][channel].f_history_value[j + 1] = this_host.f_tbl[i][channel].history_value[j];
+                }
+                this_host.f_tbl[i][channel].f_history_value[0] = f;
+            } else {
+                this_host.f_tbl[i][channel].f_history_value[this_host.f_tbl[i][channel].count] = f;
+                this_host.f_tbl[i][channel].count++;
+            }
+        }
+    }
+}
+
+float getE(int A_send, int B_send, int A_recieved, int B_recieved) {
+    if (A_send == 0 or B_send == 0) {
+        return INIT_E;
+    } else if (A_recieved == 0 or B_recieved == 0) {
+        return 0;
+    }
+    return (float) (A_send * B_send) / (float) (A_recieved * B_recieved);
+}
+
+float getF(in_addr ip_temp, int channel) {
+    int node_id;
+    for (int i = 0; i < 20; i++) {
+        if (this_host.f_tbl[i][channel].ipAddr == ip_temp) {
+            node_id = i;
+        }
+    }
+    if (node_id == 20) {
+        return 0;
+    }
+    if (this_host.f_tbl[node_id][channel].count == 0) {
+        return INIT_F;
+    } else {
+        float result;
+        for (int i = 0; i < this_host.f_tbl[node_id][channel].count; i++) {
+            result += this_host.f_tbl[node_id][channel].f_history_value[i];
+        }
+        result /= this_host.f_tbl[node_id][channel].count;
+        return result;
+    }
+}
+
+float getG(const struct node_info historyStab[], int neighbor_sum, int neighbor_change) {
+    float result = 0;
+    neighbor_change1 = (neighbor_change > 0) ? neighbor_change : -neighbor_change;
+    for (int i = 0; i < NUM_STATES; i++) {
+        if (this_host.sta_self[i].isValid == 0 || historyStab[i].isValid == 0) {
+            result += INIT_G;
+            continue;
+        }
+        if (this_host.sta_self[i].node_sta == 0 && historyStab[i].node_sta == 0) {
+            if (neighbor_sum == 0) {
+                result += K00;
+            } else {
+                result += K00 * (float) (neighbor_sum - neighbor_change) / (float) neighbor_sum;
+            }
+        } else if (this_host.sta_self[i].node_sta == 1 && historyStab[i].node_sta == 1) {
+            if (neighbor_sum == 0) {
+                result += K11;
+            } else {
+                result += K11 * (float) (neighbor_sum - neighbor_change) / (float) neighbor_sum;
+            }
+        } else {
+            if (neighbor_sum == 0) {
+                result += K01;
+            } else {
+                result += K01 * (float) (neighbor_sum - neighbor_change) / (float) neighbor_sum;
+            }
+        }
+    }
+    return (result > 0) ? result / (float) NUM_STATES : 0;
+}
+
+float updateCost(int E, int F, int G) {
+    float result = A1 * E + B1 * F + C1 * G - (A1 + B1) * E * F - (A1 + C1) * E * G - (B1 + C1) * F * G +
+                   (A1 + B1 + C1) * E * F * G;
+    hello_send_clear();
+    hello_received_clear();
+    return result;
 }
 //cyo_end
 /*

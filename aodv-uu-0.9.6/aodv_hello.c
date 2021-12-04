@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -38,7 +38,6 @@
 
 extern int unidir_hack, receive_n_hellos, hello_jittering, optimized_hellos;
 static struct timer hello_timer;
-
 #endif
 
 /* #define DEBUG_HELLO */
@@ -61,12 +60,10 @@ void NS_CLASS hello_start()
 {
     if (hello_timer.used)
 	return;
-
     gettimeofday(&this_host.fwd_time, NULL);
 
     DEBUG(LOG_DEBUG, 0, "Starting to send HELLOs!");
     timer_init(&hello_timer, &NS_CLASS hello_send, NULL);
-
     hello_send(NULL);
 }
 
@@ -101,6 +98,7 @@ void NS_CLASS hello_send(void *arg)
 
     /* This check will ensure we don't send unnecessary hello msgs, in case
        we have sent other bcast msgs within HELLO_INTERVAL */
+    int send_num = 0;
     if (time_diff >= HELLO_INTERVAL) {
 
 	for (i = 0; i < MAX_NR_INTERFACES; i++) {
@@ -109,11 +107,12 @@ void NS_CLASS hello_send(void *arg)
 #ifdef DEBUG_HELLO
 	    DEBUG(LOG_DEBUG, 0, "sending Hello to 255.255.255.255");
 #endif
+        //by cyo
 	    rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
 			       this_host.seqno,
 			       DEV_NR(i).ipaddr,
-			       ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
-
+			       ALLOWED_HELLO_LOSS * HELLO_INTERVAL,this_host.hello_infos);
+        //cyo_end
 	    /* Assemble a RREP extension which contain our neighbor set... */
 	    if (unidir_hack) {
 		int i;
@@ -162,8 +161,6 @@ void NS_CLASS hello_send(void *arg)
 			      HELLO_INTERVAL - time_diff + jitter);
     }
 }
-
-
 /* Process a hello message */
 void NS_CLASS hello_process(RREP * hello, int rreplen, unsigned int ifindex)
 {

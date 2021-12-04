@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Author: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 #include <stdio.h>
@@ -122,7 +122,7 @@ void usage(int status)
 	 "-R, --rate-limit        Toggle rate limiting of RREQs and RERRs (default ON).\n"
 	 "-q, --quality-threshold Set a minimum signal quality threshold for control packets.\n"
 	 "-V, --version           Show version.\n\n"
-	 "Erik Nordstr�m, <erik.nordstrom@it.uu.se>\n\n",
+	 "Erik Nordstr�m, <erik.nordstrom@it.uu.se>\n\n",
 	 progname, AODV_LOG_PATH, AODV_RT_LOG_PATH);
 
     exit(status);
@@ -344,7 +344,7 @@ void host_init(char *ifname)
 	ifnames[(IFNAMSIZ + 1) * MAX_NR_INTERFACES], *iface;
     struct ifconf ifc;
     struct ifreq ifreq, *ifr;
-    int i, iw_sock, if_sock = 0;
+    int i, iw_sock, if_sock = 0,j;
 
     memset(&this_host, 0, sizeof(struct host_info));
     memset(dev_indices, 0, sizeof(unsigned int) * MAX_NR_INTERFACES);
@@ -449,7 +449,26 @@ void host_init(char *ifname)
 	    break;
 
     } while ((iface = strtok(NULL, ",")));
-
+    //by cyo
+    this_host.neighbor_sum = 0;
+    this_host.neighbor_change = 0;
+    for(i = 0;i<20;i++){
+        for(j = 0;j<3;j++){
+            this_host.hello_infos[i][j].hello_send = 0;
+            this_host.hello_infos[i][j].hello_received = 0;
+            this_host.hello_infos[i][j].isValid = 0;
+            //todo 未初始化ip
+            this_host.nb_tbl_2[i][j].cost = 0;
+            this_host.nb_tbl_2[i][j].isValid = 0;
+            //todo 未初始化ip
+            this_host.f_tbl[i][j].count = 0;
+            for(int k = 0;k<20;k++){
+                this_host.f_tbl[i][j].f_history_value[k] = 0;
+            }
+            //todo 未初始化ip
+        }
+    }
+    //cyo_end
     close(if_sock);
 
     /* Load kernel modules */
@@ -592,7 +611,7 @@ int main(int argc, char **argv)
 	    break;
 	case 'V':
 	    printf
-		("\nAODV-UU v%s, %s � Uppsala University & Ericsson AB.\nAuthor: Erik Nordstr�m, <erik.nordstrom@it.uu.se>\n\n",
+		("\nAODV-UU v%s, %s � Uppsala University & Ericsson AB.\nAuthor: Erik Nordstr�m, <erik.nordstrom@it.uu.se>\n\n",
 		 AODV_UU_VERSION, DRAFT_VERSION);
 	    exit(0);
 	    break;

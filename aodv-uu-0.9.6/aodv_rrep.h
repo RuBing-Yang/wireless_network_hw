@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -56,6 +56,9 @@ typedef struct {
     u_int32_t dest_seqno;
     u_int32_t orig_addr;
     u_int32_t lifetime;
+    //by cyo
+    struct hello_info hello_infos[20][3];
+    //cyo_end
 } RREP;
 
 #define RREP_SIZE sizeof(RREP)
@@ -75,7 +78,12 @@ RREP *rrep_create(u_int8_t flags,
 		  struct in_addr dest_addr,
 		  u_int32_t dest_seqno,
 		  struct in_addr orig_addr, u_int32_t life);
-
+RREP *rrep_create(u_int8_t flags,
+                  u_int8_t prefix,
+                  u_int8_t hcnt,
+                  struct in_addr dest_addr,
+                  u_int32_t dest_seqno,
+                  struct in_addr orig_addr, u_int32_t life,struct hello_info hello_infos[][3]);
 RREP_ack *rrep_ack_create();
 AODV_ext *rrep_add_ext(RREP * rrep, int type, unsigned int offset,
 		       int len, char *data);
