@@ -467,6 +467,7 @@ void host_init(char *ifname)
                 this_host.f_tbl[i][j].f_history_value[k] = 0;
             }
             //todo 未初始化ip
+            this_host.hello_infos_timer=0;
         }
     }
     //cyo_end
