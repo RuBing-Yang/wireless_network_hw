@@ -24,6 +24,7 @@
 #ifdef NS_PORT
 #include "ns-2/aodv-uu.h"
 #else
+
 #include <netinet/in.h>
 #include "aodv_hello.h"
 #include "aodv_timeout.h"
@@ -43,23 +44,21 @@ static struct timer hello_timer;
 /* #define DEBUG_HELLO */
 
 
-long NS_CLASS hello_jitter()
-{
+long NS_CLASS hello_jitter() {
     if (hello_jittering) {
 #ifdef NS_PORT
-	return (long) (((float) Random::integer(RAND_MAX + 1) / RAND_MAX - 0.5)
-		       * JITTER_INTERVAL);
+        return (long) (((float) Random::integer(RAND_MAX + 1) / RAND_MAX - 0.5)
+                   * JITTER_INTERVAL);
 #else
-	return (long) (((float) random() / RAND_MAX - 0.5) * JITTER_INTERVAL);
+        return (long) (((float) random() / RAND_MAX - 0.5) * JITTER_INTERVAL);
 #endif
     } else
-	return 0;
+        return 0;
 }
 
-void NS_CLASS hello_start()
-{
+void NS_CLASS hello_start() {
     if (hello_timer.used)
-	return;
+        return;
     gettimeofday(&this_host.fwd_time, NULL);
 
     DEBUG(LOG_DEBUG, 0, "Starting to send HELLOs!");
@@ -67,15 +66,13 @@ void NS_CLASS hello_start()
     hello_send(NULL);
 }
 
-void NS_CLASS hello_stop()
-{
+void NS_CLASS hello_stop() {
     DEBUG(LOG_DEBUG, 0,
-	  "No active forwarding routes - stopped sending HELLOs!");
+          "No active forwarding routes - stopped sending HELLOs!");
     timer_remove(&hello_timer);
 }
 
-void NS_CLASS hello_send(void *arg)
-{
+void NS_CLASS hello_send(void *arg) {
     RREP *rrep;
     AODV_ext *ext = NULL;
     u_int8_t flags = 0;
@@ -88,9 +85,9 @@ void NS_CLASS hello_send(void *arg)
     gettimeofday(&now, NULL);
 
     if (optimized_hellos &&
-	timeval_diff(&now, &this_host.fwd_time) > ACTIVE_ROUTE_TIMEOUT) {
-	hello_stop();
-	return;
+        timeval_diff(&now, &this_host.fwd_time) > ACTIVE_ROUTE_TIMEOUT) {
+        hello_stop();
+        return;
     }
 
     time_diff = timeval_diff(&now, &this_host.bcast_time);
@@ -101,69 +98,69 @@ void NS_CLASS hello_send(void *arg)
     int send_num = 0;
     if (time_diff >= HELLO_INTERVAL) {
 
-	for (i = 0; i < MAX_NR_INTERFACES; i++) {
-	    if (!DEV_NR(i).enabled)
-		continue;
+        for (i = 0; i < MAX_NR_INTERFACES; i++) {
+            if (!DEV_NR(i).enabled)
+                continue;
 #ifdef DEBUG_HELLO
-	    DEBUG(LOG_DEBUG, 0, "sending Hello to 255.255.255.255");
+            DEBUG(LOG_DEBUG, 0, "sending Hello to 255.255.255.255");
 #endif
-        //by cyo
-	    rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
-			       this_host.seqno,
-			       DEV_NR(i).ipaddr,
-			       ALLOWED_HELLO_LOSS * HELLO_INTERVAL,this_host.hello_infos);
-        //cyo_end
-	    /* Assemble a RREP extension which contain our neighbor set... */
-	    if (unidir_hack) {
-		int i;
+            //by cyo
+            rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
+                               this_host.seqno,
+                               DEV_NR(i).ipaddr,
+                               ALLOWED_HELLO_LOSS * HELLO_INTERVAL, this_host.hello_infos);//todo
+            //cyo_end
+            /* Assemble a RREP extension which contain our neighbor set... */
+            if (unidir_hack) {
+                int i;
 
-		if (ext)
-		    ext = AODV_EXT_NEXT(ext);
-		else
-		    ext = (AODV_ext *) ((char *) rrep + RREP_SIZE);
+                if (ext)
+                    ext = AODV_EXT_NEXT(ext);
+                else
+                    ext = (AODV_ext *) ((char *) rrep + RREP_SIZE);
 
-		ext->type = RREP_HELLO_NEIGHBOR_SET_EXT;
-		ext->length = 0;
+                ext->type = RREP_HELLO_NEIGHBOR_SET_EXT;
+                ext->length = 0;
 
-		for (i = 0; i < RT_TABLESIZE; i++) {
-		    list_t *pos;
-		    list_foreach(pos, &rt_tbl.tbl[i]) {
-			rt_table_t *rt = (rt_table_t *) pos;
-			/* If an entry has an active hello timer, we assume
-			   that we are receiving hello messages from that
-			   node... */
-			if (rt->hello_timer.used) {
+                for (i = 0; i < RT_TABLESIZE; i++) {
+                    list_t *pos;
+                    list_foreach(pos, &rt_tbl.tbl[i]) {
+                        rt_table_t *rt = (rt_table_t *) pos;
+                        /* If an entry has an active hello timer, we assume
+                           that we are receiving hello messages from that
+                           node... */
+                        if (rt->hello_timer.used) {
 #ifdef DEBUG_HELLO
-			    DEBUG(LOG_INFO, 0,
-				  "Adding %s to hello neighbor set ext",
-				  ip_to_str(rt->dest_addr));
+                            DEBUG(LOG_INFO, 0,
+                              "Adding %s to hello neighbor set ext",
+                              ip_to_str(rt->dest_addr));
 #endif
-			    memcpy(AODV_EXT_DATA(ext), &rt->dest_addr,
-				   sizeof(struct in_addr));
-			    ext->length += sizeof(struct in_addr);
-			}
-		    }
-		}
-		if (ext->length)
-		    msg_size = RREP_SIZE + AODV_EXT_SIZE(ext);
-	    }
-	    dest.s_addr = AODV_BROADCAST;
-	    aodv_socket_send((AODV_msg *) rrep, dest, msg_size, 1, &DEV_NR(i));
-	}
+                            memcpy(AODV_EXT_DATA(ext), &rt->dest_addr,
+                                   sizeof(struct in_addr));
+                            ext->length += sizeof(struct in_addr);
+                        }
+                    }
+                }
+                if (ext->length)
+                    msg_size = RREP_SIZE + AODV_EXT_SIZE(ext);
+            }
+            dest.s_addr = AODV_BROADCAST;
+            aodv_socket_send((AODV_msg *) rrep, dest, msg_size, 1, &DEV_NR(i));
+        }
 
-	timer_set_timeout(&hello_timer, HELLO_INTERVAL + jitter);
+        timer_set_timeout(&hello_timer, HELLO_INTERVAL + jitter);
     } else {
-	if (HELLO_INTERVAL - time_diff + jitter < 0)
-	    timer_set_timeout(&hello_timer,
-			      HELLO_INTERVAL - time_diff - jitter);
-	else
-	    timer_set_timeout(&hello_timer,
-			      HELLO_INTERVAL - time_diff + jitter);
+        if (HELLO_INTERVAL - time_diff + jitter < 0)
+            timer_set_timeout(&hello_timer,
+                              HELLO_INTERVAL - time_diff - jitter);
+        else
+            timer_set_timeout(&hello_timer,
+                              HELLO_INTERVAL - time_diff + jitter);
     }
 }
+
 /* Process a hello message */
-void NS_CLASS hello_process(RREP * hello, int rreplen, unsigned int ifindex)
-{
+void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
     u_int32_t hello_seqno, timeout, hello_interval = HELLO_INTERVAL;
     u_int8_t state, flags = 0;
     struct in_addr ext_neighbor, hello_dest;
@@ -171,125 +168,143 @@ void NS_CLASS hello_process(RREP * hello, int rreplen, unsigned int ifindex)
     AODV_ext *ext = NULL;
     int i;
     struct timeval now;
-
+    //by cyo
+    int channel;//todo
+    int num;
+    //cyo_end
     gettimeofday(&now, NULL);
 
     hello_dest.s_addr = hello->dest_addr;
     hello_seqno = ntohl(hello->dest_seqno);
-
+    //by cyo
+    channel = hello->channel;
+    for (i = 0; i < MAX_NR_INTERFACES; i++) {
+        if (!DEV_NR(i).enabled)
+            continue;
+        else
+            break;
+    }
+    for (int j = 0; j < 20; j++) {
+        if(hello->hello_infos[j][channel].ipAddr == DEV_NR(i).ipaddr){
+            hello_send_add_nb(hello_dest, hello->channel, hello->hello_infos[j][channel].hello_send);//todo
+            hello_received_add_nb(hello_dest,hello->channel,hello->hello_infos[j][channel].hello_recieve);
+            break;
+        }
+    }
+    hello_received_add(hello_dest,hello->channel,1);
+    //cyo_end
     rt = rt_table_find(hello_dest);
 
     if (rt)
-	flags = rt->flags;
+        flags = rt->flags;
 
     if (unidir_hack)
-	flags |= RT_UNIDIR;
+        flags |= RT_UNIDIR;
 
     /* Check for hello interval extension: */
     ext = (AODV_ext *) ((char *) hello + RREP_SIZE);
 
     while (rreplen > (int) RREP_SIZE) {
-	switch (ext->type) {
-	case RREP_HELLO_INTERVAL_EXT:
-	    if (ext->length == 4) {
-		memcpy(&hello_interval, AODV_EXT_DATA(ext), 4);
-		hello_interval = ntohl(hello_interval);
+        switch (ext->type) {
+            case RREP_HELLO_INTERVAL_EXT:
+                if (ext->length == 4) {
+                    memcpy(&hello_interval, AODV_EXT_DATA(ext), 4);
+                    hello_interval = ntohl(hello_interval);
 #ifdef DEBUG_HELLO
-		DEBUG(LOG_INFO, 0, "Hello extension interval=%lu!",
-		      hello_interval);
+                    DEBUG(LOG_INFO, 0, "Hello extension interval=%lu!",
+                          hello_interval);
 #endif
 
-	    } else
-		alog(LOG_WARNING, 0,
-		     __FUNCTION__, "Bad hello interval extension!");
-	    break;
-	case RREP_HELLO_NEIGHBOR_SET_EXT:
+                } else
+                    alog(LOG_WARNING, 0,
+                         __FUNCTION__, "Bad hello interval extension!");
+                break;
+            case RREP_HELLO_NEIGHBOR_SET_EXT:
 
 #ifdef DEBUG_HELLO
-	    DEBUG(LOG_INFO, 0, "RREP_HELLO_NEIGHBOR_SET_EXT");
+                DEBUG(LOG_INFO, 0, "RREP_HELLO_NEIGHBOR_SET_EXT");
 #endif
-	    for (i = 0; i < ext->length; i = i + 4) {
-		ext_neighbor.s_addr =
-		    *(in_addr_t *) ((char *) AODV_EXT_DATA(ext) + i);
+                for (i = 0; i < ext->length; i = i + 4) {
+                    ext_neighbor.s_addr =
+                            *(in_addr_t * )((char *) AODV_EXT_DATA(ext) + i);
 
-		if (ext_neighbor.s_addr == DEV_IFINDEX(ifindex).ipaddr.s_addr)
-		    flags &= ~RT_UNIDIR;
-	    }
-	    break;
-	default:
-	    alog(LOG_WARNING, 0, __FUNCTION__,
-		 "Bad extension!! type=%d, length=%d", ext->type, ext->length);
-	    ext = NULL;
-	    break;
-	}
-	if (ext == NULL)
-	    break;
+                    if (ext_neighbor.s_addr == DEV_IFINDEX(ifindex).ipaddr.s_addr)
+                        flags &= ~RT_UNIDIR;
+                }
+                break;
+            default:
+                alog(LOG_WARNING, 0, __FUNCTION__,
+                     "Bad extension!! type=%d, length=%d", ext->type, ext->length);
+                ext = NULL;
+                break;
+        }
+        if (ext == NULL)
+            break;
 
-	rreplen -= AODV_EXT_SIZE(ext);
-	ext = AODV_EXT_NEXT(ext);
+        rreplen -= AODV_EXT_SIZE(ext);
+        ext = AODV_EXT_NEXT(ext);
     }
 
 #ifdef DEBUG_HELLO
     DEBUG(LOG_DEBUG, 0, "rcvd HELLO from %s, seqno %lu",
-	  ip_to_str(hello_dest), hello_seqno);
+      ip_to_str(hello_dest), hello_seqno);
 #endif
     /* This neighbor should only be valid after receiving 3
        consecutive hello messages... */
     if (receive_n_hellos)
-	state = INVALID;
+        state = INVALID;
     else
-	state = VALID;
+        state = VALID;
 
     timeout = ALLOWED_HELLO_LOSS * hello_interval + ROUTE_TIMEOUT_SLACK;
 
     if (!rt) {
-	/* No active or expired route in the routing table. So we add a
-	   new entry... */
+        /* No active or expired route in the routing table. So we add a
+           new entry... */
 
-	rt = rt_table_insert(hello_dest, hello_dest, 1,
-			     hello_seqno, timeout, state, flags, ifindex);
+        rt = rt_table_insert(hello_dest, hello_dest, 1,
+                             hello_seqno, timeout, state, flags, ifindex);
 
-	if (flags & RT_UNIDIR) {
-	    DEBUG(LOG_INFO, 0, "%s new NEIGHBOR, link UNI-DIR",
-		  ip_to_str(rt->dest_addr));
-	} else {
-	    DEBUG(LOG_INFO, 0, "%s new NEIGHBOR!", ip_to_str(rt->dest_addr));
-	}
-	rt->hello_cnt = 1;
+        if (flags & RT_UNIDIR) {
+            DEBUG(LOG_INFO, 0, "%s new NEIGHBOR, link UNI-DIR",
+                  ip_to_str(rt->dest_addr));
+        } else {
+            DEBUG(LOG_INFO, 0, "%s new NEIGHBOR!", ip_to_str(rt->dest_addr));
+        }
+        rt->hello_cnt = 1;
 
     } else {
 
-	if ((flags & RT_UNIDIR) && rt->state == VALID && rt->hcnt > 1) {
-	    goto hello_update;
-	}
+        if ((flags & RT_UNIDIR) && rt->state == VALID && rt->hcnt > 1) {
+            goto hello_update;
+        }
 
-	if (receive_n_hellos && rt->hello_cnt < (receive_n_hellos - 1)) {
-	    if (timeval_diff(&now, &rt->last_hello_time) <
-		(long) (hello_interval + hello_interval / 2))
-		rt->hello_cnt++;
-	    else
-		rt->hello_cnt = 1;
+        if (receive_n_hellos && rt->hello_cnt < (receive_n_hellos - 1)) {
+            if (timeval_diff(&now, &rt->last_hello_time) <
+                (long) (hello_interval + hello_interval / 2))
+                rt->hello_cnt++;
+            else
+                rt->hello_cnt = 1;
 
-	    memcpy(&rt->last_hello_time, &now, sizeof(struct timeval));
-	    return;
-	}
-	rt_table_update(rt, hello_dest, 1, hello_seqno, timeout, VALID, flags);
+            memcpy(&rt->last_hello_time, &now, sizeof(struct timeval));
+            return;
+        }
+        rt_table_update(rt, hello_dest, 1, hello_seqno, timeout, VALID, flags);
     }
 
-  hello_update:
+    hello_update:
 
     hello_update_timeout(rt, &now, ALLOWED_HELLO_LOSS * hello_interval);
     return;
 }
 
 
-#define HELLO_DELAY 50		/* The extra time we should allow an hello
+#define HELLO_DELAY 50        /* The extra time we should allow an hello
 				   message to take (due to processing) before
 				   assuming lost . */
 
-NS_INLINE void NS_CLASS hello_update_timeout(rt_table_t * rt,
-					     struct timeval *now, long time)
-{
+NS_INLINE void NS_CLASS hello_update_timeout(rt_table_t *rt,
+                                             struct timeval *now, long time) {
     timer_set_timeout(&rt->hello_timer, time + HELLO_DELAY);
     memcpy(&rt->last_hello_time, now, sizeof(struct timeval));
 }

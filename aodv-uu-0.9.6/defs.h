@@ -102,6 +102,8 @@
 #define INIT_G 0.5
 #define INIT_F 0.5
 #define INIT_COST 0.8
+#define TIMER_F 2
+#define TIMER_COST 10
 #define HELLO_INFOS_TIMER 10
 #if !defined(NUM_STATES)
 #define NUM_STATES 5
@@ -152,7 +154,7 @@ struct host_info {
     int nif;            /* Number of interfaces to broadcast on */
     struct dev_info devs[MAX_NR_INTERFACES + 1]; /* Add +1 for returning as "error" in ifindex2devindex. */
     //by cyo
-    struct node_info sta_tbl[20][NUM_STATES];   //所有邻居结点的历史稳定性值
+    struct node_info sta_tbl[20][NUM_STATES];//所有邻居结点的历史稳定性值
     struct node_info sta_self[NUM_STATES];//自身的稳定性
     int neighbor_sum;
     int neighbor_sum_init;//仅用于nb_tbl_2初始加入ip地址时计数，防止neighbor_sum减小时发生错误
@@ -244,7 +246,7 @@ void hello_received_add_nb(in_addr ip_temp, int channel, int num) {
     int i;
     for (i = 0; i < 20; i++) {
         if (this_host.hello_infos[i][channel].ipAddr == ip_temp) {
-            this_host.hello_infos[i][channel].hello_received_nb += num;
+            this_host.hello_infos[i][channel].hello_received_nb = num;
             break;
         }
     }
@@ -253,7 +255,7 @@ void hello_received_add_nb(in_addr ip_temp, int channel, int num) {
             if (this_host.hello_infos[j][channel].isValid == 0) {
                 this_host.hello_infos[j][channel].isValid = 1;
                 this_host.hello_infos[j][channel].ipAddr = ip_temp;
-                this_host.hello_infos[j][channel].hello_received_nb += num;
+                this_host.hello_infos[j][channel].hello_received_nb = num;
                 break;
             }
         }
@@ -264,7 +266,7 @@ void hello_send_add_nb(in_addr ip_temp, int channel, int num) {
     int i;
     for (i = 0; i < 20; i++) {
         if (this_host.hello_infos[i][channel].ipAddr == ip_temp) {
-            this_host.hello_infos[i][channel].hello_send_nb += num;
+            this_host.hello_infos[i][channel].hello_send_nb = num;
             break;
         }
     }
@@ -273,7 +275,7 @@ void hello_send_add_nb(in_addr ip_temp, int channel, int num) {
             if (this_host.hello_infos[j][channel].isValid == 0) {
                 this_host.hello_infos[j][channel].isValid = 1;
                 this_host.hello_infos[j][channel].ipAddr = ip_temp;
-                this_host.hello_infos[j][channel].hello_send_nb += num;
+                this_host.hello_infos[j][channel].hello_send_nb = num;
                 break;
             }
         }
@@ -291,16 +293,23 @@ void hello_infos_clear(){
 }
 void hello_infos_timer_add(){
     hello_infos_timer++;
-    if(hello_infos_timer == HELLO_INFOS_TIMER){
+    if(hello_infos_timer % TIMER_F == 0){
+        for(int i = 0;i<20;i++){
+            for(int j = 0;j<3;j++){
+                if(this_host.hello_infos[i][j].isValid == 1) {
+                    add_f_value((float) this_host.hello_infos[i][j].hello_received_nb
+                                / (float) this_host.hello_infos[i][j].hello_send,
+                                this_host.hello_infos[i][j].ipAddr, j);
+                }
+            }
+        }
+    }
+    if(hello_infos_timer == TIMER_COST){
         hello_infos_timer = 0;
         for(int i = 0;i<20;i++){
-           for(int j = 0;j<3;j++){
-               if(this_host.hello_infos[i][j].isValid == 1) {
-                   add_f_value((float) this_host.hello_infos[i][j].hello_received_nb
-                               / (float) this_host.hello_infos[i][j].hello_send,
-                               this_host.hello_infos[i][j].ipAddr, j);
-               }
-           }
+            for(int j = 0;j<3;j++){
+                updateCost(nb_tbl_2[i][j].ip_addr,j);
+            }
         }
         hello_infos_clear();
     }
