@@ -64,6 +64,10 @@ struct rt_table {
     /* 用于标记该路由是否稳定 */
     u_int8_t volatile;  /* 不稳定为1 */
     /* end yrb */
+
+    // by fxj
+    struct in_addr all_nexts[MAX_NODE];
+    // fxj_end
 };
 
 

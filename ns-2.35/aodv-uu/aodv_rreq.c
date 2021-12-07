@@ -349,7 +349,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
 			   this_host.seqno, rev_rt->dest_addr,
 			   MY_ROUTE_TIMEOUT);
-
+	// by fxj: add node to the chain.
+	rrep->union_data.nexts[0] = rreq->DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+	// fxj_end
 	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
     } else {
@@ -502,24 +504,26 @@ void NS_CLASS rreq_route_discovery(struct in_addr dest_addr, u_int8_t flags,
     return;
 }
 
+// by fxj
 /* Local repair is very similar to route discovery... */
 void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 				struct ip_data *ipd)
 {
+#ifdef FXJ_OUT
+	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
+	src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr)
+#endif // FXJ_OUT
     struct timeval now;
     seek_list_t *seek_entry;
     rt_table_t *src_entry;
     int ttl;
     u_int8_t flags = 0;
 
-    if (!rt)
-	return;
+    if (!rt) return;
 
-    if (seek_list_find(rt->dest_addr))
-	return;
+    if (seek_list_find(rt->dest_addr)) return;
 
-    if (!(rt->flags & RT_REPAIR))
-	return;
+    if (!(rt->flags & RT_REPAIR)) return;
 
     gettimeofday(&now, NULL);
 
@@ -564,6 +568,7 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 
     return;
 }
+// fxj_end
 
 NS_STATIC struct rreq_record *NS_CLASS rreq_record_insert(struct in_addr
 							  orig_addr,

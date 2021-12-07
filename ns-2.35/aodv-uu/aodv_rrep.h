@@ -37,7 +37,7 @@
 //by fxj
 union rrep_union{
     struct hello_info hello_infos[NUM_NODE][3];
-    u_int32_t nexts[NUM_NODE + 1];
+    struct in_addr nexts[NUM_NODE];
 } ;
 //fxj_end
 typedef struct {
@@ -73,8 +73,7 @@ typedef struct {
     /* end */
     
     /* by yrb */
-    u_int8_t padding8;       // by fxj
-    u_int16_t padding16;     // by fxj
+
     /* end yrb */
 
     //by cyo & fxj

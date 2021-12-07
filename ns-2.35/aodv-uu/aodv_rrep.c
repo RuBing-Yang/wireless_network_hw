@@ -360,6 +360,11 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
 				 rev_rt->volatile); //added by yrb
+		// by fxj: add nexts to rt_tbl
+		for (int i = 0; i < rrep_new_hcnt; i++) {
+			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+		}
+		// fxj_end
     } 
     /* 更新正向路由 */
 	else if (fwd_rt->dest_seqno == 0 ||
@@ -376,6 +381,11 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
 					rev_rt->volatile); //added by yrb
+		// by fxj: add nexts to rt_tbl
+		for (int i = 0; i < rrep_new_hcnt; i++) {
+			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+		}
+		// fxj_end
     } 
 	else {
 		if (fwd_rt->hcnt > 1) {
@@ -410,13 +420,23 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    /* Add a "fake" route indicating that this is an Internet
 	     * destination, thus should be encapsulated and routed through a
 	     * gateway... */
-	    if (!inet_rt)
-		rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
+	    if (!inet_rt) {
+			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex);
-	    else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
-		rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
-				rrep_lifetime, VALID, RT_INET_DEST |
-				inet_rt->flags);
+			// by fxj: add nexts to rt_tbl
+			for (int i = 0; i < rrep_new_hcnt; i++) {
+				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+			}
+			// fxj_end
+		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
+			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
+							rrep_lifetime, VALID, RT_INET_DEST |
+							inet_rt->flags);
+			// by fxj: add nexts to rt_tbl
+			for (int i = 0; i < rrep_new_hcnt; i++) {
+				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+			}
+			// fxj_end
 	    } else {
 		DEBUG(LOG_DEBUG, 0, "INET Response, but no update %s",
 		      ip_to_str(inet_dest_addr));
@@ -450,6 +470,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     } else {
 	/* --- Here we FORWARD the RREP on the REVERSE route --- */
 	if (rev_rt && rev_rt->state == VALID) {
+		// fxj: add himself into the chain
+		rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
+		// fxj_end
 	    rrep_forward(rrep, rreplen, rev_rt, fwd_rt, --ip_ttl);
 	} else {
 	    DEBUG(LOG_DEBUG, 0, "Could not forward RREP - NO ROUTE!!!");
