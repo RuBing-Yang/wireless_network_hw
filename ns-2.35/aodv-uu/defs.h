@@ -41,6 +41,7 @@
 #include <string.h>
 #include <fcntl.h>
 
+
 #ifndef NS_PORT
 #include "timer_queue.h"
 #endif
@@ -106,13 +107,27 @@
 #endif
 // cyo_end
 
-/* output */
+/* added by cyo & gcy */
+/*是否打印printf内容 */
 #define GCY_OUT 1
 #define CYO_OUT 0
 #define YRB_OUT 0
 #define FXJ_OUT 0
 #define GLO_OUT 1
 /* end */
+
+
+/* added by yrb */
+
+/* 稳定概率阈值 */
+#define COST_MIN 0.8
+
+/* cost寻路和快速修复的开关 */
+/* 用来跑tcl验证时区分原AODV协议和我们的策略 */
+#define USE_YRB 1
+#define USE_FXJ 1
+/* end yrb */
+
 /* Data for a network device */
 struct dev_info {
     int enabled;		/* 1 if struct is used, else 0 */

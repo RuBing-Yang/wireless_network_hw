@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -174,6 +174,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     u_int32_t rreq_id, rreq_new_hcnt, life;
     unsigned int extlen = 0;
     struct in_addr rreq_dest, rreq_orig;
+	/* added by yrb */
+	float cost = rreq->cost;
+	int volatile = 0;
+	/* end yrb */
 
     rreq_dest.s_addr = rreq->dest_addr;
     rreq_orig.s_addr = rreq->orig_addr;
@@ -182,6 +186,19 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     rreq_orig_seqno = ntohl(rreq->orig_seqno);
     rreq_new_hcnt = rreq->hcnt + 1;
 
+	/* added by yrb */
+	/* 计算当前链路的cost值 */
+	int i;
+    for (i = 0; i < NUM_NODE; i++) {
+        if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_src)) {
+            break;
+        }
+    }
+	if (i < NUM_NODE) {
+		cost *= this_host.hello_infos[i][channel].cost;
+	}
+	if (cost < COST_MIN) volatile = 1;
+	/* end yrb */
 
     /* Ignore RREQ's that originated from this node. Either we do this
        or we buffer our own sent RREQ's as we do with others we
@@ -207,10 +224,16 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	return;
     }
 
-    /* Ignore already processed RREQs. */
-    if (rreq_record_find(rreq_orig, rreq_id))
-	return;
-
+	/* modified by yrb */
+	/* Check if this RREQ has been processed */
+    if (rreq_record_find(rreq_orig, rreq_id)) {
+		fwd_rt = rt_table_find(rreq_dest);
+    	/* Ignore already processed RREQs. */
+		if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volatile && !volatile))
+		return;
+	}
+	/* end yrb */
+	
     /* Now buffer this RREQ so that we don't process a similar RREQ we
        get within PATH_DISCOVERY_TIME. */
     rreq_record_insert(rreq_orig, rreq_id);
@@ -236,6 +259,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     log_pkt_fields((AODV_msg *) rreq);
 #endif
 
+	/* 反向路由 */
     /* The node always creates or updates a REVERSE ROUTE entry to the
        source of the RREQ. */
     rev_rt = rt_table_find(rreq_orig);
@@ -244,32 +268,34 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     life = PATH_DISCOVERY_TIME - 2 * rreq_new_hcnt * NODE_TRAVERSAL_TIME;
 
     if (rev_rt == NULL) {
-	DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
-	      ip_to_str(rreq_orig));
+		DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
+			ip_to_str(rreq_orig));
 
-	rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
-				 rreq_orig_seqno, life, VALID, 0, ifindex);
+		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
+					rreq_orig_seqno, life, VALID, 0, ifindex, 
+					volatile); //added by yrb
     } else {
-	if (rev_rt->dest_seqno == 0 ||
-	    (int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
-	    (rreq_orig_seqno == rev_rt->dest_seqno &&
-	     (rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
-	    rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
-				     rreq_orig_seqno, life, VALID,
-				     rev_rt->flags);
-	}
-#ifdef DISABLED
-	/* This is a out of draft modification of AODV-UU to prevent
-	   nodes from creating routing entries to themselves during
-	   the RREP phase. We simple drop the RREQ if there is a
-	   missmatch between the reverse path on the node and the one
-	   suggested by the RREQ. */
+		if (rev_rt->dest_seqno == 0 ||
+			(int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
+			(rreq_orig_seqno == rev_rt->dest_seqno &&
+			(rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
+			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
+						rreq_orig_seqno, life, VALID,
+						rev_rt->flags,
+						volatile); //added by yrb
+		}
+		#ifdef DISABLED
+			/* This is a out of draft modification of AODV-UU to prevent
+			nodes from creating routing entries to themselves during
+			the RREP phase. We simple drop the RREQ if there is a
+			missmatch between the reverse path on the node and the one
+			suggested by the RREQ. */
 
-	else if (rev_rt->next_hop.s_addr != ip_src.s_addr) {
-	    DEBUG(LOG_DEBUG, 0, "Dropping RREQ due to reverse route mismatch!");
-	    return;
-	}
-#endif
+			else if (rev_rt->next_hop.s_addr != ip_src.s_addr) {
+				DEBUG(LOG_DEBUG, 0, "Dropping RREQ due to reverse route mismatch!");
+				return;
+			}
+		#endif
     }
     /**** END updating/creating REVERSE route ****/
 

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -59,6 +59,11 @@ struct rt_table {
     hash_value hash;
     int nprec;			/* Number of precursors */
     list_t precursors;		/* List of neighbors using the route */
+    
+    /* added by yrb */
+    /* 用于标记该路由是否稳定 */
+    u_int8_t volatile;  /* 不稳定为1 */
+    /* end yrb */
 };
 
 
@@ -96,10 +101,12 @@ void rt_table_destroy();
 rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
-			    unsigned int ifindex);
+			    unsigned int ifindex,
+                u_int8_t volatile);
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
-			    u_int16_t flags);
+			    u_int16_t flags
+                u_int8_t volatile);
 NS_INLINE rt_table_t *rt_table_update_timeout(rt_table_t * rt,
 					      u_int32_t lifetime);
 void rt_table_update_route_timeouts(rt_table_t * fwd_rt, rt_table_t * rev_rt);
@@ -110,6 +117,7 @@ int rt_table_invalidate(rt_table_t * rt);
 void rt_table_delete(rt_table_t * rt);
 void precursor_add(rt_table_t * rt, struct in_addr addr);
 void precursor_remove(rt_table_t * rt, struct in_addr addr);
+
 
 #endif				/* NS_NO_DECLARATIONS */
 

@@ -56,12 +56,20 @@ typedef struct {
     u_int32_t dest_seqno;
     u_int32_t orig_addr;
     u_int32_t lifetime;
+
     /* by gcy */
     u_int32_t channel;
     /* end */
-    //by cyo
-     struct hello_info hello_infos[NUM_NODE][3];
-    //cyo_end
+
+    /* by cyo */
+    struct hello_info hello_infos[NUM_NODE][3];
+    /* cyo_end */
+
+    /* by yrb */
+    /* 特殊的RREP需要更新正向路由 */
+    u_int8_t update_next_hop;
+    /* end yrb */
+
 } RREP;
 
 #define RREP_SIZE sizeof(RREP)
