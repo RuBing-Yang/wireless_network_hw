@@ -34,10 +34,18 @@
 #define RREP_ACK       0x1
 #define RREP_REPAIR    0x2
 
+//by fxj
+union rrep_union{
+    struct hello_info hello_infos[NUM_NODE][3];
+    u_int32_t nexts[NUM_NODE + 1];
+} ;
+//fxj_end
 typedef struct {
     u_int8_t type;
+// by fxj
 #if defined(__LITTLE_ENDIAN)
-    u_int16_t res1:6;
+    u_int16_t res1:5;
+    u_int16_t n:1;
     u_int16_t a:1;
     u_int16_t r:1;
     u_int16_t prefix:5;
@@ -45,12 +53,15 @@ typedef struct {
 #elif defined(__BIG_ENDIAN)
     u_int16_t r:1;
     u_int16_t a:1;
-    u_int16_t res1:6;
+    u_int16_t n:1;
+    u_int16_t res1:5;
     u_int16_t res2:3;
     u_int16_t prefix:5;
 #else
 #error "Adjust your <bits/endian.h> defines"
 #endif
+// fxj_end
+
     u_int8_t hcnt;
     u_int32_t dest_addr;
     u_int32_t dest_seqno;
@@ -60,16 +71,17 @@ typedef struct {
     /* by gcy */
     u_int32_t channel;
     /* end */
-
-    /* by cyo */
-    struct hello_info hello_infos[NUM_NODE][3];
-    /* cyo_end */
-
+    
     /* by yrb */
     /* 特殊的RREP需要更新正向路由 */
     u_int8_t update_next_hop;
+    u_int8_t padding8;       // by fxj
+    u_int16_t padding16;     // by fxj
     /* end yrb */
 
+    //by cyo & fxj
+    union rrep_union union_data;
+    //cyo_end  fxj_end
 } RREP;
 
 #define RREP_SIZE sizeof(RREP)

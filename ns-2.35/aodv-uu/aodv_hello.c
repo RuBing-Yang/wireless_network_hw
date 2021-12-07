@@ -236,9 +236,10 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
             break;
     }
     for (int j = 0; j < NUM_NODE; j++) {
-        if (hash_cmp(&(hello->hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
-            hello_send_add_nb(hello_dest, hello->channel, hello->hello_infos[j][channel].hello_send);
-            hello_received_add_nb(hello_dest, hello->channel, hello->hello_infos[j][channel].hello_received);
+        // by fxj  3  lines
+        if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
+            hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
+            hello_received_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_received);
             break;
         }
     }
