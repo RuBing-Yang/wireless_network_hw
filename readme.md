@@ -50,6 +50,7 @@ rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int16_t flags
                 u_int8_t volatile);
 
+
 /*** routing_table.c ***/
 /* volatile参数 */
 rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
@@ -58,8 +59,7 @@ rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    unsigned int ifindex,
                 u_int8_t volatile=0)
 {
-    
-	rt->volatile = volatile;
+    rt->volatile = volatile;
 }
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
@@ -70,14 +70,10 @@ rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 	rt->volatile = volatile;
 }
 
-
-/* rt_table_insert */
+/* 函数rt_table_insert */
     /* 添加参数u_int8_t volatile */
 	rt->volatile = volatile;
 
-
-rt_table_t *NS_CLASS rt_table_update();
-int NS_CLASS rt_table_invalidate();
 /* TODO: 邻居节点的invalidate(?) */
 
 
@@ -87,8 +83,9 @@ typedef struct {
     float cost;
 } RREQ;
 
+
 /*** aodv_rreq.c ***/
-/* process */
+/* rreq_process */
     /* 计算当前链路的cost值 */
     float cost = rreq->cost; 
     int i;
@@ -116,17 +113,29 @@ typedef struct {
 	rt_table_insert(..., volatile);
 	rt_table_update(..., volatile);
 
+
 /*** aodv_rrep.h ***/
-/* 特殊的RREP消息需要收到的节点更新正向路由 */
-typedef struct {
-    u_int8_t update_next_hop;
-} RREP;
+/* 对不起我发现我不需要update_next_hop了 */
 
 
 /*** aodv_rrep.c ***/
-/* 更新正向路由 */
-/* 传递volatile值 */
+/* 函数rrep_process */
+    /* 更新正向路由 */
+    /* 传递volatile值 */
+	if (fwd_rt->dest_seqno == 0 ||
+	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
+		   (rrep_seqno == fwd_rt->dest_seqno &&
+		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt
+		   || (fwd_rt->volatile && !rev_rt->volatile)))) 
+	{
+		pre_repair_hcnt = fwd_rt->hcnt;
+		pre_repair_flags = fwd_rt->flags;
 
+		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
+					rrep_lifetime, VALID,
+					rt_flags | fwd_rt->flags,
+					rev_rt->volatile); 
+    } 
 ```
 
 
@@ -134,24 +143,24 @@ typedef struct {
 #### RREP 消息变更
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |     Type      |R|A|N|   Reserved    |Prefix Sz|   Hop Count   |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                     Destination IP address                    |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                  Destination Sequence Number                  |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    Originator IP address                      |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                           Lifetime                            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                           Channel                             |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |  Updt_nxt_hop |          Padding ( 24 empty bits )            |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                                                               |
-   |                          Union (data)                         |
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     Type      |R|A|N|   Reserved    |Prefix Sz|   Hop Count   |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                     Destination IP address                    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  Destination Sequence Number                  |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                    Originator IP address                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           Lifetime                            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           Channel                             |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |  Updt_nxt_hop |          Padding ( 24 empty bits )            |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                                                               |
+    |                          Union (data)               			|
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    新增位 N：仅能在 Hello 消息中置 1，表示向所有邻居索要它们的邻居表。每个接收到这个广播的邻居都通过消息发回自己的邻居表
+

@@ -73,8 +73,6 @@ typedef struct {
     /* end */
     
     /* by yrb */
-    /* 特殊的RREP需要更新正向路由 */
-    u_int8_t update_next_hop;
     u_int8_t padding8;       // by fxj
     u_int16_t padding16;     // by fxj
     /* end yrb */

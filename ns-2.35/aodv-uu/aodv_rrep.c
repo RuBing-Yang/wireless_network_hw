@@ -358,24 +358,31 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     if (!fwd_rt) {
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
-				 rrep_lifetime, VALID, rt_flags, ifindex);
-    } else if (fwd_rt->dest_seqno == 0 ||
+				 rrep_lifetime, VALID, rt_flags, ifindex,
+				 rev_rt->volatile); //added by yrb
+    } 
+    /* 更新正向路由 */
+	else if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
-	       (rrep_seqno == fwd_rt->dest_seqno &&
-		(fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR ||
-		 rrep_new_hcnt < fwd_rt->hcnt))) {
-	pre_repair_hcnt = fwd_rt->hcnt;
-	pre_repair_flags = fwd_rt->flags;
+		   (rrep_seqno == fwd_rt->dest_seqno &&
+		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
+		   || (fwd_rt->volatile && !rev_rt->volatile))))  //added by yrb
+	{
+		pre_repair_hcnt = fwd_rt->hcnt;
+		pre_repair_flags = fwd_rt->flags;
 
-	fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
-				 rrep_lifetime, VALID,
-				 rt_flags | fwd_rt->flags);
-    } else {
-	if (fwd_rt->hcnt > 1) {
-	    DEBUG(LOG_DEBUG, 0,
-		  "Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
-		  fwd_rt->hcnt, fwd_rt->dest_seqno);
-	}
+    	/* 传递volatile值 */
+		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
+					rrep_lifetime, VALID,
+					rt_flags | fwd_rt->flags,
+					rev_rt->volatile); //added by yrb
+    } 
+	else {
+		if (fwd_rt->hcnt > 1) {
+			DEBUG(LOG_DEBUG, 0,
+			"Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
+			fwd_rt->hcnt, fwd_rt->dest_seqno);
+		}
 	return;
     }
 
