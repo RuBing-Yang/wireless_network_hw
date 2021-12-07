@@ -43,6 +43,11 @@
 /* Comment this to remove packet field output: */
 #define DEBUG_OUTPUT
 
+// fxj
+extern int unidir_hack;
+// fxj_end
+
+
 #ifndef NS_PORT
 static LIST(rreq_records);
 static LIST(rreq_blacklist);
@@ -509,10 +514,6 @@ void NS_CLASS rreq_route_discovery(struct in_addr dest_addr, u_int8_t flags,
 void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 				struct ip_data *ipd)
 {
-#ifdef FXJ_OUT
-	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
-	src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr)
-#endif // FXJ_OUT
     struct timeval now;
     seek_list_t *seek_entry;
     rt_table_t *src_entry;
@@ -550,8 +551,26 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     if (timeval_diff(&rt->rt_timer.timeout, &now) < (2 * NET_TRAVERSAL_TIME))
 	rt_table_update_timeout(rt, 2 * NET_TRAVERSAL_TIME);
 
-
+// by fxj
+if (USE_FXJ) {
+#ifdef FXJ_OUT
+	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
+			src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
+#endif
+	for (i = 0; i < MAX_NR_INTERFACES; i++) {
+    	if (!DEV_NR(i).enabled) continue;
+    	RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
+    	                   this_host.seqno,
+    	                   DEV_NR(i).ipaddr,
+    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
+    	rrep->n = 1;
+    	dest.s_addr = AODV_BROADCAST;
+    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &DEV_NR(i));
+    }
+} else {
     rreq_send(rt->dest_addr, rt->dest_seqno, ttl, flags);
+}
+// fxj_end
 
     /* Remember that we are seeking this destination and setup the
        timers */
@@ -568,7 +587,6 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 
     return;
 }
-// fxj_end
 
 NS_STATIC struct rreq_record *NS_CLASS rreq_record_insert(struct in_addr
 							  orig_addr,
