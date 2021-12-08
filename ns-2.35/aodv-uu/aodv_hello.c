@@ -235,8 +235,27 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
         else
             break;
     }
+// by fxj
+if (USE_FXJ) {
+    if (hello->n) {
+        int nb_id = neighbor_id(hello_dest);
+        if (nb_id != -1) {   // only proc nodes in nb_tbl
+            send_neighbor_table(this_host.ipaddr, hello->dest_addr, channel);
+        }  
+    } else {
+        for (int j = 0; j < NUM_NODE; j++) {
+            if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
+                hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
+                hello_received_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_received);
+                break;
+            }
+        }
+        hello_received_add(hello_dest, hello->channel, 1);
+        hello_ip_add(hello_dest, channel);  
+        nb_add(hello_dest);
+    }
+} else {
     for (int j = 0; j < NUM_NODE; j++) {
-        // by fxj  3  lines
         if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
             hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
             hello_received_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_received);
@@ -246,6 +265,8 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
     hello_received_add(hello_dest, hello->channel, 1);
     hello_ip_add(hello_dest, channel);
     nb_add(hello_dest);
+}
+// fxj_end
     //cyo_end
 
     hello_dest.s_addr = hello->dest_addr;
@@ -395,6 +416,19 @@ void NS_CLASS update_stability() {
     if (GCY_OUT) printf("A: %d, B: %d, C: %d, D: %f\n", paraA, paraB, paraC, paraD);
 }
 /* end */
+
+// fxj 
+int NS_CLASS neighbor_id(in_addr ip_temp) {
+    for (int i = 0; i < NUM_NODE; i++) {
+        if (hash_cmp(&(this_host.nb_tbl[i][0].ipaddr), &ip_temp)) {
+            return i;
+        }
+    }
+    return -1;
+}
+// fxj_end
+
+
 //by cyo
 void NS_CLASS nb_add(in_addr ip_temp) {
     for (int i = 0; i < NUM_NODE; i++) {
@@ -664,3 +698,15 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
     return hashing(addr1, &hash) == hashing(addr2, &hash);
 }
 //cyo_end
+
+//fxj_todo
+void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel) {
+    RREP *rrep = rrep_create(0, 0, 0, this_host.ipaddr,
+    	                   this_host.seqno,
+    	                   DEV_NR(i).ipaddr,
+    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
+    	rrep->t = 1;
+    	dest.s_addr = AODV_BROADCAST;
+    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &DEV_NR(i));
+}
+// fxj_end

@@ -44,7 +44,8 @@ typedef struct {
     u_int8_t type;
 // by fxj
 #if defined(__LITTLE_ENDIAN)
-    u_int16_t res1:5;
+    u_int16_t res1:4;
+    u_int16_t t:1;
     u_int16_t n:1;
     u_int16_t a:1;
     u_int16_t r:1;
@@ -54,7 +55,8 @@ typedef struct {
     u_int16_t r:1;
     u_int16_t a:1;
     u_int16_t n:1;
-    u_int16_t res1:5;
+    u_int16_t t:1;
+    u_int16_t res1:4;
     u_int16_t res2:3;
     u_int16_t prefix:5;
 #else
