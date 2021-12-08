@@ -366,7 +366,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			   this_host.seqno, rev_rt->dest_addr,
 			   MY_ROUTE_TIMEOUT);
 	// by fxj: add node to the chain.
-	rrep->union_data.nexts[0] = rreq->DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+	rrep->union_data.nexts[0] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 	// fxj_end
 	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
@@ -576,9 +576,9 @@ if (USE_FXJ) {
     	                   DEV_NR(i).ipaddr,
     	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
     	rrep->n = 1;
-    	// struct in_addr dest; //yrb
-		// dest.s_addr = AODV_BROADCAST; //yrb
-    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &(DEV_NR(i)));
+    	struct in_addr dest; 
+		dest.s_addr = AODV_BROADCAST; 
+    	aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &(DEV_NR(i)));
     }
 } else {
     rreq_send(rt->dest_addr, rt->dest_seqno, ttl, flags);
