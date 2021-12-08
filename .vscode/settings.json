@@ -1,6 +1,7 @@
 {
   "files.associations": {
-    "iosfwd": "c"
+    "iosfwd": "c",
+    "xiosbase": "c"
   },
   "C_Cpp_Runner.warnings": [
     "-Wall",

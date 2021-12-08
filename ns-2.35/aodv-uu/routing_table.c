@@ -79,12 +79,23 @@ unsigned int hashing(struct in_addr *addr, hash_value * hash)
 	return (*hash & RT_TABLEMASK);
 }
 
+/* added by yrb */
+rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
+				     struct in_addr next,
+				     u_int8_t hops, u_int32_t seqno,
+				     u_int32_t life, u_int8_t state,
+				     u_int16_t flags, unsigned int ifindex)
+{
+	rt_table_insert(dest_addr, next, hops, seqno, life, state, flags, ifindex, 0);
+}
+/* end yrb */
+
 rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 				     struct in_addr next,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t life, u_int8_t state,
 				     u_int16_t flags, unsigned int ifindex,
-					 u_int8_t volat=0) //added by yrb
+					 u_int8_t volat) //added by yrb
 {
 	hash_value hash;
 	unsigned int index;
@@ -190,11 +201,21 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 	return rt;
 }
 
+/* added by yrb */
+rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
+				     u_int8_t hops, u_int32_t seqno,
+				     u_int32_t lifetime, u_int8_t state,
+				     u_int16_t flags)
+{
+	 rt_table_update(rt, next, hops, seqno, lifetime, state, flags, 0);
+}
+/* end yrb */
+
 rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t lifetime, u_int8_t state,
 				     u_int16_t flags,
-					 u_int8_t volat=0) //added by yrb
+					 u_int8_t volat) //added by yrb
 {
 	struct in_addr nm;
 	nm.s_addr = 0;

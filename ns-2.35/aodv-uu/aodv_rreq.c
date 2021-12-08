@@ -194,6 +194,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	/* added by yrb */
 	/* 计算当前链路的cost值 */
 	int i;
+	int channel = rreq->channel;
     for (i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_src)) {
             break;
@@ -231,12 +232,17 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 
 	/* modified by yrb */
 	/* Check if this RREQ has been processed */
-    if (rreq_record_find(rreq_orig, rreq_id)) {
-		fwd_rt = rt_table_find(rreq_dest);
-    	/* Ignore already processed RREQs. */
-		if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
-		return;
+	if (USE_YRB) {
+		if (rreq_record_find(rreq_orig, rreq_id)) {
+			fwd_rt = rt_table_find(rreq_dest);
+			/* Ignore already processed RREQs. */
+			if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
+			return;
+		}
+	} else {
+		if (rreq_record_find(rreq_orig, rreq_id)) return;
 	}
+    
 	/* end yrb */
 	
     /* Now buffer this RREQ so that we don't process a similar RREQ we
@@ -275,7 +281,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     if (rev_rt == NULL) {
 		DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
 			ip_to_str(rreq_orig));
-
+		
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
 					volat); //added by yrb
@@ -557,14 +563,15 @@ if (USE_FXJ) {
 	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
 			src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
 #endif
-	for (i = 0; i < MAX_NR_INTERFACES; i++) {
+	for (int i = 0; i < MAX_NR_INTERFACES; i++) {
     	if (!DEV_NR(i).enabled) continue;
     	RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
     	                   this_host.seqno,
     	                   DEV_NR(i).ipaddr,
     	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
     	rrep->n = 1;
-    	dest.s_addr = AODV_BROADCAST;
+    	// struct in_addr dest; //yrb
+		// dest.s_addr = AODV_BROADCAST; //yrb
     	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &DEV_NR(i));
     }
 } else {
