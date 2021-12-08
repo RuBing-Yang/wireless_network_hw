@@ -181,7 +181,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     struct in_addr rreq_dest, rreq_orig;
 	/* added by yrb */
 	float cost = rreq->cost;
-	int volatile = 0;
+	int volat = 0;
 	/* end yrb */
 
     rreq_dest.s_addr = rreq->dest_addr;
@@ -202,7 +202,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	if (i < NUM_NODE) {
 		cost *= this_host.hello_infos[i][channel].cost;
 	}
-	if (cost < COST_MIN) volatile = 1;
+	if (cost < COST_MIN) volat = 1;
 	/* end yrb */
 
     /* Ignore RREQ's that originated from this node. Either we do this
@@ -234,7 +234,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     if (rreq_record_find(rreq_orig, rreq_id)) {
 		fwd_rt = rt_table_find(rreq_dest);
     	/* Ignore already processed RREQs. */
-		if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volatile && !volatile))
+		if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
 		return;
 	}
 	/* end yrb */
@@ -278,7 +278,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
-					volatile); //added by yrb
+					volat); //added by yrb
     } else {
 		if (rev_rt->dest_seqno == 0 ||
 			(int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
@@ -287,7 +287,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
 						rreq_orig_seqno, life, VALID,
 						rev_rt->flags,
-						volatile); //added by yrb
+						volat); //added by yrb
 		}
 		#ifdef DISABLED
 			/* This is a out of draft modification of AODV-UU to prevent

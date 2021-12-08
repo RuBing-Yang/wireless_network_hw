@@ -84,7 +84,7 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t life, u_int8_t state,
 				     u_int16_t flags, unsigned int ifindex,
-					 u_int8_t volatile=0) //added by yrb
+					 u_int8_t volat=0) //added by yrb
 {
 	hash_value hash;
 	unsigned int index;
@@ -123,7 +123,7 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 	rt->ifindex = ifindex;
 	rt->hash = hash;
 	rt->state = state;
-	rt->volatile = volatile; // added by yrb
+	rt->volat = volat; // added by yrb
 
 	timer_init(&rt->rt_timer, &NS_CLASS route_expire_timeout, rt);
 
@@ -194,7 +194,7 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t lifetime, u_int8_t state,
 				     u_int16_t flags,
-					 u_int8_t volatile=0) //added by yrb
+					 u_int8_t volat=0) //added by yrb
 {
 	struct in_addr nm;
 	nm.s_addr = 0;
@@ -241,7 +241,7 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 	rt->dest_seqno = seqno;
 	rt->next_hop = next;
 	rt->hcnt = hops;
-	rt->volatile = volatile; //added by yrb
+	rt->volat = volat; //added by yrb
 
 #ifdef CONFIG_GATEWAY
 	if (rt->flags & RT_GATEWAY)

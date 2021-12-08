@@ -359,7 +359,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 rev_rt->volatile); //added by yrb
+				 rev_rt->volat); //added by yrb
 		// by fxj: add nexts to rt_tbl
 		for (int i = 0; i < rrep_new_hcnt; i++) {
 			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -371,16 +371,16 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
 		   (rrep_seqno == fwd_rt->dest_seqno &&
 		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
-		   || (fwd_rt->volatile && !rev_rt->volatile))))  //added by yrb
+		   || (fwd_rt->volat && !rev_rt->volat))))  //added by yrb
 	{
 		pre_repair_hcnt = fwd_rt->hcnt;
 		pre_repair_flags = fwd_rt->flags;
 
-    	/* 传递volatile值 */
+    	/* 传递volat值 */
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rev_rt->volatile); //added by yrb
+					rev_rt->volat); //added by yrb
 		// by fxj: add nexts to rt_tbl
 		for (int i = 0; i < rrep_new_hcnt; i++) {
 			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];

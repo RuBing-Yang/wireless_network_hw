@@ -6,13 +6,13 @@
 
 #### 寻路过程
 
-- 当节点$n_j$接收到$n_s$发送的、上一条为$n_i$的RREQ寻路消息 `未过期 && 未被读过 && 传递的const值小于稳定概率阈值`时，认为这是$n_s$到$n_j$的不稳定的路由，暂时连接继续向目标节点$n_o$发送RREQ消息，并将$n_j$的路由表中$(n_s, n_i, n_j)$这一项的状态标志位`volatile`置1，记为不稳定
+- 当节点$n_j$接收到$n_s$发送的、上一条为$n_i$的RREQ寻路消息 `未过期 && 未被读过 && 传递的const值小于稳定概率阈值`时，认为这是$n_s$到$n_j$的不稳定的路由，暂时连接继续向目标节点$n_o$发送RREQ消息，并将$n_j$的路由表中$(n_s, n_i, n_j)$这一项的状态标志位`volat`置1，记为不稳定
 
 - 当上述节点$n_j$即为目标节点$n_o$时，照常发送RREP回复，并将路由表状态项置1，无需特殊处理
 
 <img src="https://s2.loli.net/2021/12/06/XxDnI4NeFGE7Kbl.png" alt="image-20211206225447921" style="zoom: 67%;" />
 
-- 当节点$n_j$对应的路由表中$(n_s, n_i, n_j)$有`volatile=1`，且收到`相同序列号 && 相同源节点 && const > Pmin`的RREQ消息时，认为找到了一条跳数较短的稳定路由，将$n_j$路由表中$n_s$对应路由表项的上一条$n_j$、跳数$ttp$进行更改，并将标志位`volatile`置0
+- 当节点$n_j$对应的路由表中$(n_s, n_i, n_j)$有`volat=1`，且收到`相同序列号 && 相同源节点 && const > Pmin`的RREQ消息时，认为找到了一条跳数较短的稳定路由，将$n_j$路由表中$n_s$对应路由表项的上一条$n_j$、跳数$ttp$进行更改，并将标志位`volat`置0
 
 <img src="https://s2.loli.net/2021/12/06/mXb5skH7v24VjiR.png" alt="image-20211206225447921" style="zoom: 67%;" />
 
@@ -37,42 +37,42 @@
 /* 用于标记该路由是否稳定 */
 struct rt_table
 {
-    u_int8_t volatile;  /* 不稳定为1 */
+    u_int8_t volat;  /* 不稳定为1 */
 }
-/* volatile参数 */
+/* volat参数 */
 rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                u_int8_t volatile);
+                u_int8_t volat);
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags
-                u_int8_t volatile);
+                u_int8_t volat);
 
 
 /*** routing_table.c ***/
-/* volatile参数 */
+/* volat参数 */
 rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                u_int8_t volatile=0)
+                u_int8_t volat=0)
 {
-    rt->volatile = volatile;
+    rt->volat = volat;
 }
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags
-                u_int8_t volatile=0)
+                u_int8_t volat=0)
 {
     
-	rt->volatile = volatile;
+	rt->volat = volat;
 }
 
 /* 函数rt_table_insert */
-    /* 添加参数u_int8_t volatile */
-	rt->volatile = volatile;
+    /* 添加参数u_int8_t volat */
+	rt->volat = volat;
 
 /* TODO: 邻居节点的invalidate(?) */
 
@@ -97,21 +97,21 @@ typedef struct {
     if (i < NUM_NODE) {
         cost *= this_host.hello_infos[i][channel].cost;
     }
-	int volatile = 0;
-	if (cost < COST_MIN) volatile = 1;
+	int volat = 0;
+	if (cost < COST_MIN) volat = 1;
 
     /* 前面路由不稳定的节点收到一条稳定的RREQ需要继续转发 */
     /* Check if this RREQ has been processed */
     if (rreq_record_find(rreq_orig, rreq_id)) {
         fwd_rt = rt_table_find(rreq_dest);
         /* Ignore already processed RREQs. */
-        if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volatile && volatile))
+        if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && volat))
         return;
     }
 
-	/* 建立反向路由添加volatile */
-	rt_table_insert(..., volatile);
-	rt_table_update(..., volatile);
+	/* 建立反向路由添加volat */
+	rt_table_insert(..., volat);
+	rt_table_update(..., volat);
 
 
 /*** aodv_rrep.h ***/
@@ -121,12 +121,12 @@ typedef struct {
 /*** aodv_rrep.c ***/
 /* 函数rrep_process */
     /* 更新正向路由 */
-    /* 传递volatile值 */
+    /* 传递volat值 */
 	if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
 		   (rrep_seqno == fwd_rt->dest_seqno &&
 		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt
-		   || (fwd_rt->volatile && !rev_rt->volatile)))) 
+		   || (fwd_rt->volat && !rev_rt->volat)))) 
 	{
 		pre_repair_hcnt = fwd_rt->hcnt;
 		pre_repair_flags = fwd_rt->flags;
@@ -134,7 +134,7 @@ typedef struct {
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rev_rt->volatile); 
+					rev_rt->volat); 
     } 
 ```
 
