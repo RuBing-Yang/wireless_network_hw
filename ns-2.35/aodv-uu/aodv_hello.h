@@ -45,8 +45,8 @@ NS_INLINE void hello_update_timeout(rt_table_t * rt, struct timeval *now,
 
 void update_stability();
 void  nb_add(in_addr ip_temp);
-int   NS_CLASS neighbor_id(struct in_addr ip_temp);    // fxj: return -1 if in nb_tbl, or id in nb_tbl
-void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel);  // fxj: send back valid neighbors in RREP
+int   neighbor_id(struct in_addr ip_temp);    // fxj: return -1 if in nb_tbl, or id in nb_tbl
+void  send_neighbor_table(struct in_addr dest, struct in_addr src, int channel);  // fxj: send back valid neighbors in RREP
 void  nb_update_cost(in_addr ip_temp,int channel,float cost_value);
 
 void  nb_setIsValid(in_addr ip_temp,int channel,int isValid);
