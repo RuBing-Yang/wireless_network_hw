@@ -495,6 +495,11 @@ Mac802_11::discard(Packet *p, const char* why)
 	}
 
 	switch(mh->dh_fc.fc_type) {
+		case MAC_Type_Reserved: {
+			Packet::free(p);
+		}
+		break;
+
 	case MAC_Type_Management:
 		switch(mh->dh_fc.fc_subtype) {
 		case MAC_Subtype_Auth:
@@ -1831,11 +1836,13 @@ Mac802_11::recv_timer()
         switch(subtype) {
         case MAC_Subtype_Noise:
             recvNoise(pktRx_);
+			break;
         default:
             fprintf(stderr, "recv_timer4:Invalid MAC Data Subtype %x\n",
                     subtype);
             exit(1);
         }
+		break;
 	/* End buaa g410 */
 	default:
 		fprintf(stderr, "recv_timer5:Invalid MAC Type %x\n", subtype);

@@ -552,7 +552,7 @@ Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qle
         set workMode_ [$ns get-workMode]
         set noiseChannel_ [$ns get-noiseChannel]
         if {$workMode_ != "" && $noiseChannel_ != ""} {
-            $mac set-workMode workMode_ noiseChannel_
+            $mac set-workMode $workMode_ $noiseChannel_
         }
     }
     # End buaa g410
