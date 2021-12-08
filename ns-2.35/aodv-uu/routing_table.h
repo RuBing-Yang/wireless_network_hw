@@ -66,7 +66,7 @@ struct rt_table {
     /* end yrb */
 
     // by fxj
-    struct in_addr all_nexts[MAX_NODE];
+    struct in_addr all_nexts[NUM_NODE];
     // fxj_end
 };
 

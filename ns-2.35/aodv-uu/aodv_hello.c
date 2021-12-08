@@ -240,6 +240,9 @@ if (USE_FXJ) {
     if (hello->n) {
         int nb_id = neighbor_id(hello_dest);
         if (nb_id != -1) {   // only proc nodes in nb_tbl
+#ifdef FXJ_OUT
+printf("fxj: node %d recvd Hello(N=1) from node %d\n", (int)(this_host.ipaddr), (int)(hello->dest_addr));
+#endif
             send_neighbor_table(this_host.ipaddr, hello->dest_addr, channel);
         }  
     } else {
@@ -700,13 +703,32 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
 //cyo_end
 
 //fxj_todo
-void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel) {
+void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel, int device_i) {
     RREP *rrep = rrep_create(0, 0, 0, this_host.ipaddr,
     	                   this_host.seqno,
-    	                   DEV_NR(i).ipaddr,
-    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
-    	rrep->t = 1;
-    	dest.s_addr = AODV_BROADCAST;
-    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &DEV_NR(i));
+    	                   DEV_NR(device_i).ipaddr,
+    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
+    rrep->t = 1;
+    rrep->hcnt = 0;
+    for (int i = 0; i < NUM_NODE; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (this_host.nb_tbl[i][j].isValid) {
+                rrep->union_data.nexts[rrep->hcnt++] = this_host.nb_tbl[i][j].ipaddr;
+                break;
+            }
+        }
+    }
+#ifdef FXJ_OUT
+    printf("node %d send nb_tbl to node %d, containing %d valid neighbors. ", (int)src, (int)dest, rrep->hcnt);
+    if (rrep->hcnt > 0) {
+        printf("(");
+        for (int i = 0; i < rrep->hcnt; i++)
+            printf("%d, ", (int)(rrep->union_data.nexts[i]));
+        printf(")\n");
+    } else {
+        printf("\n");
+    }
+#endif
+    aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &DEV_NR(device_i));
 }
 // fxj_end
