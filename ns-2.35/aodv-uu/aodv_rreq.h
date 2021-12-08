@@ -93,7 +93,7 @@ RREQ *rreq_create(u_int8_t flags, struct in_addr dest_addr,
 		  u_int32_t dest_seqno, struct in_addr orig_addr);
 void rreq_send(struct in_addr dest_addr, u_int32_t dest_seqno, int ttl,
 	       u_int8_t flags);
-void rreq_forward(RREQ * rreq, int size, int ttl, float cost);
+void rreq_forward(RREQ * rreq, int size, int ttl);
 void rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		  struct in_addr ip_dst, int ip_ttl, unsigned int ifindex);
 void rreq_route_discovery(struct in_addr dest_addr, u_int8_t flags,

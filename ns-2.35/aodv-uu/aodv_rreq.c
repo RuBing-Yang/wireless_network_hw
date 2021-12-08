@@ -568,7 +568,8 @@ if (USE_FXJ) {
 	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
 			src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
 #endif
-	for (int i = 0; i < MAX_NR_INTERFACES; i++) {
+	int i;
+	for (i = 0; i < MAX_NR_INTERFACES; i++) {
     	if (!DEV_NR(i).enabled) continue;
     	RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
     	                   this_host.seqno,
@@ -577,7 +578,7 @@ if (USE_FXJ) {
     	rrep->n = 1;
     	// struct in_addr dest; //yrb
 		// dest.s_addr = AODV_BROADCAST; //yrb
-    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &DEV_NR(i));
+    	aodv_socket_send((AODV_msg *) rrep, AODV_BROADCAST, RREQ_SIZE, 1, &(DEV_NR(i)));
     }
 } else {
     rreq_send(rt->dest_addr, rt->dest_seqno, ttl, flags);
