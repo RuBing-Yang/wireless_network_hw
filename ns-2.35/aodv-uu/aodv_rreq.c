@@ -195,15 +195,20 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	/* 计算当前链路的cost值 */
 	int i;
 	int channel = rreq->channel;
-    for (i = 0; i < NUM_NODE; i++) {
-        if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_src)) {
-            break;
-        }
-    }
-	if (i < NUM_NODE) {
-		cost *= this_host.hello_infos[i][channel].cost;
+	if (USE_YRB) {
+		for (i = 0; i < NUM_NODE; i++) {
+			if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_src)) {
+				break;
+			}
+		}
+		if (i < NUM_NODE) {
+			cost *= this_host.nb_tbl[i][channel].cost;
+		}
+		if (cost < COST_MIN) volat = 1;
+	} else {
+		cost = 1;
+		volat = 0;
 	}
-	if (cost < COST_MIN) volat = 1;
 	/* end yrb */
 
     /* Ignore RREQ's that originated from this node. Either we do this
@@ -281,7 +286,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     if (rev_rt == NULL) {
 		DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
 			ip_to_str(rreq_orig));
-		
+
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
 					volat); //added by yrb
