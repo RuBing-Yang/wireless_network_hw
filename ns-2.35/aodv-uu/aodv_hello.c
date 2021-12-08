@@ -241,9 +241,11 @@ if (USE_FXJ) {
         int nb_id = neighbor_id(hello_dest);
         if (nb_id != -1) {   // only proc nodes in nb_tbl
 #ifdef FXJ_OUT
-printf("fxj: node %d recvd Hello(N=1) from node %d\n", (int)(this_host.ipaddr), (int)(hello->dest_addr));
+printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
 #endif
-            send_neighbor_table(this_host.ipaddr, hello->dest_addr, channel);
+            struct in_addr temp;
+            memcpy(&temp, &hello->dest_addr, sizeof(u_int32_t));
+            send_neighbor_table(DEV_NR(i).ipaddr, temp, channel, i);
         }  
     } else {
         for (int j = 0; j < NUM_NODE; j++) {
@@ -704,7 +706,7 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
 
 //fxj_todo
 void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel, int device_i) {
-    RREP *rrep = rrep_create(0, 0, 0, this_host.ipaddr,
+    RREP *rrep = rrep_create(0, 0, 0, src,
     	                   this_host.seqno,
     	                   DEV_NR(device_i).ipaddr,
     	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
@@ -719,11 +721,11 @@ void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int 
         }
     }
 #ifdef FXJ_OUT
-    printf("node %d send nb_tbl to node %d, containing %d valid neighbors. ", (int)src, (int)dest, rrep->hcnt);
+    printf("node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
     if (rrep->hcnt > 0) {
         printf("(");
         for (int i = 0; i < rrep->hcnt; i++)
-            printf("%d, ", (int)(rrep->union_data.nexts[i]));
+            printf("%d, ", rrep->union_data.nexts[i]);
         printf(")\n");
     } else {
         printf("\n");
