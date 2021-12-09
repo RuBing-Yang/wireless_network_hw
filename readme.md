@@ -1,5 +1,37 @@
 # 2021无线网络课设
 
+[toc]
+
+## 当前问题
+
+如下图所示：
+
+<img src="https://s2.loli.net/2021/12/10/Lu1AGBayW2EC3dD.png" alt="image-20211210063300164" style="zoom: 80%;" /><img src="https://s2.loli.net/2021/12/10/2HWJ3ECUOszR8Nq.png" alt="image-20211210063454379" style="zoom: 80%;" />
+
+猜测问题：
+
+①链路cost=0
+
+②RREP_ACK会导致Segmetation fault
+
+## 验证场景
+
+### 单元初步验证场景
+
+脚本在`documents/try_yrb.tcl`
+
+一共6个mobilnode，1个noisenode⑥，1-40s时节点①向④发送消息，如下图所示：
+
+<img src="https://s2.loli.net/2021/12/10/jYFfhePxBOKlEwk.png" alt="image-20211210062408852" style="zoom: 67%;" />
+
+原AODV方案默认选择路由①-⑤-④（因为跳数少路程短），但是由于noisenode⑥的干扰该路由不稳定
+
+计划通过**第三单元**，选择路由①-②-③-④
+
+在第20s时，节点③会移动到稍远处，导致③④断路，计划通过**第四单元**快速修复路由为①-②-③-0-④
+
+<img src="https://s2.loli.net/2021/12/10/91SYwHs5o8vQtEr.png" alt="image-20211210064422951" style="zoom:67%;" />
+
 ## 设计方案
 
 ### 第三单元
@@ -171,7 +203,7 @@ typedef struct {
 ```
 
 
-### fxj_part
+### 第四单元
 #### RREP 消息变更
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
