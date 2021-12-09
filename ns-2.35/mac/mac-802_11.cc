@@ -326,7 +326,7 @@ Mac802_11::command(int argc, const char*const* argv)
     if (argc == 4) {
         if (strcmp(argv[1], "set-workMode") == 0) {
             workMode = atoi(argv[2]);
-            noiseChannel = atoi(argv[3]);
+            //noiseChannel = atoi(argv[3]);
             noiseInterval = 0.01;
             if (workMode < 0) {
                 mhNoise_.start(noiseInterval);

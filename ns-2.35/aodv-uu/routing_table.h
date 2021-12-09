@@ -63,6 +63,7 @@ struct rt_table {
     /* added by yrb */
     /* 用于标记该路由是否稳定 */
     u_int8_t volat;  /* 不稳定为1 */
+    u_int8_t channel; /* 使用的信道，取值{1,2,3} */
     /* end yrb */
 
     // by fxj
@@ -117,11 +118,11 @@ rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                u_int8_t volat);
+                u_int8_t volat, u_int8_t channel);
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags,
-                u_int8_t volat);
+                u_int8_t volat, u_int8_t channel);
 /* end yrb */
 
 

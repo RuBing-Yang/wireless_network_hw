@@ -359,7 +359,10 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 rev_rt->volat); //added by yrb
+				 rev_rt->volat, rev_rt->channel); //added by yrb
+		if (YRB_OUT) {
+			printf("[yrb]RREP插入正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
+		}
 		// by fxj: add nexts to rt_tbl
 		for (int i = 0; i < rrep_new_hcnt; i++) {
 			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -373,6 +376,11 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
 		   || (fwd_rt->volat && !rev_rt->volat))))  //added by yrb
 	{
+		
+		if (YRB_OUT) {
+			printf("[yrb]RREP更新正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
+		}
+		
 		pre_repair_hcnt = fwd_rt->hcnt;
 		pre_repair_flags = fwd_rt->flags;
 
@@ -380,7 +388,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rev_rt->volat); //added by yrb
+					rev_rt->volat, rev_rt->channel); //added by yrb
+
 		// by fxj: add nexts to rt_tbl
 		for (int i = 0; i < rrep_new_hcnt; i++) {
 			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -422,7 +431,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	     * gateway... */
 	    if (!inet_rt) {
 			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
-				rrep_lifetime, VALID, RT_INET_DEST, ifindex);
+				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
+				rev_rt->volat, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -431,7 +441,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
 			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
 							rrep_lifetime, VALID, RT_INET_DEST |
-							inet_rt->flags);
+							inet_rt->flags,
+				 			rev_rt->volat, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];

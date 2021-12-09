@@ -60,9 +60,6 @@ typedef struct {
     u_int32_t dest_seqno;
     u_int32_t orig_addr;
     u_int32_t orig_seqno;
-    /* by gcy */
-    u_int32_t channel;
-    /* end */
 
     /* by yrb */
     /* 回路稳定概率，为链路稳定性概率乘积 */

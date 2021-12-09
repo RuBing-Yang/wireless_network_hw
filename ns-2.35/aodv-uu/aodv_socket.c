@@ -218,6 +218,30 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 	//
 	// fxj_notes: Hellos include requests for neighbors' nb_tbl, all proced in hello_process
 	//
+	
+	if (YRB_OUT) {
+		switch(aodv_msg->type) {
+			case AODV_HELLO:
+				printf("[socket process]AODV_HELLO\n");
+				break;
+			case AODV_RREQ:
+				printf("[socket process]AODV_RREQ\n");
+				break;
+			case AODV_RREP:
+				printf("[socket process]AODV_HELLO && AODV_RREP\n");
+				break;
+			case AODV_RERR:
+				printf("[socket process]AODV_RERR\n");
+				break;
+			case AODV_RREP_ACK:
+				printf("[socket process]AODV_RREP_ACK\n");
+				break;
+			default:
+				printf("[socket process]not known type");
+		}
+	}
+
+
     if ((aodv_msg->type == AODV_RREP && ttl == 1 &&
 	 dst.s_addr == AODV_BROADCAST)) {
 	hello_process((RREP *) aodv_msg, len, ifindex);
@@ -266,6 +290,10 @@ void NS_CLASS recvAODVUUPacket(Packet * p)
     dst.s_addr = ih->daddr();
     len = ch->size() - IP_HDR_LEN;
     ttl = ih->ttl();
+
+	if (YRB_OUT) {
+		printf("[aodv_socket] recvAODVUUPacket packet_t [%d]\n", ch->ptype());
+	}
 
     AODV_msg *aodv_msg = (AODV_msg *) recv_buf;
 
@@ -372,6 +400,28 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
     int retval = 0;
     struct timeval now;
     /* Rate limit stuff: */
+
+	if (YRB_OUT) {
+		switch(aodv_msg->type) {
+			case AODV_HELLO:
+				printf("[socket send]AODV_HELLO\n");
+				break;
+			case AODV_RREQ:
+				printf("[socket send]AODV_RREQ\n");
+				break;
+			case AODV_RREP:
+				//printf("[socket send]AODV_RREP\n");
+				break;
+			case AODV_RERR:
+				printf("[socket send]AODV_RERR\n");
+				break;
+			case AODV_RREP_ACK:
+				printf("[socket send]AODV_RREP_ACK\n");
+				break;
+			default:
+				printf("[socket]not known type");
+		}
+	}
 
 #ifndef NS_PORT
 
@@ -502,7 +552,9 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
 
 #ifdef NS_PORT
 	ch->addr_type() = NS_AF_NONE;
-
+	if (YRB_OUT) {
+		printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
+	}
 	sendPacket(p, dst, 0.0);
 #else
 

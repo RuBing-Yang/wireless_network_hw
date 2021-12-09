@@ -82,6 +82,7 @@
 
 #define MAX_NR_INTERFACES 10
 #define MAX_IFINDEX (MAX_NR_INTERFACES - 1)
+#define CHANNEL_NUM 3 
 
 #if !defined(IFNAMSIZ)
 #define IFNAMSIZ 16
@@ -109,9 +110,9 @@
 
 /* added by cyo & gcy */
 /*是否打印printf内容 */
-#define GCY_OUT 1
+#define GCY_OUT 0
 #define CYO_OUT 0
-#define YRB_OUT 0
+#define YRB_OUT 1
 #define FXJ_OUT 0
 #define GLO_OUT 1
 /* end */

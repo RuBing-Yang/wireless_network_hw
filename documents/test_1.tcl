@@ -158,18 +158,3 @@ $ns_ at $val(stop) "$ns_ nam-end-wireless $val(stop)"
 $ns_ at $val(stop) "finish"
 $ns_ at $val(stop) "puts \"done\" ; $ns_ halt"
 $ns_ run
-
-
-
-
-
-
-
-
-
-
-
---
-
-祝工作、学习顺利！
-                        冯鹏

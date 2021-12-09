@@ -14,7 +14,9 @@ set val(rp) AODVUU ;# routing protocol
 set val(x) 1000 ;# X dimension of topography
 set val(y) 1000 ;# Y dimension of topography
 set val(stop) 42 ;# nam stop time
-set val(nn) 9 ;# number of mobilenodes
+set val(nn) 6 ;# number of mobilenodes
+set val(nnoise) 1 ;# number of noise nodes
+set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
 set pktsize 1000 ;# packet size in bytes
@@ -42,6 +44,8 @@ $ns_ namtrace-all-wireless $namfile $val(x) $val(y)
 for {set i 0} {$i < $val(nc)} {incr i} {
     set chan($i) [new $val(chan)]
 }
+
+
 #======================================
 # Mobile Node Parameter Setup
 #======================================
@@ -61,7 +65,7 @@ $ns_ node-config -adhocRouting $val(rp) \
                 -movementTrace OFF \
                 -ifNum $val(ni)    \
                 -workMode 0 \
-                -noiseChannel 0
+                -noiseChannel $chan(0)
 #======================================
 # Nodes Definition
 #======================================
@@ -70,7 +74,6 @@ $ns_ change-numifs $val(nc)
 for {set i 0} {$i < $val(nc)} {incr i} {
     $ns_ add-channel $i $chan($i)
 }
-
 # Create nodes
 puts "begin to create nodes"
 for {set i 0} {$i < $val(nn)} {incr i} {
@@ -81,115 +84,123 @@ puts "created nodes"
 
 # Set node positions in horizontal chain topology
 
-$n(0) set X_ 791
-$n(0) set Y_ 623
-$n(0) set Z_ 0.0
-$ns_ initial_node_pos $n(0) 20
-
-$n(1) set X_ 295
-$n(1) set Y_ 668
+$n(1) set X_ 83
+$n(1) set Y_ 274
 $n(1) set Z_ 0.0
-$ns_ initial_node_pos $n(1) 20
+$ns initial_node_pos $n(1) 20
 
-$n(2) set X_ 477
-$n(2) set Y_ 818
+$n(2) set X_ 165
+$n(2) set Y_ 445
 $n(2) set Z_ 0.0
-$ns_ initial_node_pos $n(2) 20
+$ns initial_node_pos $n(2) 20
 
-$n(3) set X_ 610
-$n(3) set Y_ 630
+$n(3) set X_ 394
+$n(3) set Y_ 445
 $n(3) set Z_ 0.0
-$ns_ initial_node_pos $n(3) 20
+$ns initial_node_pos $n(3) 20
 
-$n(4) set X_ 456
-$n(4) set Y_ 545
+$n(4) set X_ 457
+$n(4) set Y_ 268
 $n(4) set Z_ 0.0
-$ns_ initial_node_pos $n(4) 20
+$ns initial_node_pos $n(4) 20
 
-$n(5) set X_ 228
-$n(5) set Y_ 433
+$n(5) set X_ 280
+$n(5) set Y_ 184
 $n(5) set Z_ 0.0
-$ns_ initial_node_pos $n(5) 20
+$ns initial_node_pos $n(5) 20
 
-$n(6) set X_ 477
-$n(6) set Y_ 423
+$n(6) set X_ 554
+$n(6) set Y_ 431
 $n(6) set Z_ 0.0
-$ns_ initial_node_pos $n(6) 20
-
-$n(7) set X_ 355
-$n(7) set Y_ 250
-$n(7) set Z_ 0.0
-$ns_ initial_node_pos $n(7) 20
-
-$n(8) set X_ 698
-$n(8) set Y_ 393
-$n(8) set Z_ 0.0
-$ns_ initial_node_pos $n(8) 20
+$ns initial_node_pos $n(6) 20
 
 # Set links between the nodes
+
 $ns_ duplex-link $n(1) $n(2) 2Mb 10ms DropTail
-$ns_ duplex-link $n(1) $n(4) 2Mb 10ms DropTail
-$ns_ duplex-link $n(1) $n(5) 2Mb 10ms DropTail
 $ns_ duplex-link $n(2) $n(3) 2Mb 10ms DropTail
-$ns_ duplex-link $n(4) $n(3) 2Mb 10ms DropTail
+$ns_ duplex-link $n(3) $n(4) 2Mb 10ms DropTail
+$ns_ duplex-link $n(1) $n(5) 2Mb 10ms DropTail
+$ns_ duplex-link $n(5) $n(4) 2Mb 10ms DropTail
 $ns_ duplex-link $n(3) $n(6) 2Mb 10ms DropTail
 $ns_ duplex-link $n(4) $n(6) 2Mb 10ms DropTail
-$ns_ duplex-link $n(5) $n(6) 2Mb 10ms DropTail
-$ns_ duplex-link $n(5) $n(7) 2Mb 10ms DropTail
-$ns_ duplex-link $n(7) $n(6) 2Mb 10ms DropTail
-$ns_ duplex-link $n(3) $n(0) 2Mb 10ms DropTail
-$ns_ duplex-link $n(6) $n(8) 2Mb 10ms DropTail
-$ns_ duplex-link $n(0) $n(8) 2Mb 10ms DropTail
 
-$ns_ duplex-link-op $n(1) $n(2) orient right-up
-$ns_ duplex-link-op $n(1) $n(4) orient right-down
-$ns_ duplex-link-op $n(1) $n(5) orient down
-$ns_ duplex-link-op $n(2) $n(3) orient right-down
-$ns_ duplex-link-op $n(4) $n(3) orient right-up
-$ns_ duplex-link-op $n(3) $n(6) orient down
-$ns_ duplex-link-op $n(4) $n(6) orient right-down
-$ns_ duplex-link-op $n(5) $n(6) orient right
-$ns_ duplex-link-op $n(5) $n(7) orient right-down
-$ns_ duplex-link-op $n(7) $n(6) orient right-up
-$ns_ duplex-link-op $n(3) $n(0) orient right-down
-$ns_ duplex-link-op $n(6) $n(8) orient right-down
-$ns_ duplex-link-op $n(0) $n(8) orient down
+$ns_ duplex-link-op $n(1) $n(2) orient up
+$ns_ duplex-link-op $n(2) $n(3) orient right
+$ns_ duplex-link-op $n(3) $n(4) orient down
+$ns_ duplex-link-op $n(1) $n(5) orient right-down
+$ns_ duplex-link-op $n(5) $n(4) orient right-up
+$ns_ duplex-link-op $n(3) $n(6) orient right-down
+$ns_ duplex-link-op $n(4) $n(6) orient right-up
+
+
+#======================================
+# add Noise Node
+#======================================
+$ns_ node-config -adhocRouting $val(rp) \
+                -llType $val(ll) \
+                -macType $val(mac) \
+                -ifqType $val(ifq) \
+                -ifqLen $val(ifqlen) \
+                -antType $val(ant) \
+                -propType $val(prop) \
+                -phyType $val(netif) \
+                -channel $chan(0) \
+                -topoInstance $topo \
+                -agentTrace ON \
+                -routerTrace ON \
+                -macTrace OFF \
+                -movementTrace OFF \
+                -ifNum $val(ni)    \
+                -workMode -1 \
+                -noiseChannel $chan(0)
+
+# Create nodes
+puts "begin to create noise nodes"
+for {set i 0} {$i < $val(nnoise)} {incr i} {
+    set nnoise($i) [$ns_ node]
+    $god_ new_node $nnoise($i)
+}
+puts "created noise nodes"
+
+$nnoise(0) set X_ 277
+$nnoise(0) set Y_ 449
+$nnoise(0) set Z_ 0.0
+$nnoise(0) initial_node_pos $n11 20
+
 
 #======================================
 # UDP Agents Definition
 #======================================
 set last_node_id [expr $val(nn)-1]
 
-set udp0 [new Agent/UDP]
-$ns_ attach-agent $n(1) $udp0
-set null0 [new Agent/Null]
-$ns_ attach-agent $n(6) $null0
-$ns_ connect $udp0 $null0
-
-set udp1 [new Agent/UDP]
-$ns_ attach-agent $n(1) $udp1
-set null1 [new Agent/Null]
-$ns_ attach-agent $n(8) $null1
-$ns_ connect $udp1 $null1
+puts "begin to definite UDP Agent"
+for {set i 0} {$i < $val(nm)} {incr i} {
+    set udp($i) [new Agent/UDP]
+    $ns_ attach-agent $n(1) $udp($i)
+    set null($i) [new Agent/Null]
+    $ns_ attach-agent $n(6) $null($i)
+    $ns_ connect $udp($i) $null($i)
+}
+puts "definite UDP Agent"
 
 
 #======================================
 # Applications Definition
 #======================================
 # Setup CBR Application over UDP connection
-set cbr0 [new Application/Traffic/CBR]
-$cbr0 attach-agent $udp0
-$cbr0 set packetSize_ $pktsize
-$cbr0 set interval_ $pktrate
-$ns_ at 1.0 "$cbr0 start"
-$ns_ at 20.0 "$cbr0 stop"
+puts "begin to Setup CBR Application"
+for {set i 0} {$i < $val(nm)} {incr i} {
+    $cbr($i) attach-agent $udp($i)
+    $cbr($i) set packetSize_ $pktsize
+    $cbr($i) set interval_ $pktrate
+    $ns_ at 1.0 "$cbr($i) start"
+    $ns_ at 40.0 "$cbr($i) stop"
+}
+puts "Setup CBR Application over UDP connection"
 
-set cbr1 [new Application/Traffic/CBR]
-$cbr1 attach-agent $udp1
-$cbr1 set packetSize_ $pktsize
-$cbr1 set interval_ $pktrate
-$ns_ at 25.0 "$cbr1 start"
-$ns_ at 40.0 "$cbr1 stop"
+# n(3) move and link(n(3)-n(4)) break
+$ns_ at 20.0 "$n(3) setdest 364 562 0"
+# link 3->4 should change to 3->6->4
 
 
 #======================================

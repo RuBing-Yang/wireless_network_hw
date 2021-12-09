@@ -551,7 +551,7 @@ Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qle
     if {$mactype == "Mac/802_11"} {
         set workMode_ [$ns get-workMode]
         set noiseChannel_ [$ns get-noiseChannel]
-        if {$workMode_ != "" && $noiseChannel_ != ""} {
+        if {$workMode_ != "" && $noiseChannel_ != "" && $channel == $noiseChannel_} {
             $mac set-workMode $workMode_ $noiseChannel_
         }
     }

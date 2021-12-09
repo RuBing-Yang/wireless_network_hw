@@ -29,26 +29,35 @@
 #define USE_YRB 1
 #define USE_FXJ 1
 
+/* 通道数目 */
+#define CHANNEL_NUM 3 
+
 /* 稳定概率阈值 */
 #define COST_MIN 0.8
 
 
+/*** aodv-uu.cc ***/
+/* 发送RREQ和RREP
+
+
 /*** routing_table.h ***/
-/* 用于标记该路由是否稳定 */
+/* 标记该路由是否稳定 */
+/* 标记该路由选择使用的信道 */
 struct rt_table
 {
     u_int8_t volat;  /* 不稳定为1 */
+    u_int8_t channel; 
 }
 /* volat参数 */
 rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                u_int8_t volat);
+                u_int8_t volat, u_int8_t channel);
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags
-                u_int8_t volat);
+                u_int8_t volat, u_int8_t channel);
 
 
 /*** routing_table.c ***/
@@ -57,17 +66,18 @@ rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                u_int8_t volat=0)
+                u_int8_t volat=0, u_int8_t channel)
 {
     rt->volat = volat;
+    rt->channel = channel;
 }
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags
-                u_int8_t volat=0)
+                u_int8_t volat=0, u_int8_t channel)
 {
-    
-	rt->volat = volat;
+    rt->volat = volat;
+    rt->channel = channel;
 }
 
 /* 函数rt_table_insert */
@@ -81,24 +91,38 @@ rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 /* 回路稳定概率，为链路稳定性概率乘积 */
 typedef struct {
     float cost;
+    /* 注意：channel不再在消息中传递，收到RREQ时选择channel直接存入路由表， */
 } RREQ;
 
 
 /*** aodv_rreq.c ***/
 /* rreq_process */
-    /* 计算当前链路的cost值 */
-    float cost = rreq->cost; 
-    int i;
-    for (i = 0; i < NUM_NODE; i++) {
-        if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_src)) {
-            break;
-        }
-    }
-    if (i < NUM_NODE) {
-        cost *= this_host.hello_infos[i][channel].cost;
-    }
 	int volat = 0;
-	if (cost < COST_MIN) volat = 1;
+	int channel = 0;
+	float cost = rreq->cost;
+    /* 计算当前链路的cost值 */
+    float max_cost = 0;
+	if (USE_YRB) {
+		for (int channel_i = 0; channel_i < CHANNEL_NUM; channel_i++) {
+			for (i = 0; i < NUM_NODE; i++) {
+				if (hash_cmp(&(this_host.hello_infos[i][channel_i].ipaddr), &ip_src)) {
+					break;
+				}
+			}
+			if (i < NUM_NODE) {
+				float temp = this_host.nb_tbl[i][channel_i].cost;
+				if (temp > max_cost) {
+					channel = channel_i;
+					max_cost = temp;
+				}
+			}
+		}
+		cost *= max_cost;
+		if (cost < COST_MIN) volat = 1;
+	} else {
+		cost = 1;
+		volat = 0;
+	}
 
     /* 前面路由不稳定的节点收到一条稳定的RREQ需要继续转发 */
     /* Check if this RREQ has been processed */
@@ -109,19 +133,27 @@ typedef struct {
         return;
     }
 
-	/* 建立反向路由添加volat */
-	rt_table_insert(..., volat);
-	rt_table_update(..., volat);
+	/* 建立反向路由添加volat和channel */
+	rt_table_insert(..., volat, channel);
+	rt_table_update(..., volat, channel);
 
 
 /*** aodv_rrep.h ***/
 /* 对不起我发现我不需要update_next_hop了 */
+/* 注意：channel不再在消息中传递，收到RREQ时选择channel直接存入路由表， */
 
 
 /*** aodv_rrep.c ***/
 /* 函数rrep_process */
     /* 更新正向路由 */
     /* 传递volat值 */
+	/* 正向路由表不存在：直接插入路由表 */
+    if (!fwd_rt) {
+		fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
+				 rrep_lifetime, VALID, rt_flags, ifindex,
+				 rev_rt->volat, rev_rt->channel);
+    }
+	/* 当序列号更新、原正向路由表无效、现路由更短、原正向路由不稳定现路由稳定时：更新路由表 */
 	if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
 		   (rrep_seqno == fwd_rt->dest_seqno &&
@@ -134,7 +166,7 @@ typedef struct {
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rev_rt->volat); 
+				 	rev_rt->volat, rev_rt->channel); 
     } 
 ```
 
@@ -160,8 +192,8 @@ typedef struct {
     |                          Union (data)               			|
     |                                                               |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   
+
    新增位 N：仅能在 Hello 消息中置 1，表示向所有邻居索要它们的邻居表。每个接收到这个广播的邻居都通过消息RREP(T=1)发回自己的邻居表
-   
+
    新增位 T：收到Hello(N=1)后，若该节点已经有邻居记录，则发回有效的邻居表（T置1）
 

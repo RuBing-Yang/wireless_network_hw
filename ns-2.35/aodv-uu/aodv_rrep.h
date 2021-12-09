@@ -73,10 +73,6 @@ typedef struct {
     /* by gcy */
     u_int32_t channel;
     /* end */
-    
-    /* by yrb */
-
-    /* end yrb */
 
     //by cyo & fxj
     union rrep_union union_data;

@@ -2333,11 +2333,11 @@ Simulator instproc ifNum {val} {
     $self set numifs_ $val
 }
 
-Simulator instproc workMode {val} {
+Simulator instproc workMode { val} {
     $self set workMode_ $val
 }
 
-Simulator instproc noiseChannel{val} {
+Simulator instproc noiseChannel{ val} {
     $self set noiseChannel_ $val
 }
 

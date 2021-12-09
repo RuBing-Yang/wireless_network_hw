@@ -86,7 +86,7 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 				     u_int32_t life, u_int8_t state,
 				     u_int16_t flags, unsigned int ifindex)
 {
-	rt_table_insert(dest_addr, next, hops, seqno, life, state, flags, ifindex, 0);
+	rt_table_insert(dest_addr, next, hops, seqno, life, state, flags, ifindex, 0, 0);
 }
 /* end yrb */
 
@@ -95,7 +95,7 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t life, u_int8_t state,
 				     u_int16_t flags, unsigned int ifindex,
-					 u_int8_t volat) //added by yrb
+					 u_int8_t volat, u_int8_t channel) //added by yrb
 {
 	hash_value hash;
 	unsigned int index;
@@ -135,6 +135,7 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 	rt->hash = hash;
 	rt->state = state;
 	rt->volat = volat; // added by yrb
+    rt->channel = channel; // added by yrb
 
 	timer_init(&rt->rt_timer, &NS_CLASS route_expire_timeout, rt);
 
@@ -207,7 +208,7 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 				     u_int32_t lifetime, u_int8_t state,
 				     u_int16_t flags)
 {
-	 rt_table_update(rt, next, hops, seqno, lifetime, state, flags, 0);
+	 rt_table_update(rt, next, hops, seqno, lifetime, state, flags, 0, 0);
 }
 /* end yrb */
 
@@ -215,7 +216,7 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 				     u_int8_t hops, u_int32_t seqno,
 				     u_int32_t lifetime, u_int8_t state,
 				     u_int16_t flags,
-					 u_int8_t volat) //added by yrb
+					 u_int8_t volat, u_int8_t channel) //added by yrb
 {
 	struct in_addr nm;
 	nm.s_addr = 0;
@@ -263,6 +264,7 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 	rt->next_hop = next;
 	rt->hcnt = hops;
 	rt->volat = volat; //added by yrb
+    rt->channel = channel; // added by yrb
 
 #ifdef CONFIG_GATEWAY
 	if (rt->flags & RT_GATEWAY)
