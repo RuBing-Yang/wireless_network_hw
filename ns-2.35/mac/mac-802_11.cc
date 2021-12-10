@@ -323,13 +323,20 @@ Mac802_11::command(int argc, const char*const* argv)
                         return (TCL_OK);
         }
 	}
-    if (argc == 4) {
+    if (argc == 5) {
         if (strcmp(argv[1], "set-workMode") == 0) {
             workMode = atoi(argv[2]);
-            //noiseChannel = atoi(argv[3]);
+            noiseChannel = atoi(argv[3]);
+            currChannel = atoi(argv[4]);
             noiseInterval = 0.01;
             if (workMode < 0) {
-                mhNoise_.start(noiseInterval);
+                if (noiseChannel >= 0 && currChannel == noiseChannel) {
+                    mhNoise_.start(noiseInterval);
+                } else if (noiseChannel >= 0 && currChannel != noiseChannel) {
+                   ;
+                } else if (noiseChannel < 0) {
+                    mhNoise_.start(noiseInterval);
+                }
             }
             return TCL_OK;
         }
@@ -495,11 +502,10 @@ Mac802_11::discard(Packet *p, const char* why)
 	}
 
 	switch(mh->dh_fc.fc_type) {
-		case MAC_Type_Reserved: {
-			Packet::free(p);
-		}
-		break;
-
+        case MAC_Type_Reserved: {
+            Packet::free(p);
+        }
+            break;
 	case MAC_Type_Management:
 		switch(mh->dh_fc.fc_subtype) {
 		case MAC_Subtype_Auth:
@@ -1836,13 +1842,13 @@ Mac802_11::recv_timer()
         switch(subtype) {
         case MAC_Subtype_Noise:
             recvNoise(pktRx_);
-			break;
+                break;
         default:
             fprintf(stderr, "recv_timer4:Invalid MAC Data Subtype %x\n",
                     subtype);
             exit(1);
         }
-		break;
+            break;
 	/* End buaa g410 */
 	default:
 		fprintf(stderr, "recv_timer5:Invalid MAC Type %x\n", subtype);
@@ -3349,7 +3355,8 @@ Mac802_11::noiseHandler()
 void
 Mac802_11::recvNoise(Packet *p)
 {
-    noisePower = p->txinfo_.RxPr;
+    noisePower = p->txinfo_.RxPr * 100000000;
+    // printf("recv-%f\n", noisePower);
     noiseFlag = 1;
     validInterval = 2;
     if (mhValid_.busy()) {
@@ -3377,6 +3384,7 @@ Mac802_11::getNoiseFlag()
 double
 Mac802_11::getNoisePower()
 {
+    // printf("get-%f\n", 10000*noisePower);
     return noisePower;
 }
 
@@ -3386,12 +3394,12 @@ Mac802_11::getNoisePower()
 double
 Mac802_11::getInfoPower()
 {
-    return infoPower * 10000;
+    return 10000 * infoPower;
 }
 
 double
 Mac802_11::getInfoNoiseRatio()
 {
-    return getInfoPower() / getNoisePower();
+    return getInfoPower() / (getNoisePower() + 0.00001);
 }
 /* end */

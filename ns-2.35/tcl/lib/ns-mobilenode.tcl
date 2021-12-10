@@ -42,7 +42,7 @@
 # The ARPTable class
 #======================================================================
 ARPTable instproc init args {
-	eval $self next $args		;# parent class constructor
+        eval $self next $args		;# parent class constructor
 }
 
 ARPTable set bandwidth_         0
@@ -59,19 +59,19 @@ Node/MobileNode instproc init args {
 #  	$self attach-node $node
 #  	$node port-notify $self
 
-	eval $self next $args
+        eval $self next $args
 
-	$self instvar nifs_ arptable_ X_ Y_ Z_ nodetype_
-	set X_ 0.0
-	set Y_ 0.0
-	set Z_ 0.0
+        $self instvar nifs_ arptable_ X_ Y_ Z_ nodetype_
+        set X_ 0.0
+        set Y_ 0.0
+        set Z_ 0.0
 
-	# Modified by buaa g410
-    set arptable_(0) ""
-	set nifs_ 0		;# number of network interfaces
-	# End buaa g410
-	# Mobile IP node processing
-    $self makemip-New$nodetype_
+# Modified by buaa g410
+        set arptable_(0) ""
+        set nifs_ 0		;# number of network interfaces
+# End buaa g410
+# Mobile IP node processing
+        $self makemip-New$nodetype_
 }
 
 #----------------------------------------------------------------------
@@ -90,91 +90,91 @@ Node/MobileNode instproc makemip-New {} {
 }
 
 Node/MobileNode instproc makemip-NewMIPBS {} {
-	$self instvar regagent_ encap_ decap_ agents_ id_
+$self instvar regagent_ encap_ decap_ agents_ id_
 
-	set dmux [new Classifier/Port/Reserve]
-	$dmux set mask_ 0x7fffffff
-	$dmux set shift_ 0
-	$self install-demux $dmux
+        set dmux [new Classifier/Port/Reserve]
+$dmux set mask_ 0x7fffffff
+$dmux set shift_ 0
+$self install-demux $dmux
 
-	set regagent_ [new Agent/MIPBS $self]
-	$self attach $regagent_ [Node/MobileNode set REGAGENT_PORT]
-	$self attach-encap
-	$self attach-decap
+set regagent_ [new Agent/MIPBS $self]
+$self attach $regagent_ [Node/MobileNode set REGAGENT_PORT]
+$self attach-encap
+        $self attach-decap
 }
 
 Node/MobileNode instproc attach-encap {} {
-	$self instvar encap_
+$self instvar encap_
 
-	set encap_ [new MIPEncapsulator]
+        set encap_ [new MIPEncapsulator]
 
-	$encap_ set mask_ [AddrParams NodeMask 1]
-	$encap_ set shift_ [AddrParams NodeShift 1]
-	#set mask 0x7fffffff
-	#set shift 0
-	set nodeaddr [AddrParams addr2id [$self node-addr]]
-	$encap_ set addr_ [expr ( ~([AddrParams NodeMask 1] << \
+$encap_ set mask_ [AddrParams NodeMask 1]
+$encap_ set shift_ [AddrParams NodeShift 1]
+#set mask 0x7fffffff
+#set shift 0
+set nodeaddr [AddrParams addr2id [$self node-addr]]
+$encap_ set addr_ [expr ( ~([AddrParams NodeMask 1] << \
 			[AddrParams NodeShift 1]) & $nodeaddr )]
-	$encap_ set port_ 1
-	$encap_ target [$self entry]
-	$encap_ set node_ $self
+$encap_ set port_ 1
+$encap_ target [$self entry]
+$encap_ set node_ $self
 }
 
 Node/MobileNode instproc attach-decap {} {
-	$self instvar decap_ dmux_ agents_
-	set decap_ [new Classifier/Addr/MIPDecapsulator]
-	lappend agents_ $decap_
-	$decap_ set mask_ [AddrParams NodeMask 1]
-	$decap_ set shift_ [AddrParams NodeShift 1]
-	$dmux_ install [Node/MobileNode set DECAP_PORT] $decap_
+$self instvar decap_ dmux_ agents_
+        set decap_ [new Classifier/Addr/MIPDecapsulator]
+lappend agents_ $decap_
+        $decap_ set mask_ [AddrParams NodeMask 1]
+$decap_ set shift_ [AddrParams NodeShift 1]
+$dmux_ install [Node/MobileNode set DECAP_PORT] $decap_
 }
 
 Node/MobileNode instproc makemip-NewMIPMH {} {
-	$self instvar regagent_
+$self instvar regagent_
 
-	set dmux [new Classifier/Port/Reserve]
-	$dmux set mask_ 0x7fffffff
-	$dmux set shift_ 0
-	$self install-demux $dmux
+        set dmux [new Classifier/Port/Reserve]
+$dmux set mask_ 0x7fffffff
+$dmux set shift_ 0
+$self install-demux $dmux
 
-	set regagent_ [new Agent/MIPMH $self]
-	$self attach $regagent_ [Node/MobileNode set REGAGENT_PORT]
-	$regagent_ set mask_ [AddrParams NodeMask 1]
-	$regagent_ set shift_ [AddrParams NodeShift 1]
- 	$regagent_ set dst_addr_ [expr (~0) << [AddrParams NodeShift 1]]
-	$regagent_ set dst_port_ 0
-	$regagent_ node $self
+set regagent_ [new Agent/MIPMH $self]
+$self attach $regagent_ [Node/MobileNode set REGAGENT_PORT]
+$regagent_ set mask_ [AddrParams NodeMask 1]
+$regagent_ set shift_ [AddrParams NodeShift 1]
+$regagent_ set dst_addr_ [expr (~0) << [AddrParams NodeShift 1]]
+$regagent_ set dst_port_ 0
+$regagent_ node $self
 }
 
 #----------------------------------------------------------------------
 
 Node/MobileNode instproc reset {} {
-	$self instvar arptable_ nifs_ netif_ mac_ ifq_ ll_ imep_
-    for {set i 0} {$i < $nifs_} {incr i} {
-        $netif_($i) reset
+$self instvar arptable_ nifs_ netif_ mac_ ifq_ ll_ imep_
+for {set i 0} {$i < $nifs_} {incr i} {
+$netif_($i) reset
         $mac_($i) reset
         $ll_($i) reset
         $ifq_($i) reset
-        if { [info exists opt(imep)] && $opt(imep) == "ON" } {
-			$imep_($i) reset
-		}
-	}
+if { [info exists opt(imep)] && $opt(imep) == "ON" } {
+$imep_($i) reset
+}
+}
 
-	# Modified by buaa g410
-	set ns [Simulator instance]
-	set numIfsSimulator [$ns get-numifs]
-	if {$numIfsSimulator == ""} {
-		if { $arptable_(0) != "" } {
-			$arptable_(0) reset
-		}
-	} else {
-	    for {set i 0} {$i < $numIfsSimulator} {incr i} {
-	        if { $arptable_($i) != "" } {
-			$arptable_($i) reset
-			}
-	    }
-	}
-	# End buaa g410
+# Modified by buaa g410
+set ns [Simulator instance]
+set numIfsSimulator [$ns get-numifs]
+if {$numIfsSimulator == ""} {
+if { $arptable_(0) != "" } {
+$arptable_(0) reset
+}
+} else {
+for {set i 0} {$i < $numIfsSimulator} {incr i} {
+if { $arptable_($i) != "" } {
+$arptable_($i) reset
+}
+}
+}
+# End buaa g410
 }
 
 #
@@ -369,7 +369,7 @@ Node/MobileNode instproc add-target-rtagent { agent port } {
 		} else {  ;#  no IMEP
 			$agent target [$self set ll_(0)]
 		}
-			
+
 		#
 		# Recv Target
 		#
@@ -395,7 +395,7 @@ Node/MobileNode instproc add-target-rtagent { agent port } {
 # The following setups up link layer, mac layer, network interface
 # and physical layer structures for the mobile node.
 #
-Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qlen iftype anttype topo inerrproc outerrproc fecproc } {
+Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qlen iftype anttype topo inerrproc outerrproc fecproc index } {
 	$self instvar arptable_ nifs_ netif_ mac_ ifq_ ll_ imep_ inerr_ outerr_ fec_
 
 	set ns [Simulator instance]
@@ -551,8 +551,8 @@ Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qle
     if {$mactype == "Mac/802_11"} {
         set workMode_ [$ns get-workMode]
         set noiseChannel_ [$ns get-noiseChannel]
-        if {$workMode_ != "" && $noiseChannel_ != "" && $channel == $noiseChannel_} {
-            $mac set-workMode $workMode_ $noiseChannel_
+        if {$workMode_ != "" && $noiseChannel_ != ""} {
+            $mac set-workMode $workMode_ $noiseChannel_ $index
         }
     }
     # End buaa g410

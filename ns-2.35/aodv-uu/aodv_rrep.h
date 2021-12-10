@@ -34,19 +34,10 @@
 #define RREP_ACK       0x1
 #define RREP_REPAIR    0x2
 
-//by fxj
-union rrep_union{
-    struct hello_info hello_infos[NUM_NODE][3];
-    struct in_addr nexts[NUM_NODE];
-} ;
-//fxj_end
 typedef struct {
     u_int8_t type;
-// by fxj
 #if defined(__LITTLE_ENDIAN)
-    u_int16_t res1:4;
-    u_int16_t t:1;
-    u_int16_t n:1;
+    u_int16_t res1:6;
     u_int16_t a:1;
     u_int16_t r:1;
     u_int16_t prefix:5;
@@ -54,29 +45,24 @@ typedef struct {
 #elif defined(__BIG_ENDIAN)
     u_int16_t r:1;
     u_int16_t a:1;
-    u_int16_t n:1;
-    u_int16_t t:1;
-    u_int16_t res1:4;
+    u_int16_t res1:6;
     u_int16_t res2:3;
     u_int16_t prefix:5;
 #else
 #error "Adjust your <bits/endian.h> defines"
 #endif
-// fxj_end
-
     u_int8_t hcnt;
     u_int32_t dest_addr;
     u_int32_t dest_seqno;
     u_int32_t orig_addr;
     u_int32_t lifetime;
-
     /* by gcy */
     u_int32_t channel;
     /* end */
-
-    //by cyo & fxj
-    union rrep_union union_data;
-    //cyo_end  fxj_end
+    //by cyo
+     struct hello_info hello_infos[NUM_NODE][3];
+     u_int8_t sta_nb;//todo add history_sta
+    //cyo_end
 } RREP;
 
 #define RREP_SIZE sizeof(RREP)
@@ -103,7 +89,10 @@ RREP *rrep_create(u_int8_t flags,
                   u_int8_t hcnt,
                   struct in_addr dest_addr,
                   u_int32_t dest_seqno,
-                  struct in_addr orig_addr, u_int32_t life,struct hello_info hello_infos[][3]);
+                  struct in_addr orig_addr,
+                  u_int32_t life,
+                  struct hello_info hello_infos[][3],
+                  u_int8_t sta_nb);
 
 //cyo_end
 

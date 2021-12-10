@@ -652,6 +652,7 @@ private:
     /* Added by buaa g410 */
 
     int noiseChannel;
+    int currChannel;
     int workMode;
     int noiseFlag;
     double noiseInterval;

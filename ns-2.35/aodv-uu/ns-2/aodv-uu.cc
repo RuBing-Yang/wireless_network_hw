@@ -335,11 +335,6 @@ void NS_CLASS recv(Packet *p, Handler *)
 	struct hdr_cmn *ch = HDR_CMN(p);
 	struct hdr_ip *ih = HDR_IP(p);
 	struct in_addr saddr;
-
-	
-	if (YRB_OUT) {
-		printf("[aodv-uu] receive packet [%d]\n", ch->ptype());
-	}
 	
 	/* Routing agent must be started before processing packets */
 	assert(initialized);
@@ -448,9 +443,11 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_NONE;
 		jitter = 0.02 * Random::uniform();
+
+        /* by gcy */
+        AODV_msg* aodv_msg = HDR_AODVUU(p);
+
 		if (nIfaces > 0) {
-        	/* by gcy */
-        	/*AODV_msg* aodv_msg = HDR_AODVUU(p);
             for (int i = 0; i < nIfaces; i++) {
                 if (aodv_msg->type == AODV_RREP || aodv_msg->type == AODV_RREQ) {
                     if (aodv_msg->type == AODV_RREP) {
@@ -462,25 +459,15 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
                 } else {
                     Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
                 }
-            }*/
-        	/* end gcy*/
-			/* added by yrb */
-			/* notes yrb : BROADCAST广播，不限制信道*/
-			/*for (int i = 0; i < nIfaces; i++) {
-				if (YRB_OUT) {
-					printf("[Scheduler] Channel %d, Handler %d, UID %d\n", i, lllist[i], ((Event*)p)->uid_);
-				}
-				Scheduler::instance().schedule(lllist[i], p, jitter);
-			}*/ 
-			/*** 上面这个会报错Scheduler: Event UID not valid! 不知道为啥***/
-			Scheduler::instance().schedule(lllist[fixed_interface], p, jitter);
-			/* end yrb */
+                // printf("send a message with channel %d\n", i);
+            }
+			// Scheduler::instance().schedule(lllist[fixed_interface], p, jitter);
 		} else {
 			Scheduler::instance().schedule(ll, p, jitter);
 		}
+        /* end */
 	} else {
-		/* Unicast packet 单信道 */
-		/* TODO:更改fixed_interface为路由表中的channel */
+		/* Unicast packet */
 		ch->next_hop_ = next_hop.s_addr;
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_INET;

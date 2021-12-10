@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -42,11 +42,6 @@
 
 /* Comment this to remove packet field output: */
 #define DEBUG_OUTPUT
-
-// fxj
-extern int unidir_hack;
-// fxj_end
-
 
 #ifndef NS_PORT
 static LIST(rreq_records);
@@ -78,10 +73,6 @@ RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
     rreq->dest_seqno = htonl(dest_seqno);
     rreq->orig_addr = orig_addr.s_addr;
 
-	if (YRB_OUT) {
-		printf("rreq_create\n");
-	}
-
     /* Immediately before a node originates a RREQ flood it must
        increment its sequence number... */
     seqno_incr(this_host.seqno);
@@ -109,11 +100,6 @@ AODV_ext *rreq_add_ext(RREQ * rreq, int type, unsigned int offset,
 {
     AODV_ext *ext = NULL;
 
-	
-	if (YRB_OUT) {
-		printf("rreq_add_ext\n");
-	}
-
     if (offset < RREQ_SIZE)
 	return NULL;
 
@@ -134,12 +120,6 @@ void NS_CLASS rreq_send(struct in_addr dest_addr, u_int32_t dest_seqno,
     struct in_addr dest;
     int i;
 
-	
-	if (YRB_OUT) {
-		printf("rreq_send\n");
-	}
-
-
     dest.s_addr = AODV_BROADCAST;
 
     /* Check if we should force the gratuitous flag... (-g option). */
@@ -159,10 +139,6 @@ void NS_CLASS rreq_forward(RREQ * rreq, int size, int ttl)
 {
     struct in_addr dest, orig;
     int i;
-	
-	if (YRB_OUT) {
-		printf("rreq_forward\n");
-	}
 
     dest.s_addr = AODV_BROADCAST;
     orig.s_addr = rreq->orig_addr;
@@ -198,16 +174,6 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     u_int32_t rreq_id, rreq_new_hcnt, life;
     unsigned int extlen = 0;
     struct in_addr rreq_dest, rreq_orig;
-	
-	/* added by yrb */
-	if (YRB_OUT) {
-		printf("rreq_process\n");
-	}
-	float cost = rreq->cost;
-	int volat = 0;
-	int channel = 0;
-	/* end yrb */
-	
 
     rreq_dest.s_addr = rreq->dest_addr;
     rreq_orig.s_addr = rreq->orig_addr;
@@ -216,35 +182,6 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     rreq_orig_seqno = ntohl(rreq->orig_seqno);
     rreq_new_hcnt = rreq->hcnt + 1;
 
-	/* added by yrb */
-	/* 计算当前链路的cost值 */
-	float max_cost = 0;
-	if (USE_YRB) {
-		for (int channel_i = 0; channel_i < CHANNEL_NUM; channel_i++) {
-			int i;
-			for (i = 0; i < NUM_NODE; i++) {
-				if (hash_cmp(&(this_host.hello_infos[i][channel_i].ipaddr), &ip_src)) {
-					break;
-				}
-			}
-			if (i < NUM_NODE) {
-				float temp = this_host.nb_tbl[i][channel_i].cost;
-				if (temp > max_cost) {
-					channel = channel_i;
-					max_cost = temp;
-				}
-			}
-		}
-		if (YRB_OUT) {
-			printf("[yrb]RREQ收到cost值: %.3f\n这一跳链路cost值: %.3f\n", cost, max_cost);
-		}
-		cost *= max_cost;
-		if (cost < COST_MIN) volat = 1;
-	} else {
-		cost = 1;
-		volat = 0;
-	}
-	/* end yrb */
 
     /* Ignore RREQ's that originated from this node. Either we do this
        or we buffer our own sent RREQ's as we do with others we
@@ -270,24 +207,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	return;
     }
 
-	/* modified by yrb */
-	/* Check if this RREQ has been processed */
-	if (USE_YRB) {
-		if (rreq_record_find(rreq_orig, rreq_id)) {
-			fwd_rt = rt_table_find(rreq_dest);
-			/* Ignore already processed RREQs. */
-			if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
-			return;
-			if (YRB_OUT) {
-				printf("[yrb]原路由不稳定而当前路由稳定，更新路由\n");
-			}
-		}
-	} else {
-		if (rreq_record_find(rreq_orig, rreq_id)) return;
-	}
-    
-	/* end yrb */
-	
+    /* Ignore already processed RREQs. */
+    if (rreq_record_find(rreq_orig, rreq_id))
+	return;
+
     /* Now buffer this RREQ so that we don't process a similar RREQ we
        get within PATH_DISCOVERY_TIME. */
     rreq_record_insert(rreq_orig, rreq_id);
@@ -313,7 +236,6 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     log_pkt_fields((AODV_msg *) rreq);
 #endif
 
-	/* 反向路由 */
     /* The node always creates or updates a REVERSE ROUTE entry to the
        source of the RREQ. */
     rev_rt = rt_table_find(rreq_orig);
@@ -322,42 +244,32 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     life = PATH_DISCOVERY_TIME - 2 * rreq_new_hcnt * NODE_TRAVERSAL_TIME;
 
     if (rev_rt == NULL) {
-		DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
-			ip_to_str(rreq_orig));
+	DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
+	      ip_to_str(rreq_orig));
 
-		if (YRB_OUT) {
-			printf("[yrb]RREQ插入路由表项，稳定性%d，信道%d\n", volat, channel);
-		}
-
-		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
-					rreq_orig_seqno, life, VALID, 0, ifindex, 
-					volat, channel); //added by yrb
+	rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
+				 rreq_orig_seqno, life, VALID, 0, ifindex);
     } else {
-		if (rev_rt->dest_seqno == 0 ||
-			(int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
-			(rreq_orig_seqno == rev_rt->dest_seqno &&
-			(rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
-			
-			if (YRB_OUT) {
-				printf("[yrb]RREQ更新路由表项，稳定性%d，信道%d\n", volat, channel);
-			}
-			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
-						rreq_orig_seqno, life, VALID,
-						rev_rt->flags,
-						volat, channel); //added by yrb
-		}
-		#ifdef DISABLED
-			/* This is a out of draft modification of AODV-UU to prevent
-			nodes from creating routing entries to themselves during
-			the RREP phase. We simple drop the RREQ if there is a
-			missmatch between the reverse path on the node and the one
-			suggested by the RREQ. */
+	if (rev_rt->dest_seqno == 0 ||
+	    (int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
+	    (rreq_orig_seqno == rev_rt->dest_seqno &&
+	     (rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
+	    rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
+				     rreq_orig_seqno, life, VALID,
+				     rev_rt->flags);
+	}
+#ifdef DISABLED
+	/* This is a out of draft modification of AODV-UU to prevent
+	   nodes from creating routing entries to themselves during
+	   the RREP phase. We simple drop the RREQ if there is a
+	   missmatch between the reverse path on the node and the one
+	   suggested by the RREQ. */
 
-			else if (rev_rt->next_hop.s_addr != ip_src.s_addr) {
-				DEBUG(LOG_DEBUG, 0, "Dropping RREQ due to reverse route mismatch!");
-				return;
-			}
-		#endif
+	else if (rev_rt->next_hop.s_addr != ip_src.s_addr) {
+	    DEBUG(LOG_DEBUG, 0, "Dropping RREQ due to reverse route mismatch!");
+	    return;
+	}
+#endif
     }
     /**** END updating/creating REVERSE route ****/
 
@@ -411,9 +323,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
 			   this_host.seqno, rev_rt->dest_addr,
 			   MY_ROUTE_TIMEOUT);
-	// by fxj: add node to the chain.
-	rrep->union_data.nexts[0] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
-	// fxj_end
+
 	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
     } else {
@@ -566,7 +476,6 @@ void NS_CLASS rreq_route_discovery(struct in_addr dest_addr, u_int8_t flags,
     return;
 }
 
-// by fxj
 /* Local repair is very similar to route discovery... */
 void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 				struct ip_data *ipd)
@@ -577,11 +486,14 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     int ttl;
     u_int8_t flags = 0;
 
-    if (!rt) return;
+    if (!rt)
+	return;
 
-    if (seek_list_find(rt->dest_addr)) return;
+    if (seek_list_find(rt->dest_addr))
+	return;
 
-    if (!(rt->flags & RT_REPAIR)) return;
+    if (!(rt->flags & RT_REPAIR))
+	return;
 
     gettimeofday(&now, NULL);
 
@@ -608,28 +520,8 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     if (timeval_diff(&rt->rt_timer.timeout, &now) < (2 * NET_TRAVERSAL_TIME))
 	rt_table_update_timeout(rt, 2 * NET_TRAVERSAL_TIME);
 
-// by fxj
-if (USE_FXJ) {
-#ifdef FXJ_OUT
-	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
-			src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
-#endif
-	int i;
-	for (i = 0; i < MAX_NR_INTERFACES; i++) {
-    	if (!DEV_NR(i).enabled) continue;
-    	RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
-    	                   this_host.seqno,
-    	                   DEV_NR(i).ipaddr,
-    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
-    	rrep->n = 1;
-    	struct in_addr dest; 
-		dest.s_addr = AODV_BROADCAST; 
-    	aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &(DEV_NR(i)));
-    }
-} else {
+
     rreq_send(rt->dest_addr, rt->dest_seqno, ttl, flags);
-}
-// fxj_end
 
     /* Remember that we are seeking this destination and setup the
        timers */

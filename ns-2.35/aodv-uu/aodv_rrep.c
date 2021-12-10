@@ -82,12 +82,14 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
                            u_int8_t hcnt,
                            struct in_addr dest_addr,
                            u_int32_t dest_seqno,
-                           struct in_addr orig_addr, u_int32_t life, struct hello_info hello_infos[][3]) {
+                           struct in_addr orig_addr,
+                           u_int32_t life,
+                           struct hello_info hello_infos[][3],
+                           u_int8_t sta_nb) {
     RREP *rrep;
 
     rrep = (RREP *) aodv_socket_new_msg();
-    rrep->type = AODV_RREP;
-    rrep->res1 = 0;
+    rrep->type = AODV_RREP;    rrep->res1 = 0;
     rrep->res2 = 0;
     rrep->prefix = prefix;
     rrep->hcnt = hcnt;
@@ -98,9 +100,10 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
     //by cyo
     for(int i = 0;i<NUM_NODE;i++){
         for(int j = 0;j<3;j++){
-            rrep->union_data.hello_infos[i][j] = hello_infos[i][j]; // by fxj
+            rrep->hello_infos[i][j] = hello_infos[i][j];
         }
     }
+    rrep->sta_nb = sta_nb;
     //cyo_end
     if (flags & RREP_REPAIR)
         rrep->r = 1;
@@ -358,50 +361,24 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     if (!fwd_rt) {
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
-				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 rev_rt->volat, rev_rt->channel); //added by yrb
-		if (YRB_OUT) {
-			printf("[yrb]RREP插入正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
-		}
-		// by fxj: add nexts to rt_tbl
-		for (int i = 0; i < rrep_new_hcnt; i++) {
-			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-		}
-		// fxj_end
-    } 
-    /* 更新正向路由 */
-	else if (fwd_rt->dest_seqno == 0 ||
+				 rrep_lifetime, VALID, rt_flags, ifindex);
+    } else if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
-		   (rrep_seqno == fwd_rt->dest_seqno &&
-		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
-		   || (fwd_rt->volat && !rev_rt->volat))))  //added by yrb
-	{
-		
-		if (YRB_OUT) {
-			printf("[yrb]RREP更新正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
-		}
-		
-		pre_repair_hcnt = fwd_rt->hcnt;
-		pre_repair_flags = fwd_rt->flags;
+	       (rrep_seqno == fwd_rt->dest_seqno &&
+		(fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR ||
+		 rrep_new_hcnt < fwd_rt->hcnt))) {
+	pre_repair_hcnt = fwd_rt->hcnt;
+	pre_repair_flags = fwd_rt->flags;
 
-    	/* 传递volat值 */
-		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
-					rrep_lifetime, VALID,
-					rt_flags | fwd_rt->flags,
-					rev_rt->volat, rev_rt->channel); //added by yrb
-
-		// by fxj: add nexts to rt_tbl
-		for (int i = 0; i < rrep_new_hcnt; i++) {
-			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-		}
-		// fxj_end
-    } 
-	else {
-		if (fwd_rt->hcnt > 1) {
-			DEBUG(LOG_DEBUG, 0,
-			"Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
-			fwd_rt->hcnt, fwd_rt->dest_seqno);
-		}
+	fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
+				 rrep_lifetime, VALID,
+				 rt_flags | fwd_rt->flags);
+    } else {
+	if (fwd_rt->hcnt > 1) {
+	    DEBUG(LOG_DEBUG, 0,
+		  "Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
+		  fwd_rt->hcnt, fwd_rt->dest_seqno);
+	}
 	return;
     }
 
@@ -429,25 +406,13 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    /* Add a "fake" route indicating that this is an Internet
 	     * destination, thus should be encapsulated and routed through a
 	     * gateway... */
-	    if (!inet_rt) {
-			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
-				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
-				rev_rt->volat, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-			// fxj_end
-		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
-			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
-							rrep_lifetime, VALID, RT_INET_DEST |
-							inet_rt->flags,
-				 			rev_rt->volat, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-			// fxj_end
+	    if (!inet_rt)
+		rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
+				rrep_lifetime, VALID, RT_INET_DEST, ifindex);
+	    else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
+		rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
+				rrep_lifetime, VALID, RT_INET_DEST |
+				inet_rt->flags);
 	    } else {
 		DEBUG(LOG_DEBUG, 0, "INET Response, but no update %s",
 		      ip_to_str(inet_dest_addr));
@@ -481,9 +446,6 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     } else {
 	/* --- Here we FORWARD the RREP on the REVERSE route --- */
 	if (rev_rt && rev_rt->state == VALID) {
-		// fxj: add himself into the chain
-		rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
-		// fxj_end
 	    rrep_forward(rrep, rreplen, rev_rt, fwd_rt, --ip_ttl);
 	} else {
 	    DEBUG(LOG_DEBUG, 0, "Could not forward RREP - NO ROUTE!!!");

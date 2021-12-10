@@ -41,7 +41,6 @@
 #include <string.h>
 #include <fcntl.h>
 
-
 #ifndef NS_PORT
 #include "timer_queue.h"
 #endif
@@ -82,53 +81,36 @@
 
 #define MAX_NR_INTERFACES 10
 #define MAX_IFINDEX (MAX_NR_INTERFACES - 1)
-#define CHANNEL_NUM 3 
 
 #if !defined(IFNAMSIZ)
 #define IFNAMSIZ 16
 #endif
 //by cyo
-#define A1 0.3
-#define B1 0.3
-#define C1 0.3
-#define K11 1.0//稳定时一步转移概率
-#define K01 0.5//不稳定(0,1)时一步转移概率
-#define K00 0.0//不稳定(0,0)时一步转移概率
+#define A1 1
+#define B1 1
+#define C1 1
+#define MK 1
 #define INIT_E 0.5
 #define INIT_G 0.5
 #define INIT_F 0.5
 #define INIT_COST 0.8
 #define TIMER_F 2
 #define TIMER_COST 4
-#define HELLO_INFOS_TIMER 10
+#define TIMER_STA 2
 #if !defined(NUM_STATES)
-#define NUM_STATES 5
+#define NUM_STATES 8
 #define NUM_NODE 20
 #define NUM_HISTORY_F 20
 #endif
 // cyo_end
 
-/* added by cyo & gcy */
-/*是否打印printf内容 */
+/* output */
 #define GCY_OUT 0
 #define CYO_OUT 0
-#define YRB_OUT 1
+#define YRB_OUT 0
 #define FXJ_OUT 0
-#define GLO_OUT 1
+#define GLO_OUT 0
 /* end */
-
-
-/* added by yrb */
-
-/* 稳定概率阈值 */
-#define COST_MIN 0.8
-
-/* cost寻路和快速修复的开关 */
-/* 用来跑tcl验证时区分原AODV协议和我们的策略 */
-#define USE_YRB 1
-#define USE_FXJ 1
-/* end yrb */
-
 /* Data for a network device */
 struct dev_info {
     int enabled;		/* 1 if struct is used, else 0 */
@@ -156,15 +138,17 @@ struct stability_info {
 struct nb_info {
     float cost;
     int isValid;
+    int isVisited;
     struct in_addr ipaddr;
 };
 struct node_info {
-    in_addr ipaddr;
-    int node_sta;
+    struct in_addr ipaddr;
+    int node_sta[NUM_STATES];
     int isValid;
+    int count;
 };
 struct hello_info {
-    in_addr ipaddr;
+    struct in_addr ipaddr;
     u_int8_t hello_send_nb;//邻居结点发送给该节点的消息数量
     u_int8_t hello_received_nb;//邻居节点接受到的从该节点发送的消息数量
     u_int8_t hello_send;//该节点发送给邻居节点的消息的数量
@@ -172,7 +156,7 @@ struct hello_info {
     u_int8_t isValid;
 };
 struct f_value {
-    in_addr ipaddr;
+    struct in_addr ipaddr;
     int count;
     float f_history_value[NUM_HISTORY_F];
 };
@@ -186,10 +170,14 @@ struct host_info {
     struct dev_info devs[MAX_NR_INTERFACES+1]; /* Add +1 for returning as "error" in ifindex2devindex. */
     /* by gcy & cyo */
     struct stability_info stability;
-    struct node_info sta_tbl[NUM_NODE][NUM_STATES];           //所有邻居结点的历史稳定性值
-    struct node_info sta_self[NUM_STATES];              //自身的稳定性
+    struct node_info sta_tbl[NUM_NODE];//所有邻居结点的历史稳定性值
+    struct node_info sta_self;             //自身的稳定性
     int neighbor_sum_init;                              //仅用于nb_tbl初始加入ip地址时计数，防止neighbor_sum减小时发生错误
     struct hello_info hello_infos[NUM_NODE][3];
+    u_int8_t hello_received_history[NUM_NODE][3][11];//每个邻居每个信道十个值,[i][j][10]存入当前值
+    u_int8_t hello_received_queue_top[NUM_NODE][3];
+    u_int8_t hello_send;
+    u_int32_t self_addr;
     struct nb_info nb_tbl[NUM_NODE][3];                       //邻居表
     struct f_value f_tbl[NUM_NODE][3];
     int hello_infos_timer;
@@ -255,7 +243,9 @@ static inline int name2index(char *name)
    an ifindex or a device number (index into devs array). */
 #define DEV_IFINDEX(ifindex) (this_host.devs[ifindex2devindex(ifindex)])
 #define DEV_NR(n) (this_host.devs[n])
-
+//by cyo
+#define DEBUG_IP(i) (this_host.self_addr == i)
+// cyo_end
  /* Broadcast address according to draft (255.255.255.255) */
 #define AODV_BROADCAST ((in_addr_t) 0xFFFFFFFF)
 

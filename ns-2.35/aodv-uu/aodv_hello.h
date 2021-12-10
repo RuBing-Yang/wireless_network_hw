@@ -45,8 +45,6 @@ NS_INLINE void hello_update_timeout(rt_table_t * rt, struct timeval *now,
 
 void update_stability();
 void  nb_add(in_addr ip_temp);
-int   neighbor_id(struct in_addr ip_temp);    // fxj: return -1 if in nb_tbl, or id in nb_tbl
-void  send_neighbor_table(struct in_addr dest, struct in_addr src, int channel, int device_i);  // fxj: send back valid neighbors in RREP
 void  nb_update_cost(in_addr ip_temp,int channel,float cost_value);
 
 void  nb_setIsValid(in_addr ip_temp,int channel,int isValid);
@@ -59,10 +57,13 @@ void  hello_infos_clear();
 void  add_f_value(float f, in_addr ip_temp, int channel);
 float getE(u_int8_t A_send,  u_int8_t B_send, u_int8_t A_received, u_int8_t B_received);
 float getF(in_addr ip_temp, int channel);
-float getG(const struct node_info historyStab[], int neighbor_sum, int neighbor_change);
+float getG(const struct node_info historyStab, int neighbor_sum, int neighbor_change);
 void  updateCost(in_addr ip_temp,int channel);
 void  hello_infos_timer_add();
 int hash_cmp(struct in_addr *addr1, struct in_addr *addr2);
+u_int8_t get_top_and_add(int i,int j);
+void sta_nb_add(struct in_addr ip_temp,u_int8_t sta);
+
 #ifdef NS_PORT
 long hello_jitter();
 #endif
