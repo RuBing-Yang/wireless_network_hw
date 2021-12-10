@@ -323,13 +323,20 @@ Mac802_11::command(int argc, const char*const* argv)
                         return (TCL_OK);
         }
 	}
-    if (argc == 4) {
+    if (argc == 5) {
         if (strcmp(argv[1], "set-workMode") == 0) {
             workMode = atoi(argv[2]);
-            //noiseChannel = atoi(argv[3]);
+            noiseChannel = atoi(argv[3]);
+            currChannel = atoi(argv[4]);
             noiseInterval = 0.01;
             if (workMode < 0) {
-                mhNoise_.start(noiseInterval);
+                if (noiseChannel >= 0 && currChannel == noiseChannel) {
+                    mhNoise_.start(noiseInterval);
+                } else if (noiseChannel >= 0 && currChannel != noiseChannel) {
+                   ;
+                } else if (noiseChannel < 0) {
+                    mhNoise_.start(noiseInterval);
+                }
             }
             return TCL_OK;
         }
@@ -3386,12 +3393,12 @@ Mac802_11::getNoisePower()
 double
 Mac802_11::getInfoPower()
 {
-    return infoPower * 10000;
+    return 10000 * infoPower;
 }
 
 double
 Mac802_11::getInfoNoiseRatio()
 {
-    return getInfoPower() / getNoisePower();
+    return getInfoPower() / (getNoisePower() + 0.00001);
 }
 /* end */

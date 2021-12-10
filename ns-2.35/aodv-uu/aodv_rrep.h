@@ -76,6 +76,7 @@ typedef struct {
 
     //by cyo & fxj
     union rrep_union union_data;
+     u_int8_t sta_nb;//todo add history_sta
     //cyo_end  fxj_end
 } RREP;
 
@@ -103,7 +104,10 @@ RREP *rrep_create(u_int8_t flags,
                   u_int8_t hcnt,
                   struct in_addr dest_addr,
                   u_int32_t dest_seqno,
-                  struct in_addr orig_addr, u_int32_t life,struct hello_info hello_infos[][3]);
+                  struct in_addr orig_addr, 
+                  u_int32_t life,
+                  struct hello_info hello_infos[][3],
+                  u_int8_t sta_nb);
 
 //cyo_end
 

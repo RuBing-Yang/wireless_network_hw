@@ -396,7 +396,7 @@ void NS_CLASS recv(Packet *p, Handler *)
 
 #endif /* CONFIG_GATEWAY */
 		default:
-			processPacket(p);   // Data path
+			processPacket(p);   // Data path  // for yrb to modified 
 	}
 
 	end:
@@ -404,8 +404,16 @@ void NS_CLASS recv(Packet *p, Handler *)
 	scheduleNextEvent();
 }
 
+/* added by yrb */
 /* Sends a packet using the specified next hop and delay */
-void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
+void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay) {
+	sendPacket(p, next_hop, delay, 255);
+}
+/* end yrb */
+
+/* Sends a packet using the specified next hop and delay */
+void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
+						u_int8_t channel) //added by yrb
 {
 	struct hdr_cmn *ch = HDR_CMN(p);
 	struct hdr_ip *ih = HDR_IP(p);
@@ -448,33 +456,37 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_NONE;
 		jitter = 0.02 * Random::uniform();
+		
+        /* by gcy && modified by yrb */
+        AODV_msg* aodv_msg = HDR_AODVUU(p);
+		int temp = 0;
+		if (aodv_msg->type == AODV_RREP) {
+			temp = ((RREP *)aodv_msg)->channel;
+		}
+		if (aodv_msg->type == AODV_RREQ) {
+			temp = ((RREQ *)aodv_msg)->channel;
+		}
+
 		if (nIfaces > 0) {
-        	/* by gcy */
-        	/*AODV_msg* aodv_msg = HDR_AODVUU(p);
-            for (int i = 0; i < nIfaces; i++) {
-                if (aodv_msg->type == AODV_RREP || aodv_msg->type == AODV_RREQ) {
-                    if (aodv_msg->type == AODV_RREP) {
-                        ((RREP *)aodv_msg)->channel = i;
-                    } else {
-                        ((RREQ *)aodv_msg)->channel = i;
-                    }
-                    Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
-                } else {
-                    Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
-                }
-            }*/
-        	/* end gcy*/
-			/* added by yrb */
-			/* notes yrb : BROADCAST广播，不限制信道*/
-			/*for (int i = 0; i < nIfaces; i++) {
-				if (YRB_OUT) {
-					printf("[Scheduler] Channel %d, Handler %d, UID %d\n", i, lllist[i], ((Event*)p)->uid_);
+			if (USE_YRB) {
+				for (int i = 0; i < nIfaces; i++) {
+					if (aodv_msg->type == AODV_RREP || aodv_msg->type == AODV_RREQ) {
+						if (aodv_msg->type == AODV_RREP) {
+							printf("[RREP] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
+							((RREP *)aodv_msg)->channel = i;
+						} else {
+							printf("[RREQ] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
+							((RREQ *)aodv_msg)->channel = i;
+						}
+						Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
+					} else {
+						Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
+					}
 				}
-				Scheduler::instance().schedule(lllist[i], p, jitter);
-			}*/ 
-			/*** 上面这个会报错Scheduler: Event UID not valid! 不知道为啥***/
-			Scheduler::instance().schedule(lllist[fixed_interface], p, jitter);
-			/* end yrb */
+			} else {
+				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
+			}
+        	/* end gcy*/
 		} else {
 			Scheduler::instance().schedule(ll, p, jitter);
 		}
@@ -490,7 +502,20 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
 			ch->xmit_failure_data_ = (void *) this;
 		}
 		if (nIfaces > 0) {
-			Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
+			/* added by yrb */
+			AODV_msg* aodv_msg = HDR_AODVUU(p);
+			if (channel != 255) {
+				printf("[data] 单信道%d\n", channel);
+				Scheduler::instance().schedule(lllist[channel], p, delay);
+			}
+			else if (USE_YRB && aodv_msg->type == AODV_RREP) {
+				int rrep_channel = ((RREP *)aodv_msg)->channel;
+				printf("[RREP] 单信道%d\n", rrep_channel);
+				Scheduler::instance().schedule(lllist[rrep_channel], p, delay);
+			} else {
+				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
+			}
+			/* end yrb */
 		} else {
 			Scheduler::instance().schedule(ll, p, delay);
 		}

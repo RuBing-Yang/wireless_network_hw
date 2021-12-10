@@ -148,10 +148,10 @@ void NS_CLASS rreq_send(struct in_addr dest_addr, u_int32_t dest_seqno,
 
     /* Broadcast on all interfaces */
     for (i = 0; i < MAX_NR_INTERFACES; i++) {
-	if (!DEV_NR(i).enabled)
-	    continue;
-	rreq = rreq_create(flags, dest_addr, dest_seqno, DEV_NR(i).ipaddr);
-	aodv_socket_send((AODV_msg *) rreq, dest, RREQ_SIZE, ttl, &DEV_NR(i));
+		if (!DEV_NR(i).enabled) continue;
+		rreq = rreq_create(flags, dest_addr, dest_seqno, DEV_NR(i).ipaddr);
+		rreq->channel = i;
+		aodv_socket_send((AODV_msg *) rreq, dest, RREQ_SIZE, ttl, &DEV_NR(i));
     }
 }
 
@@ -179,9 +179,9 @@ void NS_CLASS rreq_forward(RREQ * rreq, int size, int ttl)
 
     /* Send out on all interfaces */
     for (i = 0; i < MAX_NR_INTERFACES; i++) {
-	if (!DEV_NR(i).enabled)
-	    continue;
-	aodv_socket_send((AODV_msg *) rreq, dest, size, ttl, &DEV_NR(i));
+		if (!DEV_NR(i).enabled) continue;
+		rreq->channel = i;
+		aodv_socket_send((AODV_msg *) rreq, dest, size, ttl, &DEV_NR(i));
     }
 }
 
@@ -411,6 +411,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
 			   this_host.seqno, rev_rt->dest_addr,
 			   MY_ROUTE_TIMEOUT);
+	rrep->channel = rev_rt->channel; //by yrb
 	// by fxj: add node to the chain.
 	rrep->union_data.nexts[0] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 	// fxj_end

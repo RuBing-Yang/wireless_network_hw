@@ -82,7 +82,11 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
                            u_int8_t hcnt,
                            struct in_addr dest_addr,
                            u_int32_t dest_seqno,
-                           struct in_addr orig_addr, u_int32_t life, struct hello_info hello_infos[][3]) {
+                           struct in_addr orig_addr,
+						   u_int32_t life,
+						   struct hello_info hello_infos[][3],
+						   u_int8_t sta_nb) //by cyo
+{
     RREP *rrep;
 
     rrep = (RREP *) aodv_socket_new_msg();
@@ -101,6 +105,7 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
             rrep->union_data.hello_infos[i][j] = hello_infos[i][j]; // by fxj
         }
     }
+	rrep->sta_nb = sta_nb;
     //cyo_end
     if (flags & RREP_REPAIR)
         rrep->r = 1;

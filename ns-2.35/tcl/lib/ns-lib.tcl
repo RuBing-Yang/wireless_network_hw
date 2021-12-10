@@ -714,7 +714,7 @@ Simulator instproc create-wireless-node args {
             # Add one interface per channel
             $node add-interface $chan($i) $propInstance_ $llType_ $macType_ \
                 $ifqType_ $ifqlen_ $phyType_ $antType_ $topoInstance_ \
-                $inerrProc_ $outerrProc_ $FECProc_
+                $inerrProc_ $outerrProc_ $FECProc_ $i
         }
     } else {
         # Add main node interface
@@ -2333,11 +2333,11 @@ Simulator instproc ifNum {val} {
     $self set numifs_ $val
 }
 
-Simulator instproc workMode { val} {
+Simulator instproc workMode {val} {
     $self set workMode_ $val
 }
 
-Simulator instproc noiseChannel{ val} {
+Simulator instproc noiseChannel {val} {
     $self set noiseChannel_ $val
 }
 

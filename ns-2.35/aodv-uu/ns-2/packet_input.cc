@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 
@@ -69,7 +69,7 @@ void NS_CLASS processPacket(Packet * p)
     /* If this is a TCP packet and we don't have a route, we should
        set the gratuituos flag in the RREQ. */
     if (ch->ptype() == PT_TCP) {
-	rreq_flags |= RREQ_GRATUITOUS;
+		rreq_flags |= RREQ_GRATUITOUS;
     }
 
     /* If the packet is a broadcast packet we just let it go
@@ -140,79 +140,83 @@ void NS_CLASS processPacket(Packet * p)
     if (!fwd_rt || fwd_rt->state == INVALID ||
 	(fwd_rt->hcnt == 1 && (fwd_rt->flags & RT_UNIDIR))) {
 
-	/* Check if the route is marked for repair or is INVALID. In
-	 * that case, do a route discovery. */
-	if (fwd_rt && (fwd_rt->flags & RT_REPAIR))
-	    goto route_discovery;
+		/* Check if the route is marked for repair or is INVALID. In
+		* that case, do a route discovery. */
+		//没有可使用路由
+		if (fwd_rt && (fwd_rt->flags & RT_REPAIR)) {
+			//路由寻路
+			goto route_discovery;
+		}
+	
+		if (ch->direction() == hdr_cmn::UP) {
 
-	if (ch->direction() == hdr_cmn::UP) {
+			struct in_addr rerr_dest;
+			RERR *rerr;
+			struct in_addr nh;
+			nh.s_addr = ch->prev_hop_;
+			
+			DEBUG(LOG_DEBUG, 0,
+			"No route, src=%s dest=%s prev_hop=%s - DROPPING!",
+			ip_to_str(src_addr), ip_to_str(dest_addr),
+			ip_to_str(nh));
 
-	    struct in_addr rerr_dest;
-	    RERR *rerr;
-	    struct in_addr nh;
-	    nh.s_addr = ch->prev_hop_;
-	    
-	    DEBUG(LOG_DEBUG, 0,
-		  "No route, src=%s dest=%s prev_hop=%s - DROPPING!",
-		  ip_to_str(src_addr), ip_to_str(dest_addr),
-		  ip_to_str(nh));
+			if (fwd_rt) {
+			rerr = rerr_create(0, fwd_rt->dest_addr,
+					fwd_rt->dest_seqno);
 
-	    if (fwd_rt) {
-		rerr = rerr_create(0, fwd_rt->dest_addr,
-				   fwd_rt->dest_seqno);
+			rt_table_update_timeout(fwd_rt, DELETE_PERIOD);
+			} else
+			rerr = rerr_create(0, dest_addr, 0);
+			
+			DEBUG(LOG_DEBUG, 0, "Sending RERR to prev hop %s for unknown dest %s", ip_to_str(src_addr), ip_to_str(dest_addr));
+			
+			/* Unicast the RERR to the source of the data transmission
+			* if possible, otherwise we broadcast it. */
+			
+			if (rev_rt && rev_rt->state == VALID)
+			rerr_dest = rev_rt->next_hop;
+			else
+			rerr_dest.s_addr = AODV_BROADCAST;
 
-		rt_table_update_timeout(fwd_rt, DELETE_PERIOD);
-	    } else
-		rerr = rerr_create(0, dest_addr, 0);
-	    
-	    DEBUG(LOG_DEBUG, 0, "Sending RERR to prev hop %s for unknown dest %s", ip_to_str(src_addr), ip_to_str(dest_addr));
-	    
-	    /* Unicast the RERR to the source of the data transmission
-	     * if possible, otherwise we broadcast it. */
-	    
-	    if (rev_rt && rev_rt->state == VALID)
-		rerr_dest = rev_rt->next_hop;
-	    else
-		rerr_dest.s_addr = AODV_BROADCAST;
+			aodv_socket_send((AODV_msg *) rerr, rerr_dest,
+					RERR_CALC_SIZE(rerr), 1, &DEV_IFINDEX(ifindex));
 
-	    aodv_socket_send((AODV_msg *) rerr, rerr_dest,
-			     RERR_CALC_SIZE(rerr), 1, &DEV_IFINDEX(ifindex));
+			if (wait_on_reboot) {
+			DEBUG(LOG_DEBUG, 0, "Wait on reboot timer reset.");
+			timer_set_timeout(&worb_timer, DELETE_PERIOD);
+			}
 
-	    if (wait_on_reboot) {
-		DEBUG(LOG_DEBUG, 0, "Wait on reboot timer reset.");
-		timer_set_timeout(&worb_timer, DELETE_PERIOD);
-	    }
+			/* DEBUG(LOG_DEBUG, 0, "Dropping pkt uid=%d", ch->uid()); */
+			drop(p, DROP_RTR_NO_ROUTE);
 
-	    /* DEBUG(LOG_DEBUG, 0, "Dropping pkt uid=%d", ch->uid()); */
-	    drop(p, DROP_RTR_NO_ROUTE);
-
-	    return;
+			return;
 	}
 
-      route_discovery:
-	/* Buffer packets... Packets are queued by the ip_queue.o
-	   module already. We only need to save the handle id, and
-	   return the proper verdict when we know what to do... */
+		route_discovery:
+		/* Buffer packets... Packets are queued by the ip_queue.o
+		module already. We only need to save the handle id, and
+		return the proper verdict when we know what to do... */
+		//路由寻路
 
-	packet_queue_add(p, dest_addr);
+		packet_queue_add(p, dest_addr);
 
-	if (fwd_rt && (fwd_rt->flags & RT_REPAIR))
-	    rreq_local_repair(fwd_rt, src_addr, ipd);
-	else
-	    rreq_route_discovery(dest_addr, rreq_flags, ipd);
+		if (fwd_rt && (fwd_rt->flags & RT_REPAIR))
+			rreq_local_repair(fwd_rt, src_addr, ipd);
+		else
+			rreq_route_discovery(dest_addr, rreq_flags, ipd);
 
-	return;
+		return;
 
     } else {
-	/* DEBUG(LOG_DEBUG, 0, "Sending pkt uid=%d", ch->uid()); */
-	sendPacket(p, fwd_rt->next_hop, 0.0);
+		/* DEBUG(LOG_DEBUG, 0, "Sending pkt uid=%d", ch->uid()); */
+		sendPacket(p, fwd_rt->next_hop, 0.0, fwd_rt->channel); //added by yrb
 
-	/* When forwarding data, make sure we are sending HELLO messages */
-	gettimeofday(&this_host.fwd_time, NULL);
+		/* When forwarding data, make sure we are sending HELLO messages */
+		gettimeofday(&this_host.fwd_time, NULL);
 
-	if (!llfeedback && optimized_hellos)
-	    hello_start();
-    }
+		if (!llfeedback && optimized_hellos)
+			hello_start();
+		}
 }
 
 /* EOF */

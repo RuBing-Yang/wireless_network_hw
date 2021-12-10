@@ -126,6 +126,8 @@ public:
 protected:
 	void interfaceQueue(nsaddr_t next_hop, int action);
 	void sendPacket(Packet *p, struct in_addr next_hop, double delay);
+	void sendPacket(Packet *p, struct in_addr next_hop, double delay, 
+							u_int8_t channel); //added by yrb
 	int startAODVUUAgent();
 	void scheduleNextEvent();
 	int gettimeofday(struct timeval *tv, struct timezone *tz);

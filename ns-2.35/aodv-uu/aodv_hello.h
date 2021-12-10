@@ -59,10 +59,13 @@ void  hello_infos_clear();
 void  add_f_value(float f, in_addr ip_temp, int channel);
 float getE(u_int8_t A_send,  u_int8_t B_send, u_int8_t A_received, u_int8_t B_received);
 float getF(in_addr ip_temp, int channel);
-float getG(const struct node_info historyStab[], int neighbor_sum, int neighbor_change);
+float getG(const struct node_info historyStab, int neighbor_sum, int neighbor_change);
 void  updateCost(in_addr ip_temp,int channel);
 void  hello_infos_timer_add();
 int hash_cmp(struct in_addr *addr1, struct in_addr *addr2);
+u_int8_t get_top_and_add(int i,int j); //by gcy
+void sta_nb_add(struct in_addr ip_temp,u_int8_t sta); //by gcy
+
 #ifdef NS_PORT
 long hello_jitter();
 #endif

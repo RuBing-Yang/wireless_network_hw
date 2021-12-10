@@ -218,34 +218,14 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 	//
 	// fxj_notes: Hellos include requests for neighbors' nb_tbl, all proced in hello_process
 	//
-	
-	if (YRB_OUT) {
-		switch(aodv_msg->type) {
-			case AODV_HELLO:
-				printf("[socket process]AODV_HELLO\n");
-				break;
-			case AODV_RREQ:
-				printf("[socket process]AODV_RREQ\n");
-				break;
-			case AODV_RREP:
-				printf("[socket process]AODV_HELLO && AODV_RREP\n");
-				break;
-			case AODV_RERR:
-				printf("[socket process]AODV_RERR\n");
-				break;
-			case AODV_RREP_ACK:
-				printf("[socket process]AODV_RREP_ACK\n");
-				break;
-			default:
-				printf("[socket process]not known type");
+
+
+    if ((aodv_msg->type == AODV_RREP && ttl == 1 && dst.s_addr == AODV_BROADCAST)) {
+		if (YRB_OUT) {
+			printf("[socket process]AODV_HELLO\n");
 		}
-	}
-
-
-    if ((aodv_msg->type == AODV_RREP && ttl == 1 &&
-	 dst.s_addr == AODV_BROADCAST)) {
-	hello_process((RREP *) aodv_msg, len, ifindex);
-	return;
+		hello_process((RREP *) aodv_msg, len, ifindex);
+		return;
     }
 
     /* Make sure we add/update neighbors */
@@ -256,25 +236,37 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
     switch (aodv_msg->type) {
 
     case AODV_RREQ:
-	rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
-	break;
+		if (YRB_OUT) {
+			printf("[socket process]AODV_RREQ\n");
+		}
+		rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
+		break;
     case AODV_RREP:
-	DEBUG(LOG_DEBUG, 0, "Received RREP");
-	rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
-	break;
-    case AODV_RERR:
-	DEBUG(LOG_DEBUG, 0, "Received RERR");
-	rerr_process((RERR *) aodv_msg, len, src, dst);
-	break;
+		if (YRB_OUT) {
+			printf("[socket process]AODV_RREP, rrep channel %d, interface %d, ttl %d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl);
+		}
+		DEBUG(LOG_DEBUG, 0, "Received RREP");
+		rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
+		break;
+	case AODV_RERR:
+		if (YRB_OUT) {
+			printf("[socket process]AODV_RERR\n");
+		}
+		DEBUG(LOG_DEBUG, 0, "Received RERR");
+		rerr_process((RERR *) aodv_msg, len, src, dst);
+		break;
     case AODV_RREP_ACK:
-	DEBUG(LOG_DEBUG, 0, "Received RREP_ACK");
-	rrep_ack_process((RREP_ack *) aodv_msg, len, src, dst);
-	break;
+		if (YRB_OUT) {
+			printf("[socket process]AODV_RREP_ACK\n");
+		}
+		DEBUG(LOG_DEBUG, 0, "Received RREP_ACK");
+		rrep_ack_process((RREP_ack *) aodv_msg, len, src, dst);
+		break;
     default:
-	alog(LOG_WARNING, 0, __FUNCTION__,
-	     "Unknown msg type %u rcvd from %s to %s", aodv_msg->type,
-	     ip_to_str(src), ip_to_str(dst));
-    }
+		alog(LOG_WARNING, 0, __FUNCTION__,
+			"Unknown msg type %u rcvd from %s to %s", aodv_msg->type,
+			ip_to_str(src), ip_to_str(dst));
+		}
 }
 
 #ifdef NS_PORT

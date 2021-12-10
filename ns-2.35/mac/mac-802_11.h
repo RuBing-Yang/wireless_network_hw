@@ -660,6 +660,7 @@ private:
     /* End buaa g410 */
     /* by gcy */
     double infoPower;
+    int currChannel; //by yrb
     /* by gcy */
 
 };
