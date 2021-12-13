@@ -2,7 +2,12 @@
   "files.associations": {
     "iosfwd": "c",
     "xiosbase": "c",
+<<<<<<< HEAD
     "aodv-uu.h": "c"
+=======
+    "exception": "cpp",
+    "new": "cpp"
+>>>>>>> master
   },
   "C_Cpp_Runner.warnings": [
     "-Wall",

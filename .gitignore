@@ -1,0 +1,4 @@
+*.o
+*/Makefile
+*/.idea
+*/.vscode

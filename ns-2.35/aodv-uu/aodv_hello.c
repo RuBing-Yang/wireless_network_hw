@@ -66,6 +66,8 @@ long NS_CLASS hello_jitter() {
 
 void NS_CLASS hello_start() {
 
+    if (YRB_OUT) printf("hello_start\n");
+
     if (hello_timer.used)
         return;
 
@@ -146,6 +148,8 @@ void NS_CLASS hello_stop() {
 }
 
 void NS_CLASS hello_send(void *arg) {
+    if (YRB_OUT) printf("hello_send\n");
+    if (YRB_OUT) printf("%x的hello计时器 [%d]\n", DEV_NR(0).ipaddr.s_addr, this_host.hello_infos_timer);
     RREP *rrep;
     AODV_ext *ext = NULL;
     u_int8_t flags = 0;
@@ -226,15 +230,20 @@ void NS_CLASS hello_send(void *arg) {
         //by cyo
         hello_send_add();
         hello_infos_timer_add();
+        if (YRB_OUT) printf("下一次间隔 type 0 [%d]ms\n",  HELLO_INTERVAL + jitter);
 
         //cyo_end
     } else {
-        if (HELLO_INTERVAL - time_diff + jitter < 0)
-            timer_set_timeout(&hello_timer,
-                              HELLO_INTERVAL - time_diff - jitter);
-        else
-            timer_set_timeout(&hello_timer,
-                              HELLO_INTERVAL - time_diff + jitter);
+        if (HELLO_INTERVAL - time_diff + jitter < 0) {
+            timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff - jitter);
+            if (YRB_OUT) printf("下一次间隔 type 1 [%d]ms\n",  HELLO_INTERVAL - time_diff - jitter);
+        }
+            
+        else {
+            timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff + jitter);
+            if (YRB_OUT) printf("下一次间隔 type 2 [%d]ms\n",  HELLO_INTERVAL - time_diff + jitter);
+        }
+            
     }
 }
 
@@ -413,6 +422,7 @@ NS_INLINE void NS_CLASS hello_update_timeout(rt_table_t *rt,
 
 /* by gcy & cyo */
 void NS_CLASS update_stability() {
+    if (YRB_OUT) printf("update_stability\n");
     int temp = this_host.stability.neighbor_sum;
     int node_sum = 0;
     int chan_sum = 0;
@@ -519,7 +529,7 @@ void NS_CLASS sta_nb_add(struct in_addr ip_temp, u_int8_t sta) {
 
 void NS_CLASS nb_update_cost(struct in_addr ip_temp, int channel, float cost_value) {      //仅在邻居表中存有该ip的时候才可有用，注意用法
     //if (CYO_OUT) printf("updateCost ip : %d\n", ip_temp.s_addr);
-    for (int i = 0; i < this_host.stability.neighbor_sum; i++) {
+    for (int i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][channel].ipaddr), &ip_temp)) {
             this_host.nb_tbl[i][channel].cost = cost_value;
             break;
@@ -528,7 +538,7 @@ void NS_CLASS nb_update_cost(struct in_addr ip_temp, int channel, float cost_val
 }
 
 void NS_CLASS nb_setIsValid(struct in_addr ip_temp, int channel, int isValid) {
-    for (int i = 0; i < this_host.stability.neighbor_sum; i++) {
+    for (int i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][channel].ipaddr), &ip_temp)) {
             this_host.nb_tbl[i][channel].isValid = isValid;
             this_host.nb_tbl[i][channel].isVisited = 1;
@@ -654,6 +664,7 @@ void NS_CLASS hello_infos_clear() {
 }
 
 void NS_CLASS hello_infos_timer_add() {
+    if (YRB_OUT) printf("hello_infos_timer_add\n");
     this_host.hello_infos_timer++;
     int i;
     for (i = 0; i < NUM_NODE; i++) {
@@ -712,8 +723,7 @@ void NS_CLASS hello_infos_timer_add() {
     if(this_host.hello_infos_timer % TIMER_STA == 0){
         update_stability();
     }
-    if (this_host.hello_infos_timer == TIMER_COST) {
-        this_host.hello_infos_timer = 0;
+    if (this_host.hello_infos_timer % TIMER_COST == 0) {
         for (i = 0; i < MAX_NR_INTERFACES; i++) {
             if (!DEV_NR(i).enabled)
                 continue;
@@ -729,6 +739,7 @@ void NS_CLASS hello_infos_timer_add() {
         }
         //hello_infos_clear();
     }
+    if (this_host.hello_infos_timer == 256) this_host.hello_infos_timer = 0;
 }
 
 void NS_CLASS add_f_value(float f, struct in_addr ip_temp, int channel) {

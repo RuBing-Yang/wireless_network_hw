@@ -255,7 +255,7 @@ printf("fxj_: %d recvd rreqA from %d to comfirm if im alive, try to fix %d to %d
 			}
 		}
 		if (YRB_OUT) {
-			printf("[yrb]RREQ收到cost值: %.3f\n这一跳链路cost值: %.3f\n", cost, max_cost);
+			printf("[yrb]RREQ收到cost值: %.3f\n这一跳链路cost值: %.3f\n", rreq->cost, max_cost);
 		}
 		cost *= max_cost;
 		if (cost < COST_MIN) volat = 1;
