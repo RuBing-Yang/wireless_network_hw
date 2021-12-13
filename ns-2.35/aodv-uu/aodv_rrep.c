@@ -300,61 +300,34 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 // fxj
 if (USE_FXJ) {
 	if (rrep->t) {
-#ifdef FXJ_OUT
-printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
-#endif
-		list_t *pos;
-    	list_foreach_safe(pos, &seekhead) {
-			seek_list_t *sk_entry = (seek_list_t *) pos;
-			// sk_entry->dest_addr.s_addr
-			rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
-			if (rt_entry) {
-				for (int i = 0; i < rt_entry->hcnt; i++) {
-					if (rt_entry->all_nexts[i].s_addr == ip_src.s_addr) {
-#ifdef FXJ_OUT
-printf("fxj_: %d found a next %d in range, GREAT ! ! \n", ip_dst.s_addr, ip_src.s_addr);
-#endif
-						list_detach(pos);
-						rt_entry->next_hop.s_addr = ip_src.s_addr;
-						rt_entry->flags &= 0xfffffffd;
-						packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
-#ifdef FXJ_OUT
-printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
-	ip_dst.s_addr, sk_entry->dest_addr);
-#endif
-						break;
-					}
-					for (int j = 0; j < rrep->hcnt; j++) {
-						if (rt_entry->all_nexts[i].s_addr == rrep->union_data.nexts[j].s_addr) {
-							send_RReqT(ip_dst, ip_src, rrep->union_data.nexts[j], sk_entry->dest_addr, ifindex);
-						}
-					}
-				}
-			} else {
-				return; // no rt_entry found
-			}
-    	}
+		#ifdef FXJ_OUT
+		printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
+		#endif
+		recvd_nb_tbl(ip_src, ip_dst, rrep);
 		return;
 	}
 	if (rrep->A) {
-#ifdef FXJ_OUT
-printf("fxj_: %d comfirmed %d \'s alive...\n", ip_dst.s_addr, ip_src.s_addr);
-#endif
+		#ifdef FXJ_OUT
+		printf("fxj_: %d comfirmed %d \'s alive...\n", ip_dst.s_addr, ip_src.s_addr);
+		#endif
 		send_RRepC(rrep->orig_addr, ip_dst, ip_src, rrep->dest_addr);
+		return;
 	}
 	if (rrep->c) {
-#ifdef FXJ_OUT
-printf("fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", 
-	ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
-#endif
-		confirm_repair(ip_src, rrep->orig_dest, rrep->dest_addr, ifindex);
+		#ifdef FXJ_OUT
+		printf("fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", 
+			ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+		#endif
+		confirm_repair(ip_src, ip_dst, rrep->orig_dest, rrep->dest_addr, ifindex);
+		return;
 	}
 	if (rrep->f) {
-#ifdef FXJ_OUT
-printf("fxj_: %d will create a forward rt  %d -> %d ! !\n", 
-	ip_dst.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
-#endif
-		create_forward_route(rrep);
+		#ifdef FXJ_OUT
+		printf("fxj_: %d will create a forward rt  %d -> %d ! !\n", 
+			ip_dst.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+		#endif
+		create_forward_route(rrep, ifindex);
+		return;
 	}
 }
 // fxj_end
@@ -607,7 +580,7 @@ void NS_CLASS send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifi
 	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), &DEV_NR(ifindex));
 }
 
-void NS_CLASS comfirm_repair(in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
+void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex) {
 	rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
 	if (!rt_entry) return;
 	// send route table
@@ -635,12 +608,59 @@ void NS_CLASS comfirm_repair(in_addr mid, in_addr nbr, in_addr dst, int ifindex)
 		send_RRepF(mid, nbr, rt_entry, ifindex);
 #ifdef FXJ_OUT
 printf("fxj_: %d will forwar to %d -> %d finally to %d...\n", 
-	ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+	src.s_addr, mid.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
 printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
-	ip_dst.s_addr, sk_entry->dest_addr);
+	src.s_addr, sk_entry->dest_addr);
 #endif		
 		packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
 		break;
     }
+}
+
+void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
+	rt_table_t *re = rt_table_find(rrep->dest_addr);
+	if (re) return;
+	int channel = nb_best_channel(rrep->orig_addr);
+	re = rt_table_insert(rrep->dest_addr, rrep->orig_addr, rrep->hcnt - 1, 0,
+				 MY_ROUTE_TIMEOUT, VALID, 0, ifindex,
+				 0, channel); //added by yrb
+		// by fxj: add nexts to rt_tbl
+	for (int i = 1; i < rrep->hcnt - 1; i++) {
+		re->all_nexts[i - 1] = rrep->union_data.nexts[i];
+	}
+}
+
+void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
+			list_t *pos;
+    	list_foreach_safe(pos, &seekhead) {
+			seek_list_t *sk_entry = (seek_list_t *) pos;
+			// sk_entry->dest_addr.s_addr
+			rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
+			if (rt_entry) {
+				for (int i = 0; i < rt_entry->hcnt; i++) {
+					if (rt_entry->all_nexts[i].s_addr == mid.s_addr) {
+#ifdef FXJ_OUT
+printf("fxj_: %d found a next %d in range, GREAT ! ! \n", src.s_addr, mid.s_addr);
+#endif
+						list_detach(pos);
+						rt_entry->next_hop.s_addr = mid.s_addr;
+						rt_entry->flags &= 0xfffffffd;
+						packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
+#ifdef FXJ_OUT
+printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
+	src.s_addr, sk_entry->dest_addr);
+#endif
+						break;
+					}
+					for (int j = 0; j < rrep->hcnt; j++) {
+						if (rt_entry->all_nexts[i].s_addr == rrep->union_data.nexts[j].s_addr) {
+							send_RReqT(src, mid, rrep->union_data.nexts[j], sk_entry->dest_addr, ifindex);
+						}
+					}
+				}
+			} else {
+				return; // no rt_entry found
+			}
+    	}
 }
 //fxj_end
