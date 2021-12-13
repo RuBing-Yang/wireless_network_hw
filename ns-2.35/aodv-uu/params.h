@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -46,7 +46,7 @@
 #define ALLOWED_HELLO_LOSS      2
 /* If expanding ring search is used, BLACKLIST_TIMEOUT should be?: */
 #define BLACKLIST_TIMEOUT       RREQ_RETRIES * NET_TRAVERSAL_TIME + (TTL_THRESHOLD - TTL_START)/TTL_INCREMENT + 1 + RREQ_RETRIES
-#define HELLO_INTERVAL          1000
+#define HELLO_INTERVAL          50 //单位：毫秒 modified by yrb
 #define LOCAL_ADD_TTL           2
 #define MAX_REPAIR_TTL          3 * NET_DIAMETER / 10
 #define MY_ROUTE_TIMEOUT        2 * ACTIVE_ROUTE_TIMEOUT
