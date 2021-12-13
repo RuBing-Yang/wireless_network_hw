@@ -39,7 +39,9 @@
 typedef struct {
     u_int8_t type;
 #if defined(__LITTLE_ENDIAN)
-    u_int8_t res1:4;
+    u_int8_t res1:2;   // bits modified by fxj
+    u_int8_t a:1;    
+    u_int8_t t:1;    
     u_int8_t d:1;
     u_int8_t g:1;
     u_int8_t r:1;
@@ -49,7 +51,9 @@ typedef struct {
     u_int8_t r:1;		/* Repair flag */
     u_int8_t g:1;		/* Gratuitous RREP flag */
     u_int8_t d:1;		/* Destination only respond */
-    u_int8_t res1:4;
+    u_int8_t t:1;
+    u_int8_t a:1;    
+    u_int8_t res1:2;
 #else
 #error "Adjust your <bits/endian.h> defines"
 #endif
@@ -104,6 +108,10 @@ struct blacklist *rreq_blacklist_insert(struct in_addr dest_addr);
 void rreq_blacklist_timeout(void *arg);
 void rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 		       struct ip_data *ipd);
+
+void send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex);   // by fxj
+void send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst);   // by fxj
+
 
 #ifdef NS_PORT
 struct rreq_record *rreq_record_insert(struct in_addr orig_addr,

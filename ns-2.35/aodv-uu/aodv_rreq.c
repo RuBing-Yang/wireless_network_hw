@@ -207,7 +207,26 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	int volat = 0;
 	int channel = 0;
 	/* end yrb */
-	
+
+//fxj
+if (USE_FXJ) {
+	if (rreq->t) {
+#ifdef FXJ_OUT
+printf("fxj_: %d recvd rreqT from %d to comfirm if %d is alive..\n", ip_dst.s_addr, ip_src.s_addr, rreq.orig_addr.s_addr);
+#endif
+		send_RReqA(ip_dst, rreq->orig_addr, ip_src, rreq->dest_addr);
+		return;
+	}
+	if (rreq->a) {
+#ifdef FXJ_OUT
+printf("fxj_: %d recvd rreqA from %d to comfirm if im alive, try to fix %d to %d via moi..\n", 
+		ip_dst.s_addr, ip_src.s_addr, rreq.orig_addr.s_addr, rreq.dest_addr.s_addr);
+#endif
+		send_RRepA(ip_src, ip_dst, rreq.orig_addr, rreq.dest_addr, ifindex);
+		return;
+	}
+}
+// fxj_end
 
     rreq_dest.s_addr = rreq->dest_addr;
     rreq_orig.s_addr = rreq->orig_addr;
@@ -647,6 +666,35 @@ if (USE_FXJ) {
 
     return;
 }
+
+
+// fxj
+void NS_CLASS send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
+#ifdef FXJ_OUT
+printf("fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", src.a_addr, mid.s_addr, nbr.s_addr);
+#endif
+	RREQ *rreq = rreq_create(0, dst.s_addr, 0, nbr.a_addr);
+	rreq->t = 1;
+	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));
+}
+
+void NS_CLASS send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst) {
+#ifdef FXJ_OUT
+printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.a_addr, nbr.s_addr);
+#endif
+	RREQ *rreq = rreq_create(0, dst.s_addr, 0, src.a_addr);
+	rreq->a = 1;
+	int ifindex;
+	for (ifindex = 0; ifindex < MAX_NR_INTERFACES; ifindex++) {
+        if (!DEV_NR(ifindex).enabled)
+            continue;
+        else
+            break;
+    }
+	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));	
+}
+
+// fxj_end
 
 NS_STATIC struct rreq_record *NS_CLASS rreq_record_insert(struct in_addr
 							  orig_addr,

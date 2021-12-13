@@ -44,7 +44,10 @@ typedef struct {
     u_int8_t type;
 // by fxj
 #if defined(__LITTLE_ENDIAN)
-    u_int16_t res1:4;
+    u_int16_t res1:1;
+    u_int16_t f:1;
+    u_int16_t c:1;
+    u_int16_t A:1;
     u_int16_t t:1;
     u_int16_t n:1;
     u_int16_t a:1;
@@ -56,7 +59,10 @@ typedef struct {
     u_int16_t a:1;
     u_int16_t n:1;
     u_int16_t t:1;
-    u_int16_t res1:4;
+    u_int16_t A:1;
+    u_int16_t c:1;
+    u_int16_t f:1;
+    u_int16_t res1:1;
     u_int16_t res2:3;
     u_int16_t prefix:5;
 #else
@@ -122,6 +128,10 @@ void rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		  struct in_addr ip_dst, int ip_ttl, unsigned int ifindex);
 void rrep_ack_process(RREP_ack * rrep_ack, int rreplen, struct in_addr ip_src,
 		      struct in_addr ip_dst);
+void send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex); // fxj
+void send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst); // fxj
+void comfirm_repair(in_addr mid, in_addr nbr, in_addr dst, int ifindex);  // fxj
+void send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifindex); // fxj
 #endif				/* NS_NO_DECLARATIONS */
 
 #endif				/* AODV_RREP_H */

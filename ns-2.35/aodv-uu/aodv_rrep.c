@@ -26,6 +26,7 @@
 #else
 #include <netinet/in.h>
 #include "aodv_rrep.h"
+#include "aodv_rreq.h"
 #include "aodv_neighbor.h"
 #include "aodv_hello.h"
 #include "routing_table.h"
@@ -37,7 +38,7 @@
 #include "params.h"
 
 extern int unidir_hack, optimized_hellos, llfeedback;
-
+extern list_t seekhead; // fxj
 #endif
 
 RREP *NS_CLASS rrep_create(u_int8_t flags,
@@ -296,6 +297,68 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     int inet_rrep = 0;
 #endif
 
+// fxj
+if (USE_FXJ) {
+	if (rrep->t) {
+#ifdef FXJ_OUT
+printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
+#endif
+		list_t *pos;
+    	list_foreach_safe(pos, &seekhead) {
+			seek_list_t *sk_entry = (seek_list_t *) pos;
+			// sk_entry->dest_addr.s_addr
+			rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
+			if (rt_entry) {
+				for (int i = 0; i < rt_entry->hcnt; i++) {
+					if (rt_entry->all_nexts[i].s_addr == ip_src.s_addr) {
+#ifdef FXJ_OUT
+printf("fxj_: %d found a next %d in range, GREAT ! ! \n", ip_dst.s_addr, ip_src.s_addr);
+#endif
+						list_detach(pos);
+						rt_entry->next_hop.s_addr = ip_src.s_addr;
+						rt_entry->flags &= 0xfffffffd;
+						packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
+#ifdef FXJ_OUT
+printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
+	ip_dst.s_addr, sk_entry->dest_addr);
+#endif
+						break;
+					}
+					for (int j = 0; j < rrep->hcnt; j++) {
+						if (rt_entry->all_nexts[i].s_addr == rrep->union_data.nexts[j].s_addr) {
+							send_RReqT(ip_dst, ip_src, rrep->union_data.nexts[j], sk_entry->dest_addr, ifindex);
+						}
+					}
+				}
+			} else {
+				return; // no rt_entry found
+			}
+    	}
+		return;
+	}
+	if (rrep->A) {
+#ifdef FXJ_OUT
+printf("fxj_: %d comfirmed %d \'s alive...\n", ip_dst.s_addr, ip_src.s_addr);
+#endif
+		send_RRepC(rrep->orig_addr, ip_dst, ip_src, rrep->dest_addr);
+	}
+	if (rrep->c) {
+#ifdef FXJ_OUT
+printf("fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", 
+	ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+#endif
+		confirm_repair(ip_src, rrep->orig_dest, rrep->dest_addr, ifindex);
+	}
+	if (rrep->f) {
+#ifdef FXJ_OUT
+printf("fxj_: %d will create a forward rt  %d -> %d ! !\n", 
+	ip_dst.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+#endif
+		create_forward_route(rrep);
+	}
+}
+// fxj_end
+
     /* Convert to correct byte order on affeected fields: */
     rrep_dest.s_addr = rrep->dest_addr;
     rrep_orig.s_addr = rrep->orig_addr;
@@ -514,3 +577,70 @@ int rrep_add_hello_ext(RREP * rrep, int offset, u_int32_t interval)
 
     return (offset + AODV_EXT_SIZE(ext));
 }
+
+// by fxj
+void NS_CLASS send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex) {
+	RREP *rrep = rrep_create(0, 0, 1, dst, 0, src, 1);
+	rrep->A = 1;
+	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
+}
+
+void NS_CLASS send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst) {
+	RREP *rrep = rrep_create(0, 0, 1, dst, 0, nbr, 1);
+	rrep->c = 1;
+	int ifindex = 0;
+	for (ifindex = 0; ifindex < MAX_NR_INTERFACES; ifindex++) {
+        if (!DEV_NR(ifindex).enabled)
+            continue;
+        else
+            break;
+    }
+	aodv_socket_send((AODV_msg*)rrep, src, sizeof(RREP), 1, &DEV_NR(ifindex));
+}
+
+void NS_CLASS send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifindex) {
+	RREP *rrep = rrep_create(0, 0, rt_entry->hcnt - 1, rt_entry->dest_addr, 0, nbr, 1);
+	rrep->f = 1;
+	for (int i = 0; i < rrep->hcnt; i++) {
+		rrep->union_data.nexs[i].s_addr = rt_entry->all_nexts[i + 1].s_addr;
+	}
+	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), &DEV_NR(ifindex));
+}
+
+void NS_CLASS comfirm_repair(in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
+	rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
+	if (!rt_entry) return;
+	// send route table
+	// remove sk list and send cached pack
+	list_foreach_safe(pos, &seekhead) {
+		seek_list_t *sk_entry = (seek_list_t *) pos;
+		if (sk_entry->dest_addr.s_addr != dst.s_addr) continue;
+		list_detach(pos);
+		rt_entry->flags &= 0xfffffffd;
+		rt_entry->next_hop.s_addr = mid.s_addr;
+		for (int i = 0; i < rt_entry->hcnt; i++) {
+			if (nbr.s_addr = rt_entry->all_nexts[i].s_addr) 
+				break;
+		}
+		if (i == 0) {
+			for (int j = rt_entry->hcnt; j > 0; j--)
+				rt_entry->all_nexts[j].s_addr = rt_entry->all_nexts[j - 1].s_addr;
+			rt_entry->hcnt++;
+		} else if (i >= 2) {
+			for (int j = 1; j < rt_entry->hcnt + 1 - i; j++)
+				rt_entry->all_nexts[j].s_addr = rt_entry->all_nexts[j + i - 1].s_addr;
+			rt_entry->hcnt -= i - 1;
+		}
+		rt_entry->all_nexts[0].s_addr = mid.s_addr;
+		send_RRepF(mid, nbr, rt_entry, ifindex);
+#ifdef FXJ_OUT
+printf("fxj_: %d will forwar to %d -> %d finally to %d...\n", 
+	ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr.s_addr, rrep->dest_addr.s_addr);
+printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
+	ip_dst.s_addr, sk_entry->dest_addr);
+#endif		
+		packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
+		break;
+    }
+}
+//fxj_end

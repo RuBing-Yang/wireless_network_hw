@@ -272,21 +272,13 @@ printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(h
 #endif
             struct in_addr temp;
             memcpy(&temp, &hello->dest_addr, sizeof(u_int32_t));
-            send_neighbor_table(DEV_NR(i).ipaddr, temp, channel, i);
+            send_neighbor_table(DEV_NR(i).ipaddr, temp, i);
         }  
-    } else {
-        for (int j = 0; j < NUM_NODE; j++) {
-            if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
-                hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
-                hello_received_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_received);
-                break;
-            }
-        }
-        hello_received_add(hello_dest, hello->channel, 1);
-        hello_ip_add(hello_dest, channel);  
-        nb_add(hello_dest);
+        return;
     }
-} else {
+} 
+// fxj_end
+
     for (int j = 0; j < NUM_NODE; j++) {
         if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
             hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
@@ -298,8 +290,6 @@ printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(h
     hello_ip_add(hello_dest, channel);
     nb_add(hello_dest);
     sta_nb_add(hello_dest, hello->sta_nb);
-}
-// fxj_end
     //cyo_end
 
     hello_dest.s_addr = hello->dest_addr;
@@ -853,8 +843,8 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
 
 //cyo_end
 
-//fxj_todo
-void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int channel, int device_i) {
+//fxj
+void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int device_i) {
     RREP *rrep = rrep_create(0, 0, 0, src,
     	                   this_host.seqno,
     	                   DEV_NR(device_i).ipaddr,
