@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 
@@ -203,3 +203,46 @@ void NS_CLASS neighbor_link_break(rt_table_t * rt)
 	}
     }
 }
+
+// fxj
+int NS_CLASS nb_table_find(in_addr addr) {
+	for (int i = 0; i < NUM_NODE; i++) {
+		if (this_host.nb_tbl[i][0].ipaddr.s_addr != addr.s_addr)
+			continue;
+		for (int j = 0; j < CHANNEL_NUM; j++) {
+			if (this_host.nb_tbl[i][j].isValid)
+				return i;
+		}
+	}
+	return -1;
+}
+
+int NS_CLASS nb_table_find(int addr) {
+	in_addr ad;
+	ad.s_addr = addr;
+	return nb_table_find(ad);
+}
+
+int NS_CLASS nb_best_channel(int addr) {
+	in_addr ad;
+	ad.s_addr = addr;
+	return nb_best_channel(ad);
+}
+
+int NS_CLASS nb_best_channel(in_addr addr) {
+	int index = nb_table_find(addr);
+	if (index == -1) return -1;
+	float maxc = 0;
+	int ret = -1;
+	for (int i = 0; i < CHANNEL_NUM; i++) {
+		if (this_host.nb_tbl[index][i].isValid) {
+			if (this_host.nb_tbl[index][i].cost > maxc) {
+				maxc = this_host.nb_tbl[index][i].cost;
+				ret = i;
+			}
+		}
+	}
+	return ret;
+}
+
+// fxj_end
