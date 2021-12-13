@@ -212,17 +212,24 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 if (USE_FXJ) {
 	if (rreq->t) {
 #ifdef FXJ_OUT
-printf("fxj_: %d recvd rreqT from %d to comfirm if %d is alive..\n", ip_dst.s_addr, ip_src.s_addr, rreq.orig_addr.s_addr);
+printf("fxj_: %d recvd rreqT from %d to comfirm if %d is alive..\n", 
+	ip_dst.s_addr, ip_src.s_addr, rreq->orig_addr);
 #endif
-		send_RReqA(ip_dst, rreq->orig_addr, ip_src, rreq->dest_addr);
+		in_addr nbr, dst;
+		nbr.s_addr = rreq->orig_addr;
+		dst.s_addr = rreq->dest_addr;
+		send_RReqA(nbr, ip_dst, ip_src, dst);
 		return;
 	}
 	if (rreq->a) {
 #ifdef FXJ_OUT
 printf("fxj_: %d recvd rreqA from %d to comfirm if im alive, try to fix %d to %d via moi..\n", 
-		ip_dst.s_addr, ip_src.s_addr, rreq.orig_addr.s_addr, rreq.dest_addr.s_addr);
+		ip_dst.s_addr, ip_src.s_addr, rreq->orig_addr, rreq->dest_addr);
 #endif
-		send_RRepA(ip_src, ip_dst, rreq.orig_addr, rreq.dest_addr, ifindex);
+		in_addr src, dst;
+		src.s_addr =  rreq->orig_addr;
+		dst.s_addr = rreq->dest_addr;
+		send_RRepA(ip_src, ip_dst, src, dst, ifindex);
 		return;
 	}
 }
@@ -671,18 +678,18 @@ if (USE_FXJ) {
 // fxj
 void NS_CLASS send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
 #ifdef FXJ_OUT
-printf("fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", src.a_addr, mid.s_addr, nbr.s_addr);
+printf("fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", src.s_addr, mid.s_addr, nbr.s_addr);
 #endif
-	RREQ *rreq = rreq_create(0, dst.s_addr, 0, nbr.a_addr);
+	RREQ *rreq = rreq_create(0, dst, 0, nbr);
 	rreq->t = 1;
 	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));
 }
 
 void NS_CLASS send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst) {
 #ifdef FXJ_OUT
-printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.a_addr, nbr.s_addr);
+printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.s_addr, nbr.s_addr);
 #endif
-	RREQ *rreq = rreq_create(0, dst.s_addr, 0, src.a_addr);
+	RREQ *rreq = rreq_create(0, dst, 0, src);
 	rreq->a = 1;
 	int ifindex;
 	for (ifindex = 0; ifindex < MAX_NR_INTERFACES; ifindex++) {

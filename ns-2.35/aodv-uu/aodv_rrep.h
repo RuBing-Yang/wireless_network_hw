@@ -128,7 +128,7 @@ void rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		  struct in_addr ip_dst, int ip_ttl, unsigned int ifindex);
 void rrep_ack_process(RREP_ack * rrep_ack, int rreplen, struct in_addr ip_src,
 		      struct in_addr ip_dst);
-void recvd_nb_tbl();
+void recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep);
 void send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex); // fxj
 void send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst); // fxj
 void confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex);  // fxj

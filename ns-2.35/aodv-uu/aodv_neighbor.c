@@ -204,6 +204,7 @@ void NS_CLASS neighbor_link_break(rt_table_t * rt)
     }
 }
 
+// fxj
 int NS_CLASS nb_table_find(in_addr addr) {
 	for (int i = 0; i < NUM_NODE; i++) {
 		if (this_host.nb_tbl[i][0].ipaddr.s_addr != addr.s_addr)
@@ -214,6 +215,18 @@ int NS_CLASS nb_table_find(in_addr addr) {
 		}
 	}
 	return -1;
+}
+
+int NS_CLASS nb_table_find(int addr) {
+	in_addr ad;
+	ad.s_addr = addr;
+	return nb_table_find(ad);
+}
+
+int NS_CLASS nb_best_channel(int addr) {
+	in_addr ad;
+	ad.s_addr = addr;
+	return nb_best_channel(ad);
 }
 
 int NS_CLASS nb_best_channel(in_addr addr) {
@@ -231,3 +244,5 @@ int NS_CLASS nb_best_channel(in_addr addr) {
 	}
 	return ret;
 }
+
+// fxj_end
