@@ -297,8 +297,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     int inet_rrep = 0;
 #endif
 
-// fxj
-if (USE_FXJ) {
+	// fxj
+	#ifdef USE_FXJ
 	if (rrep->t) {
 		#ifdef FXJ_OUT
 		printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
@@ -335,8 +335,8 @@ if (USE_FXJ) {
 		create_forward_route(rrep, ifindex);
 		return;
 	}
-}
-// fxj_end
+	#endif
+	// fxj_end
 
     /* Convert to correct byte order on affeected fields: */
     rrep_dest.s_addr = rrep->dest_addr;

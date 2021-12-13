@@ -262,22 +262,22 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
         else
             break;
     }
-// by fxj
-if (USE_FXJ) {
+    // by fxj
+    #ifdef USE_FXJ
     if (hello->n) {
         int nb_id = neighbor_id(hello_dest);
         if (nb_id != -1) {   // only proc nodes in nb_tbl
-#ifdef FXJ_OUT
-printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
-#endif
+    #ifdef FXJ_OUT
+    printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
+    #endif
             struct in_addr temp;
             memcpy(&temp, &hello->dest_addr, sizeof(u_int32_t));
             send_neighbor_table(DEV_NR(i).ipaddr, temp, i);
         }  
         return;
     }
-} 
-// fxj_end
+    #endif
+    // fxj_end
 
     for (int j = 0; j < NUM_NODE; j++) {
         if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
