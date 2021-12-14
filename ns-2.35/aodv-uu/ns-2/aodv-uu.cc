@@ -335,11 +335,6 @@ void NS_CLASS recv(Packet *p, Handler *)
 	struct hdr_cmn *ch = HDR_CMN(p);
 	struct hdr_ip *ih = HDR_IP(p);
 	struct in_addr saddr;
-
-	
-	if (YRB_OUT) {
-		printf("[aodv-uu] receive packet [%d]\n", ch->ptype());
-	}
 	
 	/* Routing agent must be started before processing packets */
 	assert(initialized);

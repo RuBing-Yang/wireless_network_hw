@@ -221,9 +221,7 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 
 
     if ((aodv_msg->type == AODV_RREP && ttl == 1 && dst.s_addr == AODV_BROADCAST)) {
-		if (YRB_OUT) {
-			printf("[socket process]AODV_HELLO\n");
-		}
+		
 		hello_process((RREP *) aodv_msg, len, ifindex);
 		return;
     }
@@ -236,9 +234,6 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
     switch (aodv_msg->type) {
 
     case AODV_RREQ:
-		if (YRB_OUT) {
-			printf("[socket process]AODV_RREQ\n");
-		}
 		rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
     case AODV_RREP:
@@ -249,16 +244,10 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 		rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
 	case AODV_RERR:
-		if (YRB_OUT) {
-			printf("[socket process]AODV_RERR\n");
-		}
 		DEBUG(LOG_DEBUG, 0, "Received RERR");
 		rerr_process((RERR *) aodv_msg, len, src, dst);
 		break;
     case AODV_RREP_ACK:
-		if (YRB_OUT) {
-			printf("[socket process]AODV_RREP_ACK\n");
-		}
 		DEBUG(LOG_DEBUG, 0, "Received RREP_ACK");
 		rrep_ack_process((RREP_ack *) aodv_msg, len, src, dst);
 		break;
@@ -282,10 +271,6 @@ void NS_CLASS recvAODVUUPacket(Packet * p)
     dst.s_addr = ih->daddr();
     len = ch->size() - IP_HDR_LEN;
     ttl = ih->ttl();
-
-	if (YRB_OUT) {
-		printf("[aodv_socket] recvAODVUUPacket packet_t [%d]\n", ch->ptype());
-	}
 
     AODV_msg *aodv_msg = (AODV_msg *) recv_buf;
 
@@ -393,28 +378,7 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
     struct timeval now;
     /* Rate limit stuff: */
 
-	if (YRB_OUT) {
-		switch(aodv_msg->type) {
-			case AODV_HELLO:
-				printf("[socket send]AODV_HELLO\n");
-				break;
-			case AODV_RREQ:
-				printf("[socket send]AODV_RREQ\n");
-				break;
-			case AODV_RREP:
-				//printf("[socket send]AODV_RREP\n");
-				break;
-			case AODV_RERR:
-				printf("[socket send]AODV_RERR\n");
-				break;
-			case AODV_RREP_ACK:
-				printf("[socket send]AODV_RREP_ACK\n");
-				break;
-			default:
-				printf("[socket]not known type");
-		}
-	}
-
+	
 #ifndef NS_PORT
 
     struct sockaddr_in dst_addr;

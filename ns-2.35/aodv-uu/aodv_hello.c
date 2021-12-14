@@ -66,8 +66,6 @@ long NS_CLASS hello_jitter() {
 
 void NS_CLASS hello_start() {
 
-    if (YRB_OUT) printf("hello_start\n");
-
     if (hello_timer.used)
         return;
 
@@ -148,8 +146,8 @@ void NS_CLASS hello_stop() {
 }
 
 void NS_CLASS hello_send(void *arg) {
-    if (YRB_OUT) printf("hello_send\n");
-    if (YRB_OUT) printf("%x的hello计时器 [%d]\n", DEV_NR(0).ipaddr.s_addr, this_host.hello_infos_timer);
+
+    //if (YRB_OUT) printf("%x的hello计时器 [%d]\n", DEV_NR(0).ipaddr.s_addr, this_host.hello_infos_timer);
     RREP *rrep;
     AODV_ext *ext = NULL;
     u_int8_t flags = 0;
@@ -230,18 +228,15 @@ void NS_CLASS hello_send(void *arg) {
         //by cyo
         hello_send_add();
         hello_infos_timer_add();
-        if (YRB_OUT) printf("下一次间隔 type 0 [%d]ms\n",  HELLO_INTERVAL + jitter);
 
         //cyo_end
     } else {
         if (HELLO_INTERVAL - time_diff + jitter < 0) {
             timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff - jitter);
-            if (YRB_OUT) printf("下一次间隔 type 1 [%d]ms\n",  HELLO_INTERVAL - time_diff - jitter);
         }
             
         else {
             timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff + jitter);
-            if (YRB_OUT) printf("下一次间隔 type 2 [%d]ms\n",  HELLO_INTERVAL - time_diff + jitter);
         }
             
     }
@@ -422,7 +417,6 @@ NS_INLINE void NS_CLASS hello_update_timeout(rt_table_t *rt,
 
 /* by gcy & cyo */
 void NS_CLASS update_stability() {
-    if (YRB_OUT) printf("update_stability\n");
     int temp = this_host.stability.neighbor_sum;
     int node_sum = 0;
     int chan_sum = 0;
@@ -664,7 +658,6 @@ void NS_CLASS hello_infos_clear() {
 }
 
 void NS_CLASS hello_infos_timer_add() {
-    if (YRB_OUT) printf("hello_infos_timer_add\n");
     this_host.hello_infos_timer++;
     int i;
     for (i = 0; i < NUM_NODE; i++) {
