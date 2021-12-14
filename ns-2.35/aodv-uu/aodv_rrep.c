@@ -646,13 +646,30 @@ void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
 }
 
 void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
+	#ifdef FXJ_OUT
+	printf("       valid neighbors: %d. ", rrep->hcnt);
+	if (rrep->hcnt > 0) {
+        printf("(");
+        for (int i = 0; i < rrep->hcnt; i++)
+            printf("%d, ", rrep->union_data.nexts[i]);
+        printf(")\n");
+    } else {
+        printf("\n");
+    }
+	#endif
 	list_t *pos, *temp__;
     list_foreach_safe(pos, temp__, &seekhead) {
 		seek_list_t *sk_entry = (seek_list_t *) pos;
 		// sk_entry->dest_addr.s_addr
 		rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
+		#ifdef FXJ_OUT_1
+		printf("fxj_: searching dest %d.\n", sk_entry->dest_addr.s_addr);
+		#endif
 		if (rt_entry) {
 			for (int i = 0; i < rt_entry->hcnt; i++) {
+				#ifdef FXJ_OUT_2
+				printf("       searching next %d.\n", rt_entry->all_nexts[i].s_addr);
+				#endif
 				if (rt_entry->all_nexts[i].s_addr == mid.s_addr) {
 					#ifdef FXJ_OUT
 					printf("fxj_: %d found a next %d in range, GREAT ! ! \n", src.s_addr, mid.s_addr);
@@ -674,8 +691,6 @@ void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
 					}
 				}
 			}
-		} else {
-			return; // no rt_entry found
 		}
     }
 }

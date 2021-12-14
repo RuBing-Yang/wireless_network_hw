@@ -403,7 +403,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	    rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
 			       this_host.seqno, rev_rt->dest_addr,
 			       ACTIVE_ROUTE_TIMEOUT);
-
+		// by fxj: add node to the chain.
+		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		// fxj_end
 	    ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
 			       sizeof(struct in_addr), (char *) &rreq_dest);
 
@@ -441,7 +443,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			   MY_ROUTE_TIMEOUT);
 	rrep->channel = rev_rt->channel; //by yrb
 	// by fxj: add node to the chain.
-	rrep->union_data.nexts[0] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+	rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 	// fxj_end
 	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
@@ -478,7 +480,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, gw_rt->hcnt, gw_rt->dest_addr,
 				   gw_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
-
+		// by fxj: add node to the chain.
+		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		// fxj_end
 		ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
 				   sizeof(struct in_addr), (char *) &rreq_dest);
 
@@ -500,6 +504,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
 				   fwd_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
+		// by fxj: add node to the chain.
+		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		// fxj_end
 		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
 	    } else {
 		goto forward;
@@ -510,7 +517,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
 				   rev_rt->dest_seqno, fwd_rt->dest_addr,
 				   lifetime);
-
+		// by fxj: add node to the chain.
+		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		// fxj_end
 		rrep_send(rrep, fwd_rt, rev_rt, RREP_SIZE);
 
 		DEBUG(LOG_INFO, 0, "Sending G-RREP to %s with rte to %s",
@@ -595,7 +604,7 @@ void NS_CLASS rreq_route_discovery(struct in_addr dest_addr, u_int8_t flags,
     return;
 }
 
-// by fxj
+
 /* Local repair is very similar to route discovery... */
 void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 				struct ip_data *ipd)

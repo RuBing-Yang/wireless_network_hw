@@ -871,7 +871,7 @@ void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int 
         }
     }
 #ifdef FXJ_OUT
-    printf("node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
+    printf("fxj_:node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
     if (rrep->hcnt > 0) {
         printf("(");
         for (int i = 0; i < rrep->hcnt; i++)
