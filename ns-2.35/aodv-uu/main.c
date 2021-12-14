@@ -53,7 +53,7 @@ int unidir_hack = 0;
 int rreq_gratuitous = 0;
 int expanding_ring_search = 1;
 int internet_gw_mode = 0;
-int local_repair = 0;
+int local_repair = 1;
 int receive_n_hellos = 0;
 int hello_jittering = 1;
 int optimized_hellos = 0;
@@ -582,7 +582,7 @@ int main(int argc, char **argv)
 	    expanding_ring_search = !expanding_ring_search;
 	    break;
 	case 'L':
-	    local_repair = !local_repair;
+	    local_repair = 1;
 	    break;
 	case 'D':
 	    wait_on_reboot = !wait_on_reboot;

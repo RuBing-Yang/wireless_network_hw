@@ -639,22 +639,22 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 
 	// by fxj
 	#ifdef USE_FXJ
-	#ifdef FXJ_OUT
-	printf("\nfxj: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
-			src_addr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
-	#endif
 	int i;
 	for (i = 0; i < MAX_NR_INTERFACES; i++) {
-    	if (!DEV_NR(i).enabled) continue;
-    	RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
-    	                   this_host.seqno,
-    	                   DEV_NR(i).ipaddr,
-    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
-    	rrep->n = 1;
-    	struct in_addr dest; 
-		dest.s_addr = AODV_BROADCAST; 
-    	aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &(DEV_NR(i)));
+    	if (DEV_NR(i).enabled) break;
     }
+	#ifdef FXJ_OUT
+	printf("\nfxj_: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
+			DEV_NR(i).ipaddr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
+	#endif
+    RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
+                       this_host.seqno,
+                       DEV_NR(i).ipaddr,
+                       ALLOWED_HELLO_LOSS * HELLO_INTERVAL);   // Hello msg whose N is set true
+    rrep->n = 1;
+    struct in_addr dest; 
+	dest.s_addr = AODV_BROADCAST; 
+    aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &(DEV_NR(i)));
 	#else
     rreq_send(rt->dest_addr, rt->dest_seqno, ttl, flags);
 	#endif

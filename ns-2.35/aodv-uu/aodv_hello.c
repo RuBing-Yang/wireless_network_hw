@@ -279,9 +279,9 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
     #ifdef FXJ_OUT
     printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
     #endif
-            struct in_addr temp;
-            memcpy(&temp, &hello->dest_addr, sizeof(u_int32_t));
-            send_neighbor_table(DEV_NR(i).ipaddr, temp, i);
+            struct in_addr dest;
+            dest.s_addr = hello->dest_addr;
+            send_neighbor_table(dest, DEV_NR(i).ipaddr, i);
         }  
         return;
     }

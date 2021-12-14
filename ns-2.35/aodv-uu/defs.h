@@ -118,8 +118,10 @@
 #define GCY_OUT 1
 #define CYO_OUT 1
 #define YRB_OUT 1
-#define FXJ_OUT 0
-#define GLO_OUT 1
+#define FXJ_OUT 
+#define FXJ_OUT_1
+#define FXJ_OUT_2
+#define GLO_OUT 
 /* end */
 
 
@@ -134,7 +136,7 @@
 /* cost寻路和快速修复的开关 */
 /* 用来跑tcl验证时区分原AODV协议和我们的策略 */
 #define USE_YRB 1
-#define USE_FXJ 1
+#define USE_FXJ
 /* end yrb */
 
 /* Data for a network device */

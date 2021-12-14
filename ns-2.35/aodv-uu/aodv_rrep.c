@@ -599,6 +599,7 @@ void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst,
 		seek_list_t *sk_entry = (seek_list_t *) pos;
 		if (sk_entry->dest_addr.s_addr != dst.s_addr) continue;
 		list_detach(pos);
+		sk_entry->seek_timer.handler = 0;
 		rt_entry->flags &= 0xfffffffd;
 		rt_entry->next_hop.s_addr = mid.s_addr;
 		int i;
@@ -657,6 +658,7 @@ void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
 					printf("fxj_: %d found a next %d in range, GREAT ! ! \n", src.s_addr, mid.s_addr);
 					#endif
 					list_detach(pos);
+					sk_entry->seek_timer.handler = 0;
 					rt_entry->next_hop.s_addr = mid.s_addr;
 					rt_entry->flags &= 0xfffffffd;
 					packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);

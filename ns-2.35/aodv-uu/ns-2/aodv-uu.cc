@@ -296,7 +296,7 @@ void NS_CLASS packetFailed(Packet *p)
 	}
 
 	/* Do local repair? */
-	if (local_repair && rt->hcnt <= MAX_REPAIR_TTL
+	if (1 && rt->hcnt <= MAX_REPAIR_TTL
 		/* && ch->num_forwards() > rt->hcnt */
 			) {
 
