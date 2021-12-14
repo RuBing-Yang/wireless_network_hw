@@ -271,7 +271,7 @@ void NS_CLASS rrep_forward(RREP * rrep, int size, rt_table_t * rev_rt,
     rrep = (RREP *) aodv_socket_queue_msg((AODV_msg *) rrep, size);
     rrep->hcnt = fwd_rt->hcnt;	/* Update the hopcount */
 
-	rrep->cost = rev_rt->cost; //by yrb
+	//rrep->cost = rev_rt->cost; //by yrb
 	rrep->channel = rev_rt->channel; //by yrb
 
     aodv_socket_send((AODV_msg *) rrep, rev_rt->next_hop, size, ttl,
@@ -299,6 +299,35 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     struct in_addr inet_dest_addr;
     int inet_rrep = 0;
 #endif
+
+
+	/* added by yrb */
+	// to ori_node的上一跳link_cost
+	float last_cost = 0;
+	float all_cost = rrep->all_cost;
+	if (USE_YRB) {
+		int i = 0;
+		for (i = 0; i < NUM_NODE; i++) {
+			if (hash_cmp(&(this_host.hello_infos[i][rrep->channel].ipaddr), &ip_src)) {
+				break;
+			}
+		}
+		if (i < NUM_NODE) {
+			last_cost = this_host.nb_tbl[i][rrep->channel].cost;
+			last_cost = cost_normalize(last_cost);
+		}
+		if (YRB_OUT) {
+			printf("[%d->%d] node(%d) rrep.cost=%f, r.last.cost=%f, last.channel(%d)\n", rrep_orig.s_addr,  rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rrep->all_cost, last_cost, rrep->channel);
+		}
+		all_cost *= last_cost;
+		//if (cost < COST_MIN) volat = 1;
+	} else {
+		all_cost = 1;
+		//volat = 0;
+	}
+	/* end yrb */
+
+
 
 	// fxj
 	#ifdef USE_FXJ
@@ -409,9 +438,13 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 rrep->cost, rrep->channel); //added by yrb
+				 1.0, all_cost, rrep->channel); //added by yrb
+		if (rev_rt) {
+			rev_rt->last_all_cost = all_cost; //added by yrb
+			fwd_rt->last_all_cost = rev_rt->next_all_cost; //added by yrb
+		}
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rrep insert: next(%d) cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, rrep->cost, rrep->channel);
+			printf("[%d->%d] node(%d) rrep insert: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -423,12 +456,12 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	else if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
 		   (rrep_seqno == fwd_rt->dest_seqno &&
-		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
-		   || (rrep->cost - fwd_rt->cost >= COST_PROMOTE))))  //added by yrb
+		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt)))  
+		   // yrb note: 不用管cost，因为序列号rrep_create会更新
 	{
 		
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rrep update: next(%d) cost(%f>%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, rrep->cost, fwd_rt->cost, rrep->channel);
+			printf("[%d->%d] node(%d) rrep update: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
 		
 		pre_repair_hcnt = fwd_rt->hcnt;
@@ -438,7 +471,11 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rrep->cost, rrep->channel); //added by yrb
+					1.0, all_cost, rrep->channel); //added by yrb
+		if (rev_rt) {
+			rev_rt->last_all_cost = all_cost; //added by yrb
+			fwd_rt->last_all_cost = rev_rt->next_all_cost; //added by yrb
+		}
 
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -482,7 +519,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    if (!inet_rt) {
 			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
-				rev_rt->cost, rev_rt->channel);
+				rev_rt->next_all_cost, 1, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -492,7 +529,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
 							rrep_lifetime, VALID, RT_INET_DEST |
 							inet_rt->flags,
-				 			rev_rt->cost, rev_rt->channel);
+				 			rev_rt->next_all_cost, 1, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -638,7 +675,7 @@ void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
 	int channel = nb_best_channel(next);
 	re = rt_table_insert(dest, next, rrep->hcnt - 1, 0,
 				 MY_ROUTE_TIMEOUT, VALID, 0, ifindex,
-				 0, channel); //added by yrb
+				 0, 0, channel); //added by yrb
 		// by fxj: add nexts to rt_tbl
 	for (int i = 1; i < rrep->hcnt - 1; i++) {
 		re->all_nexts[i - 1] = rrep->union_data.nexts[i];

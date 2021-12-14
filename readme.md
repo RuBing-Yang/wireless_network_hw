@@ -2,17 +2,7 @@
 
 [toc]
 
-## 当前问题
 
-如下图所示：
-
-<img src="https://s2.loli.net/2021/12/10/Lu1AGBayW2EC3dD.png" alt="image-20211210063300164" style="zoom: 80%;" /><img src="https://s2.loli.net/2021/12/10/2HWJ3ECUOszR8Nq.png" alt="image-20211210063454379" style="zoom: 80%;" />
-
-猜测问题：
-
-①链路cost=0
-
-②RREP_ACK会导致Segmetation fault
 
 ## 验证场景
 

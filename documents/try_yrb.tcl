@@ -136,7 +136,8 @@ $ns_ duplex-link-op $n(4) $n(0) orient right-up
 #======================================
 # add Noise Node
 #======================================
-$ns_ node-config -workMode -1  -noiseChannel 0
+# 全信道干扰： noiseChannel = -1
+$ns_ node-config -workMode -1  -noiseChannel -1
 
 # Create nodes
 puts "begin to create noise nodes"

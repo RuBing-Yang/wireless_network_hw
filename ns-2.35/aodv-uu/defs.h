@@ -133,6 +133,11 @@
 /* 概率提升(cost_new - cost_old >= 0.1)时更新路由表 */
 #define COST_PROMOTE 0.1
 
+/* 链路cost取值范围和归一化 */
+#define COST_LOW 0.0
+#define COST_HIGH 3.0
+#define cost_normalize(x) ((x - COST_LOW) / (COST_HIGH - COST_LOW))
+
 /* cost寻路和快速修复的开关 */
 /* 用来跑tcl验证时区分原AODV协议和我们的策略 */
 #define USE_YRB 1

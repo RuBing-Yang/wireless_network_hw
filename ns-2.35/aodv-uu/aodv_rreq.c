@@ -73,7 +73,7 @@ RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
     rreq->res1 = 0;
     rreq->res2 = 0;
     rreq->hcnt = 0;
-	rreq->cost = 1.0; //初始1.0
+	rreq->all_cost = 1.0; //初始1.0
     rreq->rreq_id = htonl(this_host.rreq_id++);
     rreq->dest_addr = dest_addr.s_addr;
     rreq->dest_seqno = htonl(dest_seqno);
@@ -182,7 +182,8 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     struct in_addr rreq_dest, rreq_orig;
 	
 	/* added by yrb */
-	float cost = rreq->cost;
+	float all_cost = rreq->all_cost;
+	int cost_flag = 0; //当正向路由f存在且rreq.all_cost - f.last_all_cost > limit时置1
 	//int volat = 0;
 	int channel = 0;
 	/* end yrb */
@@ -222,8 +223,8 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     rreq_new_hcnt = rreq->hcnt + 1;
 
 	/* added by yrb */
-	/* 计算当前链路的cost值 */
-	float max_cost = 0;
+	/* 计算正向上一跳的最大cost值对应channel */
+	float max_last_cost = 0;
 	if (USE_YRB) {
 		for (int channel_i = 0; channel_i < CHANNEL_NUM; channel_i++) {
 			int i;
@@ -234,19 +235,20 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			}
 			if (i < NUM_NODE) {
 				float temp = this_host.nb_tbl[i][channel_i].cost;
-				if (temp > max_cost) {
+				if (temp > max_last_cost) {
 					channel = channel_i;
-					max_cost = temp;
+					max_last_cost = temp;
 				}
 			}
 		}
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rreq.cost=%f, last.cost=%f, last.channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->cost, max_cost, rreq->channel);
+			printf("[%d->%d] node(%d) rreq.cost=%f, f.lastall.cost=%f, f.last.channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->all_cost, max_last_cost, rreq->channel);
 		}
-		cost *= max_cost;
+		max_last_cost = cost_normalize(max_last_cost);
+		all_cost *= max_last_cost;
 		//if (cost < COST_MIN) volat = 1;
 	} else {
-		cost = 1;
+		all_cost = 1;
 		//volat = 0;
 	}
 	/* end yrb */
@@ -280,15 +282,16 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	if (USE_YRB) {
 		if (rreq_record_find(rreq_orig, rreq_id)) {
 			fwd_rt = rt_table_find(rreq_dest);
-			/* Ignore already processed RREQs. */
+			
 			//if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
-			if (fwd_rt && fwd_rt->state == VALID && fwd_rt->cost > cost - COST_PROMOTE)
-			return; //fwd_rt存在有效且新的cost不够大
-			if (YRB_OUT) {
-				printf("[yrb]原路由不稳定而当前路由稳定，更新路由\n");
-			}
-			if (YRB_OUT) {
-				printf("[%d->%d] node(%d) last cost (%d)%f change to (%d)%f\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, , ip_src.s_addr, rreq->cost);
+			if (fwd_rt && fwd_rt->state == VALID) {
+				if (all_cost - fwd_rt->last_all_cost >= COST_PROMOTE) 
+					cost_flag = 1;
+				else 
+					return; /* Ignore already processed RREQs. */
+				if (YRB_OUT) {
+					printf("[%d->%d] node(%d) last cost %f change to (%d)%f\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, fwd_rt->last_all_cost, ip_src.s_addr, all_cost);
+				}
 			}
 		}
 	} else {
@@ -335,25 +338,26 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			ip_to_str(rreq_orig));
 
 		if (YRB_OUT) {
-			printf("[yrb]RREQ插入路由表项，cost值%f，信道%d\n", cost, channel);
+			printf("[%d->%d] node(%d) rreq insert: last(%d), r.nextall.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
 		}
 
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
-					cost, channel); //added by yrb
+					1, all_cost, channel); //added by yrb
     } else {
 		if (rev_rt->dest_seqno == 0 ||
-			(int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
-			(rreq_orig_seqno == rev_rt->dest_seqno &&
-			(rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
+			((int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno) ||
+			(rreq_orig_seqno == rev_rt->dest_seqno && (rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt)) ||
+			cost_flag) {
 			
 			if (YRB_OUT) {
-				printf("[yrb]RREQ更新路由表项，cost值%f，信道%d\n", cost, channel);
+				printf("[%d->%d] node(%d) rreq update: last(%d), r.next.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
+				if (cost_flag) printf("[%d->%d] node(%d) rreq update [cost_flag]: last(%d), r.next.cost(%f), fwd.last.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, fwd_rt->last_all_cost, channel);
 			}
 			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
 						rreq_orig_seqno, life, VALID,
 						rev_rt->flags,
-						cost, channel); //added by yrb
+						1, all_cost, channel); //added by yrb
 		}
 		#ifdef DISABLED
 			/* This is a out of draft modification of AODV-UU to prevent
@@ -410,25 +414,26 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
        RREP.. */
     if (rreq_dest.s_addr == DEV_IFINDEX(ifindex).ipaddr.s_addr) {
 
-	/* WE are the RREQ DESTINATION. Update the node's own
-	   sequence number to the maximum of the current seqno and the
-	   one in the RREQ. */
-	if (rreq_dest_seqno != 0) {
-	    if ((int32_t) this_host.seqno < (int32_t) rreq_dest_seqno)
-		this_host.seqno = rreq_dest_seqno;
-	    else if (this_host.seqno == rreq_dest_seqno)
-		seqno_incr(this_host.seqno);
-	}
-	rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
-			   this_host.seqno, rev_rt->dest_addr,
-			   MY_ROUTE_TIMEOUT);
-	rrep->channel = rev_rt->channel; //by yrb
-	// by fxj: add node to the chain.
-	rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
-	// fxj_end
-	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
+		/* WE are the RREQ DESTINATION. Update the node's own
+		sequence number to the maximum of the current seqno and the
+		one in the RREQ. */
+		if (rreq_dest_seqno != 0) {
+			if ((int32_t) this_host.seqno < (int32_t) rreq_dest_seqno)
+			this_host.seqno = rreq_dest_seqno;
+			else if (this_host.seqno == rreq_dest_seqno)
+			seqno_incr(this_host.seqno);
+		}
+		rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
+				this_host.seqno, rev_rt->dest_addr,
+				MY_ROUTE_TIMEOUT);
+		rrep->channel = rev_rt->channel; //by yrb
+		// by fxj: add node to the chain.
+		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		// fxj_end
+		rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
     } else {
+		/* yrb note: 注意！！！cost_flag置0时，需要目标节点更新序列号，不能由中间节点直接回复RREP  */
 		/* We are an INTERMEDIATE node. - check if we have an active
 		* route entry */
 
@@ -479,7 +484,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 #endif				/* CONFIG_GATEWAY_DISABLED */
 
 	    /* Respond only if the sequence number is fresh enough... */
-	    if (fwd_rt->dest_seqno != 0 &&
+		/* yrb note: 注意当由于cost值更大需要更新路由表时，不能由中间节点提前回复RREQ */
+		if (cost_flag) goto forward; //added by yrb
+
+	    else if (fwd_rt->dest_seqno != 0 &&
 		(int32_t) fwd_rt->dest_seqno >= (int32_t) rreq_dest_seqno) {
 		lifetime = timeval_diff(&fwd_rt->rt_timer.timeout, &now);
 		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
@@ -490,7 +498,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		// fxj_end
 		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
 	    } else {
-		goto forward;
+			goto forward;
 	    }
 	    /* If the GRATUITOUS flag is set, we must also unicast a
 	       gratuitous RREP to the destination. */
@@ -508,28 +516,14 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	    }
 	    return;
 	}
-      forward:
-	if (ip_ttl > 1) {
-	    /* Update the sequence number in case the maintained one is
-	     * larger */
-	    if (fwd_rt && !(fwd_rt->flags & RT_INET_DEST) &&
-		(int32_t) fwd_rt->dest_seqno > (int32_t) rreq_dest_seqno)
-		rreq->dest_seqno = htonl(fwd_rt->dest_seqno);
-
-			rrep_send(rrep, fwd_rt, rev_rt, RREP_SIZE);
-
-			DEBUG(LOG_INFO, 0, "Sending G-RREP to %s with rte to %s",
-				ip_to_str(rreq_dest), ip_to_str(rreq_orig));
-			}
-			return;
-		}
-		forward:
+forward:
 		if (ip_ttl > 1) {
 			/* Update the sequence number in case the maintained one is
 			* larger */
 			if (fwd_rt && !(fwd_rt->flags & RT_INET_DEST) &&
 			(int32_t) fwd_rt->dest_seqno > (int32_t) rreq_dest_seqno)
 			rreq->dest_seqno = htonl(fwd_rt->dest_seqno);
+			rreq->all_cost = all_cost; //added by yrb
 
 			rreq_forward(rreq, rreqlen, --ip_ttl);
 

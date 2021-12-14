@@ -467,10 +467,10 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 				for (int i = 0; i < nIfaces; i++) {
 					if (aodv_msg->type == AODV_RREP || aodv_msg->type == AODV_RREQ) {
 						if (aodv_msg->type == AODV_RREP) {
-							printf("[RREP] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
+							//printf("[RREP] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
 							((RREP *)aodv_msg)->channel = i;
 						} else {
-							printf("[RREQ] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
+							//printf("[RREQ] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
 							((RREQ *)aodv_msg)->channel = i;
 						}
 						Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
@@ -500,12 +500,11 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 			/* added by yrb */
 			AODV_msg* aodv_msg = HDR_AODVUU(p);
 			if (channel != 255) {
-				printf("[data] 单信道%d\n", channel);
+				//printf("[data] 单信道%d\n", channel);
 				Scheduler::instance().schedule(lllist[channel], p, delay);
 			}
 			else if (USE_YRB && aodv_msg->type == AODV_RREP) {
 				int rrep_channel = ((RREP *)aodv_msg)->channel;
-				printf("[RREP] 单信道%d\n", rrep_channel);
 				Scheduler::instance().schedule(lllist[rrep_channel], p, delay);
 			} else {
 				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
