@@ -103,7 +103,7 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
     //by cyo
     for(int i = 0;i<NUM_NODE;i++){
         for(int j = 0;j<3;j++){
-            rrep->union_data.hello_infos[i][j] = hello_infos[i][j]; // by fxj
+            rrep->union_data.hello_infos[i][j] = hello_infos[i][j];
         }
     }
 	rrep->sta_nb = sta_nb;
