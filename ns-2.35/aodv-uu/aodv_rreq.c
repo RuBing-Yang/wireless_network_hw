@@ -79,10 +79,6 @@ RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
     rreq->dest_seqno = htonl(dest_seqno);
     rreq->orig_addr = orig_addr.s_addr;
 
-	if (YRB_OUT) {
-		printf("rreq_create\n");
-	}
-
     /* Immediately before a node originates a RREQ flood it must
        increment its sequence number... */
     seqno_incr(this_host.seqno);
@@ -110,11 +106,6 @@ AODV_ext *rreq_add_ext(RREQ * rreq, int type, unsigned int offset,
 {
     AODV_ext *ext = NULL;
 
-	
-	if (YRB_OUT) {
-		printf("rreq_add_ext\n");
-	}
-
     if (offset < RREQ_SIZE)
 	return NULL;
 
@@ -135,12 +126,6 @@ void NS_CLASS rreq_send(struct in_addr dest_addr, u_int32_t dest_seqno,
     struct in_addr dest;
     int i;
 
-	
-	if (YRB_OUT) {
-		printf("rreq_send\n");
-	}
-
-
     dest.s_addr = AODV_BROADCAST;
 
     /* Check if we should force the gratuitous flag... (-g option). */
@@ -160,10 +145,6 @@ void NS_CLASS rreq_forward(RREQ * rreq, int size, int ttl)
 {
     struct in_addr dest, orig;
     int i;
-	
-	if (YRB_OUT) {
-		printf("rreq_forward\n");
-	}
 
     dest.s_addr = AODV_BROADCAST;
     orig.s_addr = rreq->orig_addr;
@@ -201,9 +182,6 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     struct in_addr rreq_dest, rreq_orig;
 	
 	/* added by yrb */
-	if (YRB_OUT) {
-		printf("rreq_process\n");
-	}
 	float cost = rreq->cost;
 	//int volat = 0;
 	int channel = 0;
@@ -263,7 +241,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			}
 		}
 		if (YRB_OUT) {
-			printf("[yrb]RREQ收到cost值: %.3f\n这一跳链路cost值: %.3f\n", rreq->cost, max_cost);
+			printf("[%d->%d] node(%d) rreq.cost=%f, last.cost=%f, last.channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->cost, max_cost, rreq->channel);
 		}
 		cost *= max_cost;
 		//if (cost < COST_MIN) volat = 1;
@@ -308,6 +286,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			return; //fwd_rt存在有效且新的cost不够大
 			if (YRB_OUT) {
 				printf("[yrb]原路由不稳定而当前路由稳定，更新路由\n");
+			}
+			if (YRB_OUT) {
+				printf("[%d->%d] node(%d) last cost (%d)%f change to (%d)%f\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, , ip_src.s_addr, rreq->cost);
 			}
 		}
 	} else {
@@ -446,91 +427,91 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
     } else {
-	/* We are an INTERMEDIATE node. - check if we have an active
-	 * route entry */
+		/* We are an INTERMEDIATE node. - check if we have an active
+		* route entry */
 
-	fwd_rt = rt_table_find(rreq_dest);
+		fwd_rt = rt_table_find(rreq_dest);
 
-	if (fwd_rt && fwd_rt->state == VALID && !rreq->d) {
-	    struct timeval now;
-	    u_int32_t lifetime;
+		if (fwd_rt && fwd_rt->state == VALID && !rreq->d) {
+			struct timeval now;
+			u_int32_t lifetime;
 
-	    /* GENERATE RREP, i.e we have an ACTIVE route entry that is fresh
-	       enough (our destination sequence number for that route is
-	       larger than the one in the RREQ). */
+			/* GENERATE RREP, i.e we have an ACTIVE route entry that is fresh
+			enough (our destination sequence number for that route is
+			larger than the one in the RREQ). */
 
-	    gettimeofday(&now, NULL);
-#ifdef CONFIG_GATEWAY_DISABLED
-	    if (fwd_rt->flags & RT_INET_DEST) {
-		rt_table_t *gw_rt;
-		/* This node knows that this is a rreq for an Internet
-		 * destination and it has a valid route to the gateway */
+			gettimeofday(&now, NULL);
+	#ifdef CONFIG_GATEWAY_DISABLED
+			if (fwd_rt->flags & RT_INET_DEST) {
+				rt_table_t *gw_rt;
+				/* This node knows that this is a rreq for an Internet
+				* destination and it has a valid route to the gateway */
 
-		goto forward;	// DISABLED
+				goto forward;	// DISABLED
 
-		gw_rt = rt_table_find(fwd_rt->next_hop);
+				gw_rt = rt_table_find(fwd_rt->next_hop);
 
-		if (!gw_rt || gw_rt->state == INVALID)
-		    goto forward;
+				if (!gw_rt || gw_rt->state == INVALID)
+					goto forward;
 
-		lifetime = timeval_diff(&gw_rt->rt_timer.timeout, &now);
+				lifetime = timeval_diff(&gw_rt->rt_timer.timeout, &now);
 
-		rrep = rrep_create(0, 0, gw_rt->hcnt, gw_rt->dest_addr,
-				   gw_rt->dest_seqno, rev_rt->dest_addr,
-				   lifetime);
+				rrep = rrep_create(0, 0, gw_rt->hcnt, gw_rt->dest_addr,
+						gw_rt->dest_seqno, rev_rt->dest_addr,
+						lifetime);
 
-		ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
-				   sizeof(struct in_addr), (char *) &rreq_dest);
+				ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
+						sizeof(struct in_addr), (char *) &rreq_dest);
 
-		rrep_size += AODV_EXT_SIZE(ext);
+				rrep_size += AODV_EXT_SIZE(ext);
 
-		DEBUG(LOG_DEBUG, 0,
-		      "Intermediate node response for INTERNET dest: %s rrep_size=%d",
-		      ip_to_str(rreq_dest), rrep_size);
+				DEBUG(LOG_DEBUG, 0,
+					"Intermediate node response for INTERNET dest: %s rrep_size=%d",
+					ip_to_str(rreq_dest), rrep_size);
 
-		rrep_send(rrep, rev_rt, gw_rt, rrep_size);
-		return;
-	    }
-#endif				/* CONFIG_GATEWAY_DISABLED */
+				rrep_send(rrep, rev_rt, gw_rt, rrep_size);
+				return;
+			}
+	#endif				/* CONFIG_GATEWAY_DISABLED */
 
-	    /* Respond only if the sequence number is fresh enough... */
-	    if (fwd_rt->dest_seqno != 0 &&
-		(int32_t) fwd_rt->dest_seqno >= (int32_t) rreq_dest_seqno) {
-		lifetime = timeval_diff(&fwd_rt->rt_timer.timeout, &now);
-		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
-				   fwd_rt->dest_seqno, rev_rt->dest_addr,
-				   lifetime);
-		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
-	    } else {
-		goto forward;
-	    }
-	    /* If the GRATUITOUS flag is set, we must also unicast a
-	       gratuitous RREP to the destination. */
-	    if (rreq->g) {
-		rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
-				   rev_rt->dest_seqno, fwd_rt->dest_addr,
-				   lifetime);
+			/* Respond only if the sequence number is fresh enough... */
+			if (fwd_rt->dest_seqno != 0 &&
+			(int32_t) fwd_rt->dest_seqno >= (int32_t) rreq_dest_seqno) {
+				lifetime = timeval_diff(&fwd_rt->rt_timer.timeout, &now);
+				rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
+						fwd_rt->dest_seqno, rev_rt->dest_addr,
+						lifetime);
+				rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
+			} else {
+				goto forward;
+			}
+			/* If the GRATUITOUS flag is set, we must also unicast a
+			gratuitous RREP to the destination. */
+			if (rreq->g) {
+			rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
+					rev_rt->dest_seqno, fwd_rt->dest_addr,
+					lifetime);
 
-		rrep_send(rrep, fwd_rt, rev_rt, RREP_SIZE);
+			rrep_send(rrep, fwd_rt, rev_rt, RREP_SIZE);
 
-		DEBUG(LOG_INFO, 0, "Sending G-RREP to %s with rte to %s",
-		      ip_to_str(rreq_dest), ip_to_str(rreq_orig));
-	    }
-	    return;
-	}
-      forward:
-	if (ip_ttl > 1) {
-	    /* Update the sequence number in case the maintained one is
-	     * larger */
-	    if (fwd_rt && !(fwd_rt->flags & RT_INET_DEST) &&
-		(int32_t) fwd_rt->dest_seqno > (int32_t) rreq_dest_seqno)
-		rreq->dest_seqno = htonl(fwd_rt->dest_seqno);
+			DEBUG(LOG_INFO, 0, "Sending G-RREP to %s with rte to %s",
+				ip_to_str(rreq_dest), ip_to_str(rreq_orig));
+			}
+			return;
+		}
+		forward:
+		if (ip_ttl > 1) {
+			/* Update the sequence number in case the maintained one is
+			* larger */
+			if (fwd_rt && !(fwd_rt->flags & RT_INET_DEST) &&
+			(int32_t) fwd_rt->dest_seqno > (int32_t) rreq_dest_seqno)
+			rreq->dest_seqno = htonl(fwd_rt->dest_seqno);
 
-	    rreq_forward(rreq, rreqlen, --ip_ttl);
+			rreq_forward(rreq, rreqlen, --ip_ttl);
 
-	} else {
-	    DEBUG(LOG_DEBUG, 0, "RREQ not forwarded - ttl=0");
-	}
+		} else {
+			DEBUG(LOG_DEBUG, 0, "RREQ not forwarded - ttl=0");
+		}
     }
 }
 

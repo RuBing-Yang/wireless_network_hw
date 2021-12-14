@@ -411,7 +411,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
 				 rrep->cost, rrep->channel); //added by yrb
 		if (YRB_OUT) {
-			printf("[yrb]RREP插入正向路由，cost值%f，信道%d\n", rrep->cost, rrep->channel);
+			printf("[%d->%d] node(%d) rrep insert: next(%d) cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, rrep->cost, rrep->channel);
 		}
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -428,7 +428,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	{
 		
 		if (YRB_OUT) {
-			printf("[yrb]RREP更新正向路由，cost值%f，信道%d\n", rrep->cost, rrep->channel);
+			printf("[%d->%d] node(%d) rrep update: next(%d) cost(%f>%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, rrep->cost, fwd_rt->cost, rrep->channel);
 		}
 		
 		pre_repair_hcnt = fwd_rt->hcnt;

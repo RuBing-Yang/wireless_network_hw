@@ -555,11 +555,7 @@ Packet *p;
 
 void
 AODV::recv(Packet *p, Handler*) {
-
-	if (YRB_OUT) {
-		printf("[aodv] receive packet [%d]\n", ch->ptype());
-	}
-
+  
 struct hdr_cmn *ch = HDR_CMN(p);
 struct hdr_ip *ih = HDR_IP(p);
 

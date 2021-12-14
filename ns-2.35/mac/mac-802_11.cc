@@ -331,11 +331,11 @@ Mac802_11::command(int argc, const char*const* argv)
             noiseInterval = 0.01;
             if (workMode < 0) {
                 if (noiseChannel >= 0 && currChannel == noiseChannel) {
-                    mhNoise_.start(noiseInterval);
+                    mhNoise_.start(noiseInterval); //单信道干扰
                 } else if (noiseChannel >= 0 && currChannel != noiseChannel) {
-                   ;
+                   ; //单信道干扰且不是当前信道，啥都不干
                 } else if (noiseChannel < 0) {
-                    mhNoise_.start(noiseInterval);
+                    mhNoise_.start(noiseInterval); //广播干扰
                 }
             }
             return TCL_OK;
