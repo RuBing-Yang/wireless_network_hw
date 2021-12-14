@@ -271,6 +271,9 @@ void NS_CLASS rrep_forward(RREP * rrep, int size, rt_table_t * rev_rt,
     rrep = (RREP *) aodv_socket_queue_msg((AODV_msg *) rrep, size);
     rrep->hcnt = fwd_rt->hcnt;	/* Update the hopcount */
 
+	rrep->cost = rev_rt->cost; //by yrb
+	rrep->channel = rev_rt->channel; //by yrb
+
     aodv_socket_send((AODV_msg *) rrep, rev_rt->next_hop, size, ttl,
 		     &DEV_IFINDEX(rev_rt->ifindex));
 
@@ -406,9 +409,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
 				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 rev_rt->volat, rev_rt->channel); //added by yrb
+				 rrep->cost, rrep->channel); //added by yrb
 		if (YRB_OUT) {
-			printf("[yrb]RREP插入正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
+			printf("[yrb]RREP插入正向路由，cost值%f，信道%d\n", rrep->cost, rrep->channel);
 		}
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -421,21 +424,21 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
 		   (rrep_seqno == fwd_rt->dest_seqno &&
 		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || rrep_new_hcnt < fwd_rt->hcnt 
-		   || (fwd_rt->volat && !rev_rt->volat))))  //added by yrb
+		   || (rrep->cost - fwd_rt->cost >= COST_PROMOTE))))  //added by yrb
 	{
 		
 		if (YRB_OUT) {
-			printf("[yrb]RREP更新正向路由，稳定性%d，信道%d\n", rev_rt->volat, rev_rt->channel);
+			printf("[yrb]RREP更新正向路由，cost值%f，信道%d\n", rrep->cost, rrep->channel);
 		}
 		
 		pre_repair_hcnt = fwd_rt->hcnt;
 		pre_repair_flags = fwd_rt->flags;
 
-    	/* 传递volat值 */
+    	/* 传递cost值 */
 		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
 					rrep_lifetime, VALID,
 					rt_flags | fwd_rt->flags,
-					rev_rt->volat, rev_rt->channel); //added by yrb
+					rrep->cost, rrep->channel); //added by yrb
 
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -479,7 +482,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    if (!inet_rt) {
 			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
-				rev_rt->volat, rev_rt->channel);
+				rev_rt->cost, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
@@ -489,7 +492,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
 							rrep_lifetime, VALID, RT_INET_DEST |
 							inet_rt->flags,
-				 			rev_rt->volat, rev_rt->channel);
+				 			rev_rt->cost, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];

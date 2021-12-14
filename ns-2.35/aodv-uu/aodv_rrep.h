@@ -76,14 +76,17 @@ typedef struct {
     u_int32_t orig_addr;
     u_int32_t lifetime;
 
-    /* by gcy */
-    u_int32_t channel;
-    /* end */
-
     //by cyo & fxj
     union rrep_union union_data;
      u_int8_t sta_nb;//todo add history_sta
     //cyo_end  fxj_end
+    
+    /* by gcy */
+    u_int8_t channel;
+    /* end */
+
+    float cost; // by yrb
+    
 } RREP;
 
 #define RREP_SIZE sizeof(RREP)

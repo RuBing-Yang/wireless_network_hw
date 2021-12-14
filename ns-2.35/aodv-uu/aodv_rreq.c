@@ -73,6 +73,7 @@ RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
     rreq->res1 = 0;
     rreq->res2 = 0;
     rreq->hcnt = 0;
+	rreq->cost = 1.0; //初始1.0
     rreq->rreq_id = htonl(this_host.rreq_id++);
     rreq->dest_addr = dest_addr.s_addr;
     rreq->dest_seqno = htonl(dest_seqno);
@@ -150,7 +151,7 @@ void NS_CLASS rreq_send(struct in_addr dest_addr, u_int32_t dest_seqno,
     for (i = 0; i < MAX_NR_INTERFACES; i++) {
 		if (!DEV_NR(i).enabled) continue;
 		rreq = rreq_create(flags, dest_addr, dest_seqno, DEV_NR(i).ipaddr);
-		rreq->channel = i;
+		//rreq->channel = i; //channel和NR_INTERFACE不一样喔
 		aodv_socket_send((AODV_msg *) rreq, dest, RREQ_SIZE, ttl, &DEV_NR(i));
     }
 }
@@ -180,7 +181,7 @@ void NS_CLASS rreq_forward(RREQ * rreq, int size, int ttl)
     /* Send out on all interfaces */
     for (i = 0; i < MAX_NR_INTERFACES; i++) {
 		if (!DEV_NR(i).enabled) continue;
-		rreq->channel = i;
+		//rreq->channel = i; //by yrb
 		aodv_socket_send((AODV_msg *) rreq, dest, size, ttl, &DEV_NR(i));
     }
 }
@@ -204,7 +205,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		printf("rreq_process\n");
 	}
 	float cost = rreq->cost;
-	int volat = 0;
+	//int volat = 0;
 	int channel = 0;
 	/* end yrb */
 
@@ -265,10 +266,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			printf("[yrb]RREQ收到cost值: %.3f\n这一跳链路cost值: %.3f\n", rreq->cost, max_cost);
 		}
 		cost *= max_cost;
-		if (cost < COST_MIN) volat = 1;
+		//if (cost < COST_MIN) volat = 1;
 	} else {
 		cost = 1;
-		volat = 0;
+		//volat = 0;
 	}
 	/* end yrb */
 
@@ -302,8 +303,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		if (rreq_record_find(rreq_orig, rreq_id)) {
 			fwd_rt = rt_table_find(rreq_dest);
 			/* Ignore already processed RREQs. */
-			if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
-			return;
+			//if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
+			if (fwd_rt && fwd_rt->state == VALID && fwd_rt->cost > cost - COST_PROMOTE)
+			return; //fwd_rt存在有效且新的cost不够大
 			if (YRB_OUT) {
 				printf("[yrb]原路由不稳定而当前路由稳定，更新路由\n");
 			}
@@ -352,12 +354,12 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			ip_to_str(rreq_orig));
 
 		if (YRB_OUT) {
-			printf("[yrb]RREQ插入路由表项，稳定性%d，信道%d\n", volat, channel);
+			printf("[yrb]RREQ插入路由表项，cost值%f，信道%d\n", cost, channel);
 		}
 
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
-					volat, channel); //added by yrb
+					cost, channel); //added by yrb
     } else {
 		if (rev_rt->dest_seqno == 0 ||
 			(int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno ||
@@ -365,12 +367,12 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			(rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt))) {
 			
 			if (YRB_OUT) {
-				printf("[yrb]RREQ更新路由表项，稳定性%d，信道%d\n", volat, channel);
+				printf("[yrb]RREQ更新路由表项，cost值%f，信道%d\n", cost, channel);
 			}
 			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
 						rreq_orig_seqno, life, VALID,
 						rev_rt->flags,
-						volat, channel); //added by yrb
+						cost, channel); //added by yrb
 		}
 		#ifdef DISABLED
 			/* This is a out of draft modification of AODV-UU to prevent

@@ -126,7 +126,10 @@
 /* added by yrb */
 
 /* 稳定概率阈值 */
-#define COST_MIN 0.8
+//#define COST_MIN 0.8
+/* 概率提升阈值 */
+/* 概率提升(cost_new - cost_old >= 0.1)时更新路由表 */
+#define COST_PROMOTE 0.1
 
 /* cost寻路和快速修复的开关 */
 /* 用来跑tcl验证时区分原AODV协议和我们的策略 */
