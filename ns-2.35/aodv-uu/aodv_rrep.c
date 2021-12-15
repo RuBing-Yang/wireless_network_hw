@@ -331,6 +331,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 
 	// fxj
 	#ifdef USE_FXJ
+
+	int fxj_fix = 0;
+
 	if (rrep->t) {
 		#ifdef FXJ_OUT
 		printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
@@ -345,7 +348,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		in_addr src, dst;
 		src.s_addr = rrep->orig_addr;
 		dst.s_addr = rrep->dest_addr;
-		send_RRepC(src, ip_dst, ip_src, dst);
+		int dest_seqno = rrep->dest_seqno;
+		send_RRepC(src, ip_dst, ip_src, dst, dest_seqno);
 		return;
 	}
 	if (rrep->c) {
@@ -356,10 +360,11 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		in_addr nbr, dst;
 		nbr.s_addr = rrep->orig_addr;
 		dst.s_addr = rrep->dest_addr;
-		confirm_repair(ip_src, ip_dst, nbr, dst, ifindex);
-		return;
+		confirm_repair(ip_src, ip_dst, nbr, dst, ifindex, rrep);
+		// return;
 	}
 	if (rrep->f) {
+		fxj_fix = 1;
 		#ifdef FXJ_OUT
 		printf("fxj_: %d will create a forward rt  %d -> %d ! !\n", 
 			ip_dst.s_addr, rrep->orig_addr, rrep->dest_addr);
@@ -446,11 +451,16 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 		if (YRB_OUT) {
 			printf("[%d->%d] node(%d) rrep insert: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
-		// by fxj: add nexts to rt_tbl
-		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-		}
-		// fxj_end
+		// fxj
+			if (fxj_fix) {
+				
+			} else {
+				// by fxj: add nexts to rt_tbl
+				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
+					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+				}
+			}
+			// fxj_end
     } 
     /* 更新正向路由 */
 	else if (fwd_rt->dest_seqno == 0 ||
@@ -476,12 +486,16 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rev_rt->last_all_cost = all_cost; //added by yrb
 			fwd_rt->last_all_cost = rev_rt->next_all_cost; //added by yrb
 		}
-
-		// by fxj: add nexts to rt_tbl
-		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-			fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-		}
-		// fxj_end
+		// fxj
+			if (fxj_fix) {
+				
+			} else {
+				// by fxj: add nexts to rt_tbl
+				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
+					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+				}
+			}
+			// fxj_end
     } 
 	else {
 		if (fwd_rt->hcnt > 1) {
@@ -520,9 +534,14 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
 				rev_rt->next_all_cost, 1, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+			// fxj
+			if (fxj_fix) {
+				
+			} else {
+				// by fxj: add nexts to rt_tbl
+				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
+					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+				}
 			}
 			// fxj_end
 		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
@@ -530,9 +549,14 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 							rrep_lifetime, VALID, RT_INET_DEST |
 							inet_rt->flags,
 				 			rev_rt->next_all_cost, 1, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+			// fxj
+			if (fxj_fix) {
+				
+			} else {
+				// by fxj: add nexts to rt_tbl
+				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
+					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
+				}
 			}
 			// fxj_end
 	    } else {
@@ -569,7 +593,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	/* --- Here we FORWARD the RREP on the REVERSE route --- */
 	if (rev_rt && rev_rt->state == VALID) {
 		// fxj: add himself into the chain
-		rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
+		if (!fxj_fix) {
+			rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
+		}
 		// fxj_end
 	    rrep_forward(rrep, rreplen, rev_rt, fwd_rt, --ip_ttl);
 	} else {
@@ -599,13 +625,16 @@ int rrep_add_hello_ext(RREP * rrep, int offset, u_int32_t interval)
 
 // by fxj
 void NS_CLASS send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex) {
-	RREP *rrep = rrep_create(0, 0, 1, dst, 0, src, 1);
-	rrep->A = 1;
-	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
+	rt_table_t *rt_entry = rt_table_find(dst);
+	if (rt_entry) {
+		RREP *rrep = rrep_create(0, 0, 1, dst, rt_entry->dest_seqno, src, 1);
+		rrep->A = 1;
+		aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
+	}
 }
 
-void NS_CLASS send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst) {
-	RREP *rrep = rrep_create(0, 0, 1, dst, 0, nbr, 1);
+void NS_CLASS send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int dest_seqno) {
+	RREP *rrep = rrep_create(0, 0, 1, dst, dest_seqno, nbr, 1);
 	rrep->c = 1;
 	int ifindex = 0;
 	for (ifindex = 0; ifindex < MAX_NR_INTERFACES; ifindex++) {
@@ -626,7 +655,7 @@ void NS_CLASS send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifi
 	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
 }
 
-void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex) {
+void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex, RREP* rrep) {
 	rt_table_t *rt_entry = rt_table_find(dst);
 	if (!rt_entry) return;
 	// send route table
@@ -653,14 +682,15 @@ void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst,
 				rt_entry->all_nexts[j].s_addr = rt_entry->all_nexts[j + i - 1].s_addr;
 			rt_entry->hcnt -= i - 1;
 		}
+		rrep->hcnt = rt_entry->hcnt;
 		rt_entry->all_nexts[0].s_addr = mid.s_addr;
 		send_RRepF(mid, nbr, rt_entry, ifindex);
-#ifdef FXJ_OUT
-printf("fxj_: %d will forwar to %d -> %d finally to %d...\n", 
-	src.s_addr, mid.s_addr, nbr.s_addr, dst.s_addr);
-printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
-	src.s_addr, dst.s_addr);
-#endif		
+		#ifdef FXJ_OUT
+		printf("fxj_: %d will forwar to %d -> %d finally to %d...\n", 
+			src.s_addr, mid.s_addr, nbr.s_addr, dst.s_addr);
+		printf("fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", 
+			src.s_addr, dst.s_addr, mid.s_addr);
+		#endif		
 		packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
 		break;
     }
@@ -717,8 +747,8 @@ void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
 					rt_entry->flags &= 0xfffffffd;
 					packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
 					#ifdef FXJ_OUT
-					printf("fxj_: %d is sending all cached packets to dst %d...A SUCCESSFUL REPAIR ! !\n", 
-						src.s_addr, sk_entry->dest_addr);
+					printf("fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", 
+						src.s_addr, sk_entry->dest_addr, mid.s_addr);
 					#endif
 					break;
 				}

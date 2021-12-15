@@ -135,8 +135,8 @@ void rrep_ack_process(RREP_ack * rrep_ack, int rreplen, struct in_addr ip_src,
 		      struct in_addr ip_dst);
 void recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep);
 void send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex); // fxj
-void send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst); // fxj
-void confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex);  // fxj
+void send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int dest_seqno); // fxj
+void confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex, RREP* rrep);  // fxj
 void send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifindex); // fxj
 void create_forward_route(RREP *rrep, int ifindex);   //fxj
 #endif				/* NS_NO_DECLARATIONS */
