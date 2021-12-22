@@ -43,9 +43,7 @@
 /* Comment this to remove packet field output: */
 #define DEBUG_OUTPUT
 
-// fxj
-extern int unidir_hack;
-// fxj_end
+
 
 
 #ifndef NS_PORT
@@ -388,8 +386,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	    rrep = rrep_create(0, 0, 0, DEV_IFINDEX(rev_rt->ifindex).ipaddr,
 			       this_host.seqno, rev_rt->dest_addr,
 			       ACTIVE_ROUTE_TIMEOUT);
-		// by fxj: add node to the chain.
+		// by fxj_: add node to the chain.
+		#ifdef USE_FXJ
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		#endif
 		// fxj_end
 	    ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
 			       sizeof(struct in_addr), (char *) &rreq_dest);
@@ -427,8 +427,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				this_host.seqno, rev_rt->dest_addr,
 				MY_ROUTE_TIMEOUT);
 		rrep->channel = rev_rt->channel; //by yrb
-		// by fxj: add node to the chain.
+		// by fxj_: add node to the chain.
+		#ifdef USE_FXJ
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		#endif
 		// fxj_end
 		rrep_send(rrep, rev_rt, NULL, RREP_SIZE);
 
@@ -466,8 +468,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, gw_rt->hcnt, gw_rt->dest_addr,
 				   gw_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
-		// by fxj: add node to the chain.
+		// by fxj_: add node to the chain.
+		#ifdef USE_FXJ
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		#endif
 		// fxj_end
 		ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
 				   sizeof(struct in_addr), (char *) &rreq_dest);
@@ -493,8 +497,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
 				   fwd_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
-		// by fxj: add node to the chain.
+		// by fxj_: add node to the chain.
+		#ifdef USE_FXJ
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		#endif
 		// fxj_end
 		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
 	    } else {
@@ -506,8 +512,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
 				   rev_rt->dest_seqno, fwd_rt->dest_addr,
 				   lifetime);
-		// by fxj: add node to the chain.
+		// by fxj_: add node to the chain.
+		#ifdef USE_FXJ
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+		#endif
 		// fxj_end
 		rrep_send(rrep, fwd_rt, rev_rt, RREP_SIZE);
 
@@ -643,8 +651,9 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     	if (DEV_NR(i).enabled) break;
     }
 	#ifdef FXJ_OUT
-	printf("\nfxj_: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n\n",
+	printf("\nfxj_: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n",
 			DEV_NR(i).ipaddr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
+	printf("fxj_: time now %d.%06d\n\n:", now.tv_sec, now.tv_usec);
 	#endif
     RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
                        this_host.seqno,
@@ -677,6 +686,7 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 
 
 // fxj
+#ifdef USE_FXJ
 void NS_CLASS send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
 #ifdef FXJ_OUT
 printf("fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", src.s_addr, mid.s_addr, nbr.s_addr);
@@ -701,7 +711,7 @@ printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.s
     }
 	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));	
 }
-
+#endif
 // fxj_end
 
 NS_STATIC struct rreq_record *NS_CLASS rreq_record_insert(struct in_addr

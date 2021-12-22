@@ -111,9 +111,12 @@ void rreq_blacklist_timeout(void *arg);
 void rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 		       struct ip_data *ipd);
 
-void send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex);   // by fxj
-void send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst);   // by fxj
-
+// fxj            
+#ifdef USE_FXJ
+void send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex);   
+void send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst);  
+#endif
+// fxj_end
 
 #ifdef NS_PORT
 struct rreq_record *rreq_record_insert(struct in_addr orig_addr,

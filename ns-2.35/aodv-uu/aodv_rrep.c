@@ -38,7 +38,13 @@
 #include "params.h"
 
 extern int unidir_hack, optimized_hellos, llfeedback;
-extern list_t seekhead; // fxj
+
+// fxj
+#ifdef USE_FXJ
+extern list_t seekhead; 
+#endif 
+// fxj_end
+
 #endif
 
 RREP *NS_CLASS rrep_create(u_int8_t flags,
@@ -452,7 +458,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			printf("[%d->%d] node(%d) rrep insert: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
 		// fxj
-			if (fxj_fix) {
+		#ifdef USE_FXJ
+		if (fxj_fix) {
 				
 			} else {
 				// by fxj: add nexts to rt_tbl
@@ -460,7 +467,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 				}
 			}
-			// fxj_end
+		#endif
+		// fxj_end
     } 
     /* 更新正向路由 */
 	else if (fwd_rt->dest_seqno == 0 ||
@@ -486,8 +494,8 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rev_rt->last_all_cost = all_cost; //added by yrb
 			fwd_rt->last_all_cost = rev_rt->next_all_cost; //added by yrb
 		}
-		// fxj
-			if (fxj_fix) {
+		#ifdef USE_FXJ
+		if (fxj_fix) {
 				
 			} else {
 				// by fxj: add nexts to rt_tbl
@@ -495,7 +503,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 				}
 			}
-			// fxj_end
+		#endif
     } 
 	else {
 		if (fwd_rt->hcnt > 1) {
@@ -535,6 +543,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
 				rev_rt->next_all_cost, 1, rev_rt->channel);
 			// fxj
+			#ifdef USE_FXJ
 			if (fxj_fix) {
 				
 			} else {
@@ -543,6 +552,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 				}
 			}
+			#endif
 			// fxj_end
 		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
 			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
@@ -550,6 +560,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 							inet_rt->flags,
 				 			rev_rt->next_all_cost, 1, rev_rt->channel);
 			// fxj
+			#ifdef USE_FXJ
 			if (fxj_fix) {
 				
 			} else {
@@ -558,6 +569,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 				}
 			}
+			#endif
 			// fxj_end
 	    } else {
 		DEBUG(LOG_DEBUG, 0, "INET Response, but no update %s",
@@ -592,10 +604,12 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     } else {
 	/* --- Here we FORWARD the RREP on the REVERSE route --- */
 	if (rev_rt && rev_rt->state == VALID) {
-		// fxj: add himself into the chain
+		// fxj_: add himself into the chain
+		#ifdef USE_FXJ
 		if (!fxj_fix) {
 			rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
 		}
+		#endif
 		// fxj_end
 	    rrep_forward(rrep, rreplen, rev_rt, fwd_rt, --ip_ttl);
 	} else {
@@ -623,7 +637,8 @@ int rrep_add_hello_ext(RREP * rrep, int offset, u_int32_t interval)
     return (offset + AODV_EXT_SIZE(ext));
 }
 
-// by fxj
+// fxj
+#ifdef USE_FXJ
 void NS_CLASS send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex) {
 	rt_table_t *rt_entry = rt_table_find(dst);
 	if (rt_entry) {
@@ -705,8 +720,8 @@ void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
 	int channel = nb_best_channel(next);
 	re = rt_table_insert(dest, next, rrep->hcnt - 1, 0,
 				 MY_ROUTE_TIMEOUT, VALID, 0, ifindex,
-				 0, 0, channel); //added by yrb
-		// by fxj: add nexts to rt_tbl
+				 1, 1, channel); //added by yrb
+	// by fxj_: add nexts to rt_tbl
 	for (int i = 1; i < rrep->hcnt - 1; i++) {
 		re->all_nexts[i - 1] = rrep->union_data.nexts[i];
 	}
@@ -761,4 +776,6 @@ void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
 		}
     }
 }
+
+#endif
 //fxj_end

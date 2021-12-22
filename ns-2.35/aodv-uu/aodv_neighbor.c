@@ -205,6 +205,7 @@ void NS_CLASS neighbor_link_break(rt_table_t * rt)
 }
 
 // fxj
+#ifdef USE_FXJ
 int NS_CLASS nb_table_find(in_addr addr) {
 	for (int i = 0; i < NUM_NODE; i++) {
 		if (this_host.nb_tbl[i][0].ipaddr.s_addr != addr.s_addr)
@@ -244,5 +245,5 @@ int NS_CLASS nb_best_channel(in_addr addr) {
 	}
 	return ret;
 }
-
+#endif
 // fxj_end

@@ -266,14 +266,14 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
         else
             break;
     }
-    // by fxj
+    // fxj
     #ifdef USE_FXJ
     if (hello->n) {
         int nb_id = neighbor_id(hello_dest);
         if (nb_id != -1) {   // only proc nodes in nb_tbl
-    #ifdef FXJ_OUT
-    printf("fxj: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
-    #endif
+            #ifdef FXJ_OUT
+            printf("fxj_: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
+            #endif
             struct in_addr dest;
             dest.s_addr = hello->dest_addr;
             send_neighbor_table(dest, DEV_NR(i).ipaddr, i);
@@ -848,6 +848,7 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
 //cyo_end
 
 //fxj
+#ifdef USE_FXJ
 void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int device_i) {
     RREP *rrep = rrep_create(0, 0, 0, src,
     	                   this_host.seqno,
@@ -863,7 +864,7 @@ void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int 
             }
         }
     }
-#ifdef FXJ_OUT
+    #ifdef FXJ_OUT
     printf("fxj_:node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
     if (rrep->hcnt > 0) {
         printf("(");
@@ -873,13 +874,10 @@ void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int 
     } else {
         printf("\n");
     }
-#endif
+    #endif
     aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &DEV_NR(device_i));
 }
-// fxj_end
 
-
-// fxj 
 int NS_CLASS neighbor_id(in_addr ip_temp) {
     for (int i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][0].ipaddr), &ip_temp)) {
@@ -888,4 +886,5 @@ int NS_CLASS neighbor_id(in_addr ip_temp) {
     }
     return -1;
 }
+#endif
 // fxj_end

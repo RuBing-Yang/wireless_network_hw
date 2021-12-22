@@ -299,7 +299,10 @@ void NS_CLASS packetFailed(Packet *p)
 	if (1 && rt->hcnt <= MAX_REPAIR_TTL
 		/* && ch->num_forwards() > rt->hcnt */
 			) {
-
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		printf("fxj_:  SHOULD BE LOCAL REPAIR    ");
+		printf("time now %d.%06d\n\n", now.tv_sec, now.tv_usec);
 		/* Buffer the current packet */
 		packet_queue_add(p, dest_addr);
 
@@ -487,7 +490,7 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 		}
 	} else {
 		/* Unicast packet 单信道 */
-		/* TODO:更改fixed_interface为路由表中的channel */
+		
 		ch->next_hop_ = next_hop.s_addr;
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_INET;
