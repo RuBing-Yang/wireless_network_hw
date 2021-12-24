@@ -317,7 +317,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			last_cost = cost_normalize(last_cost);
 		}
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rrep.cost=%f, r.last.cost=%f, last.channel(%d)\n", rrep_orig.s_addr,  rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rrep->all_cost, last_cost, rrep->channel);
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			printf("[%d] %d->%d node(%d) rrep.cost=%f, r.last.cost=%f, last.channel(%d)\n", now.tv_sec, rrep_orig.s_addr,  rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rrep->all_cost, last_cost, rrep->channel);
 		}
 		all_cost *= last_cost;
 		//if (cost < COST_MIN) volat = 1;
@@ -444,7 +446,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			fwd_rt->last_all_cost = rev_rt->next_all_cost; //added by yrb
 		}
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rrep insert: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			printf("[%d] %d->%d node(%d) rrep insert: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", now.tv_sec, rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
 		// by fxj: add nexts to rt_tbl
 		for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
@@ -461,7 +465,9 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	{
 		
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rrep update: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			printf("[%d] %d->%d node(%d) rrep update: next(%d) r.last.cost(%f), r.lastall.cost(%f), channel(%d)\n", now.tv_sec, rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, all_cost, rrep->channel);
 		}
 		
 		pre_repair_hcnt = fwd_rt->hcnt;

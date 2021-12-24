@@ -242,7 +242,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			}
 		}
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rreq.cost=%f, f.lastall.cost=%f, f.last.channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->all_cost, max_last_cost, rreq->channel);
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			printf("[%d] %d->%d node(%d) rreq.cost=%f, f.lastall.cost=%f, f.last.channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->all_cost, max_last_cost, rreq->channel);
 		}
 		max_last_cost = cost_normalize(max_last_cost);
 		all_cost *= max_last_cost;
@@ -290,7 +292,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				else 
 					return; /* Ignore already processed RREQs. */
 				if (YRB_OUT) {
-					printf("[%d->%d] node(%d) last cost %f change to (%d)%f\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, fwd_rt->last_all_cost, ip_src.s_addr, all_cost);
+					struct timeval now;
+					gettimeofday(&now, NULL);
+					printf("[%d] %d->%d node(%d) last cost %f change to (%d)%f\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, fwd_rt->last_all_cost, ip_src.s_addr, all_cost);
 				}
 			}
 		}
@@ -338,7 +342,9 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			ip_to_str(rreq_orig));
 
 		if (YRB_OUT) {
-			printf("[%d->%d] node(%d) rreq insert: last(%d), r.nextall.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			printf("[%d] %d->%d node(%d) rreq insert: last(%d), r.nextall.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
 		}
 
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
@@ -351,8 +357,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 			cost_flag) {
 			
 			if (YRB_OUT) {
-				printf("[%d->%d] node(%d) rreq update: last(%d), r.next.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
-				if (cost_flag) printf("[%d->%d] node(%d) rreq update [cost_flag]: last(%d), r.next.cost(%f), fwd.last.cost(%f), channel(%d)\n", rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, fwd_rt->last_all_cost, channel);
+				struct timeval now;
+				gettimeofday(&now, NULL);
+				printf("[%d] %d->%d node(%d) rreq update: last(%d), r.next.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
+				if (cost_flag) printf("[%d] %d->%d node(%d) rreq update [cost_flag]: last(%d), r.next.cost(%f), fwd.last.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, fwd_rt->last_all_cost, channel);
 			}
 			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
 						rreq_orig_seqno, life, VALID,
