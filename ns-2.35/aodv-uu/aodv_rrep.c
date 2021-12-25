@@ -552,18 +552,10 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    if (!inet_rt) {
 			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
-<<<<<<< HEAD
 				rev_rt->weight, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-=======
-				rev_rt->weight, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
->>>>>>> yrb2
 			}
 			#endif
 			// fxj_end
@@ -571,18 +563,10 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
 							rrep_lifetime, VALID, RT_INET_DEST |
 							inet_rt->flags,
-<<<<<<< HEAD
 				 			rev_rt->weight, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-=======
-				 			rev_rt->weight, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
->>>>>>> yrb2
 			}
 			#endif
 			// fxj_end
@@ -735,13 +719,8 @@ void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
 	int channel = nb_best_channel(next);
 	re = rt_table_insert(dest, next, rrep->hcnt - 1, 0,
 				 MY_ROUTE_TIMEOUT, VALID, 0, ifindex,
-<<<<<<< HEAD
-				 1, channel); //added by yrb
-	// by fxj_: add nexts to rt_tbl
-=======
 				 1, channel); //added by yrb
 		// by fxj: add nexts to rt_tbl
->>>>>>> yrb2
 	for (int i = 1; i < rrep->hcnt - 1; i++) {
 		re->all_nexts[i - 1] = rrep->union_data.nexts[i];
 	}
