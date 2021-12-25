@@ -85,7 +85,7 @@ typedef struct {
     u_int8_t channel;
     /* end */
 
-    float all_cost; // by yrb
+    float weight; // by yrb
     //rrep经过的所有link的cost乘积
     //是rev_table的last_all，for_table的next_all
     

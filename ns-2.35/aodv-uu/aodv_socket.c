@@ -237,9 +237,7 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 		rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
     case AODV_RREP:
-		if (YRB_OUT) {
-			//printf("[socket process]AODV_RREP, rrep channel %d, interface %d, ttl %d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl);
-		}
+		 //if (YRB_OUT) printf("[socket process]AODV_RREP, rrep channel %d, interface %d, ttl %d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl);
 		DEBUG(LOG_DEBUG, 0, "Received RREP");
 		rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
@@ -508,9 +506,7 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
 
 #ifdef NS_PORT
 	ch->addr_type() = NS_AF_NONE;
-	if (YRB_OUT) {
-		//printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
-	}
+	 //if (YRB_OUT) printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
 	sendPacket(p, dst, 0.0);
 #else
 

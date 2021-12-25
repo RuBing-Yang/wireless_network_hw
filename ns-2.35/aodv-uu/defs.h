@@ -131,7 +131,7 @@
 //#define COST_MIN 0.8
 /* 概率提升阈值 */
 /* 概率提升(cost_new - cost_old >= 0.1)时更新路由表 */
-#define COST_PROMOTE 0.1
+#define D_W 0.05 //d_weight
 
 /* 链路cost取值范围和归一化 */
 #define COST_LOW 0.0
