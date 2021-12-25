@@ -460,13 +460,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				this_host.seqno, rev_rt->dest_addr,
 				MY_ROUTE_TIMEOUT);
 		rrep->channel = rev_rt->channel; //by yrb
-<<<<<<< HEAD
 		// by fxj_: add node to the chain.
 		#ifdef USE_FXJ
-=======
 		rrep->weight = weight; //by yrb
 		// by fxj: add node to the chain.
->>>>>>> yrb2
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		#endif
 		// fxj_end
@@ -506,13 +503,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, gw_rt->hcnt, gw_rt->dest_addr,
 				   gw_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
-<<<<<<< HEAD
 		// by fxj_: add node to the chain.
 		#ifdef USE_FXJ
-=======
 		// by fxj: add node to the chain.
 		rrep->weight = weight; //by yrb
->>>>>>> yrb2
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		#endif
 		// fxj_end
@@ -540,13 +534,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
 				   fwd_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
-<<<<<<< HEAD
 		// by fxj_: add node to the chain.
 		#ifdef USE_FXJ
-=======
 		// by fxj: add node to the chain.
 		rrep->weight = weight; //by yrb
->>>>>>> yrb2
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		#endif
 		// fxj_end
@@ -560,13 +551,10 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
 				   rev_rt->dest_seqno, fwd_rt->dest_addr,
 				   lifetime);
-<<<<<<< HEAD
 		// by fxj_: add node to the chain.
 		#ifdef USE_FXJ
-=======
 		rrep->weight = weight; //by yrb
 		// by fxj: add node to the chain.
->>>>>>> yrb2
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		#endif
 		// fxj_end

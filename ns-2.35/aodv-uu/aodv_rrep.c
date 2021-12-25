@@ -554,6 +554,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
 				rev_rt->weight, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
+			#ifdef USE_FXJ
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 			}
@@ -565,6 +566,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 							inet_rt->flags,
 				 			rev_rt->weight, rev_rt->channel);
 			// by fxj: add nexts to rt_tbl
+			#ifdef USE_FXJ
 			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
 				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
 			}
