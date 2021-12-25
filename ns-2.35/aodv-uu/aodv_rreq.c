@@ -63,6 +63,7 @@ extern int rreq_gratuitous, expanding_ring_search;
 extern int internet_gw_mode;
 #endif
 
+
 RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
 			   u_int32_t dest_seqno, struct in_addr orig_addr)
 {
@@ -73,7 +74,7 @@ RREQ *NS_CLASS rreq_create(u_int8_t flags, struct in_addr dest_addr,
     rreq->res1 = 0;
     rreq->res2 = 0;
     rreq->hcnt = 0;
-	rreq->all_cost = 1.0; //初始1.0
+	rreq->weight = 1.0; //初始1.0
     rreq->rreq_id = htonl(this_host.rreq_id++);
     rreq->dest_addr = dest_addr.s_addr;
     rreq->dest_seqno = htonl(dest_seqno);
@@ -149,6 +150,13 @@ void NS_CLASS rreq_forward(RREQ * rreq, int size, int ttl)
     dest.s_addr = AODV_BROADCAST;
     orig.s_addr = rreq->orig_addr;
 
+	if (YRB_OUT) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		printf("[%.2f][%d->%d]%d %d rreq forward BROADCAST\n", theTime, rreq->orig_addr, rreq->dest_addr, rreq->rreq_id, DEV_NR(0).ipaddr.s_addr);
+	}
+
     /* FORWARD the RREQ if the TTL allows it. */
     DEBUG(LOG_INFO, 0, "forwarding RREQ src=%s, rreq_id=%lu",
 	  ip_to_str(orig), ntohl(rreq->rreq_id));
@@ -175,18 +183,26 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     AODV_ext *ext;
     RREP *rrep = NULL;
     int rrep_size = RREP_SIZE;
-    rt_table_t *rev_rt, *fwd_rt = NULL;
+    rt_table_t *rev_rt = NULL, *fwd_rt = NULL;
     u_int32_t rreq_orig_seqno, rreq_dest_seqno;
     u_int32_t rreq_id, rreq_new_hcnt, life;
     unsigned int extlen = 0;
     struct in_addr rreq_dest, rreq_orig;
 	
 	/* added by yrb */
-	float all_cost = rreq->all_cost;
-	int cost_flag = 0; //当正向路由f存在且rreq.all_cost - f.last_all_cost > limit时置1
+	float weight = rreq->weight;
+	int cost_flag = 0; //当正向路由f存在且rreq.weight - f.weight > limit时置1
 	//int volat = 0;
 	int channel = 0;
 	/* end yrb */
+
+	if (YRB_OUT) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		printf("[%.2f][%d->%d]%d %d rreq received from %d\n", theTime, rreq->orig_addr, rreq->dest_addr, rreq->rreq_id, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr);
+		if (rreq->t || rreq->a) printf("fxj: rreq->t=%d, rreq->a=%d\n", rreq->t, rreq->a);
+	}
 
 	//fxj
 	#ifdef USE_FXJ
@@ -241,16 +257,12 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				}
 			}
 		}
-		if (YRB_OUT) {
-			struct timeval now;
-			gettimeofday(&now, NULL);
-			printf("[%d] %d->%d node(%d) rreq.cost=%f, f.lastall.cost=%f, f.last.channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, rreq->all_cost, max_last_cost, rreq->channel);
-		}
 		max_last_cost = cost_normalize(max_last_cost);
-		all_cost *= max_last_cost;
+		//weight *= max_last_cost;
+		weight = (weight > max_last_cost) ? max_last_cost : weight;//乘法改极小值了
 		//if (cost < COST_MIN) volat = 1;
 	} else {
-		all_cost = 1;
+		weight = 1;
 		//volat = 0;
 	}
 	/* end yrb */
@@ -269,39 +281,35 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	alog(LOG_WARNING, 0,
 	     __FUNCTION__, "IP data field too short (%u bytes)"
 	     "from %s to %s", rreqlen, ip_to_str(ip_src), ip_to_str(ip_dst));
-	return;
+		return;
     }
 
     /* Check if the previous hop of the RREQ is in the blacklist set. If
        it is, then ignore the RREQ. */
     if (rreq_blacklist_find(ip_src)) {
-	DEBUG(LOG_DEBUG, 0, "prev hop of RREQ blacklisted, ignoring!");
-	return;
+		DEBUG(LOG_DEBUG, 0, "prev hop of RREQ blacklisted, ignoring!");
+		return;
     }
 
-	/* modified by yrb */
+	
 	/* Check if this RREQ has been processed */
 	if (USE_YRB) {
 		if (rreq_record_find(rreq_orig, rreq_id)) {
 			fwd_rt = rt_table_find(rreq_dest);
-			
-			//if (!(fwd_rt && fwd_rt->state == VALID && fwd_rt->volat && !volat))
+			rev_rt = rt_table_find(rreq_orig);
+
+			if (rev_rt && rev_rt->state == VALID 
+			&& weight - rev_rt->weight < D_W) 
+				return; 
+				
 			if (fwd_rt && fwd_rt->state == VALID) {
-				if (all_cost - fwd_rt->last_all_cost >= COST_PROMOTE) 
-					cost_flag = 1;
-				else 
-					return; /* Ignore already processed RREQs. */
-				if (YRB_OUT) {
-					struct timeval now;
-					gettimeofday(&now, NULL);
-					printf("[%d] %d->%d node(%d) last cost %f change to (%d)%f\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, fwd_rt->last_all_cost, ip_src.s_addr, all_cost);
-				}
+				if (weight - fwd_rt->weight < D_W) return;
+				cost_flag = 1; 
 			}
 		}
 	} else {
 		if (rreq_record_find(rreq_orig, rreq_id)) return;
 	}
-    
 	/* end yrb */
 	
     /* Now buffer this RREQ so that we don't process a similar RREQ we
@@ -337,6 +345,14 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     /* Calculate the extended minimal life time. */
     life = PATH_DISCOVERY_TIME - 2 * rreq_new_hcnt * NODE_TRAVERSAL_TIME;
 
+
+	if (YRB_OUT) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		printf("[%.2f][%d->%d]%d %d->%d rreq: weight(%f)\n", theTime, rreq_orig.s_addr, rreq_dest.s_addr, rreq->rreq_id, ip_src.s_addr, DEV_NR(0).ipaddr.s_addr, weight);
+	}
+
     if (rev_rt == NULL) {
 		DEBUG(LOG_DEBUG, 0, "Creating REVERSE route entry, RREQ orig: %s",
 			ip_to_str(rreq_orig));
@@ -344,28 +360,37 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		if (YRB_OUT) {
 			struct timeval now;
 			gettimeofday(&now, NULL);
-			printf("[%d] %d->%d node(%d) rreq insert: last(%d), r.nextall.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
+			double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+			printf("[%.2f][%d->%d]%d %d->%d rreq insert: cost(%f) weight(%f) channel(%d)\n", theTime, rreq_orig.s_addr, rreq_dest.s_addr, rreq->rreq_id, ip_src.s_addr, DEV_NR(0).ipaddr.s_addr, max_last_cost, weight, channel);
 		}
 
 		rev_rt = rt_table_insert(rreq_orig, ip_src, rreq_new_hcnt,
 					rreq_orig_seqno, life, VALID, 0, ifindex, 
-					1, all_cost, channel); //added by yrb
+					weight, channel); //added by yrb
     } else {
-		if (rev_rt->dest_seqno == 0 ||
-			((int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno) ||
-			(rreq_orig_seqno == rev_rt->dest_seqno && (rev_rt->state == INVALID || rreq_new_hcnt < rev_rt->hcnt)) ||
-			cost_flag) {
-			
+		if (rev_rt->dest_seqno == 0 
+		|| ((int32_t) rreq_orig_seqno > (int32_t) rev_rt->dest_seqno) 
+		|| (rreq_orig_seqno == rev_rt->dest_seqno 
+		&& (rev_rt->state == INVALID 
+		|| (rreq_new_hcnt < rev_rt->hcnt && weight > rev_rt->weight - D_W)))
+		|| weight > rev_rt->weight + D_W) 
+		//added by yrb
+		//注意：序列号相同时，虽然跳数少但不稳定的路，不更新！
+		{	
 			if (YRB_OUT) {
 				struct timeval now;
 				gettimeofday(&now, NULL);
-				printf("[%d] %d->%d node(%d) rreq update: last(%d), r.next.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, channel);
-				if (cost_flag) printf("[%d] %d->%d node(%d) rreq update [cost_flag]: last(%d), r.next.cost(%f), fwd.last.cost(%f), channel(%d)\n", now.tv_sec, rreq_orig.s_addr, rreq_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, all_cost, fwd_rt->last_all_cost, channel);
+				double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+				
+				printf("[%.2f][%d->%d]%d %d->%d rreq update: cost(%f) weight(%f) channel(%d)\n", theTime, rreq_orig.s_addr, rreq_dest.s_addr, rreq->rreq_id, ip_src.s_addr, DEV_NR(0).ipaddr.s_addr, max_last_cost, weight, channel);
+				
+				fwd_rt = rt_table_find(rreq_dest);
+				if (fwd_rt != NULL) printf("[%.2f][%d->%d]%d %d->%d rreq update [cost_flag]: oldweight(%f) newweight(%f) channel(%d)\n", theTime, rreq_orig.s_addr, rreq_dest.s_addr, rreq->rreq_id, ip_src.s_addr, DEV_NR(0).ipaddr.s_addr, fwd_rt->weight, weight, channel);
 			}
 			rev_rt = rt_table_update(rev_rt, ip_src, rreq_new_hcnt,
 						rreq_orig_seqno, life, VALID,
 						rev_rt->flags,
-						1, all_cost, channel); //added by yrb
+						weight, channel); //added by yrb
 		}
 		#ifdef DISABLED
 			/* This is a out of draft modification of AODV-UU to prevent
@@ -435,6 +460,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				this_host.seqno, rev_rt->dest_addr,
 				MY_ROUTE_TIMEOUT);
 		rrep->channel = rev_rt->channel; //by yrb
+		rrep->weight = weight; //by yrb
 		// by fxj: add node to the chain.
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		// fxj_end
@@ -475,6 +501,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				   gw_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
 		// by fxj: add node to the chain.
+		rrep->weight = weight; //by yrb
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		// fxj_end
 		ext = rrep_add_ext(rrep, RREP_INET_DEST_EXT, rrep_size,
@@ -502,6 +529,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 				   fwd_rt->dest_seqno, rev_rt->dest_addr,
 				   lifetime);
 		// by fxj: add node to the chain.
+		rrep->weight = weight; //by yrb
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		// fxj_end
 		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
@@ -514,6 +542,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 		rrep = rrep_create(0, 0, rev_rt->hcnt, rev_rt->dest_addr,
 				   rev_rt->dest_seqno, fwd_rt->dest_addr,
 				   lifetime);
+		rrep->weight = weight; //by yrb
 		// by fxj: add node to the chain.
 		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
 		// fxj_end
@@ -531,7 +560,7 @@ forward:
 			if (fwd_rt && !(fwd_rt->flags & RT_INET_DEST) &&
 			(int32_t) fwd_rt->dest_seqno > (int32_t) rreq_dest_seqno)
 			rreq->dest_seqno = htonl(fwd_rt->dest_seqno);
-			rreq->all_cost = all_cost; //added by yrb
+			rreq->weight = weight; //added by yrb
 
 			rreq_forward(rreq, rreqlen, --ip_ttl);
 

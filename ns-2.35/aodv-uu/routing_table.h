@@ -64,8 +64,7 @@ struct rt_table {
     /* 用于标记该路由是否稳定 */
     //u_int8_t volat;  /* 不稳定为1 */
     /* cost越小越不稳定，取值范围通过cost_normalize映射到0~1 */
-    float last_all_cost;  //之前所有link的cost乘积
-    float next_all_cost;  //之后所有link的cost乘积
+    float weight;  //之前所有link的cost乘积
     u_int8_t channel; /* 使用的信道，取值{1,2,3} */
     /* end yrb */
 
@@ -121,11 +120,11 @@ rt_table_t *rt_table_insert(struct in_addr dest, struct in_addr next,
 			    u_int8_t hops, u_int32_t seqno, u_int32_t life,
 			    u_int8_t state, u_int16_t flags,
 			    unsigned int ifindex,
-                float last_all_cost, float next_all_cost, u_int8_t channel); //volat改为cost
+                float weight, u_int8_t channel); //volat改为cost
 rt_table_t *rt_table_update(rt_table_t * rt, struct in_addr next, u_int8_t hops,
 			    u_int32_t seqno, u_int32_t lifetime, u_int8_t state,
 			    u_int16_t flags,
-                float last_all_cost, float next_all_cost, u_int8_t channel); //volat改为cost
+                float weight, u_int8_t channel); //volat改为cost
 /* end yrb */
 
 

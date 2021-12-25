@@ -71,7 +71,7 @@ typedef struct {
 
     /* by yrb */
     /* 回路稳定概率，为之前经过To dest的link稳定性概率乘积 */
-    float all_cost; 
+    float weight; 
     //rreq经过的所有link的cost乘积
     //是rev_table的next_all，for_table的last_all，需要在正向与rreq相比较
     /* end yrb*/

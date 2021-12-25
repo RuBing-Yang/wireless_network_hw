@@ -11,8 +11,8 @@ set val(ll) LL ;# link layer type
 set val(ant) Antenna/OmniAntenna ;# antenna model
 set val(ifqlen) 50 ;# max packet in ifq
 set val(rp) AODVUU ;# routing protocol
-set val(x) 1000 ;# X dimension of topography
-set val(y) 1000 ;# Y dimension of topography
+set val(x) 700 ;# X dimension of topography
+set val(y) 700 ;# Y dimension of topography
 set val(stop) 42 ;# nam stop time
 set val(nn) 6 ;# number of mobilenodes
 set val(nnoise) 1 ;# number of noise nodes
@@ -20,7 +20,7 @@ set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
 set pktsize 1000 ;# packet size in bytes
-set pktrate 0.01 ;# packet rate in seconds
+set pktrate 0.1 ;# packet rate in seconds
 set filename try_yrb ;# trace file name
 puts "Ad-Hoc Wireless Network in Chain Topologies - $val(nn) Nodes, $val(nc) Channels, $val(ni) Interfaces"
 #======================================
@@ -84,33 +84,33 @@ puts "created nodes"
 
 # Set node positions in horizontal chain topology
 
-$n(1) set X_ 83
-$n(1) set Y_ 274
+$n(1) set X_ 100
+$n(1) set Y_ 350
 $n(1) set Z_ 0.0
 $ns_ initial_node_pos $n(1) 20
 
-$n(2) set X_ 165
-$n(2) set Y_ 445
+$n(2) set X_ 200
+$n(2) set Y_ 450
 $n(2) set Z_ 0.0
 $ns_ initial_node_pos $n(2) 20
 
-$n(3) set X_ 394
-$n(3) set Y_ 445
+$n(3) set X_ 360
+$n(3) set Y_ 450
 $n(3) set Z_ 0.0
 $ns_ initial_node_pos $n(3) 20
 
-$n(4) set X_ 457
-$n(4) set Y_ 268
+$n(4) set X_ 460
+$n(4) set Y_ 350
 $n(4) set Z_ 0.0
 $ns_ initial_node_pos $n(4) 20
 
 $n(5) set X_ 280
-$n(5) set Y_ 184
+$n(5) set Y_ 200
 $n(5) set Z_ 0.0
 $ns_ initial_node_pos $n(5) 20
 
-$n(0) set X_ 554
-$n(0) set Y_ 431
+$n(0) set X_ 500
+$n(0) set Y_ 450
 $n(0) set Z_ 0.0
 $ns_ initial_node_pos $n(0) 20
 
@@ -137,9 +137,24 @@ $ns_ duplex-link-op $n(4) $n(0) orient right-up
 # add Noise Node
 #======================================
 # 全信道干扰： noiseChannel = -1
-$ns_ node-config -workMode -1  -noiseChannel -1
+$ns_ node-config -adhocRouting $val(rp) \
+                -llType $val(ll) \
+                -macType $val(mac) \
+                -ifqType $val(ifq) \
+                -ifqLen $val(ifqlen) \
+                -antType $val(ant) \
+                -propType $val(prop) \
+                -phyType $val(netif) \
+                -channel $chan(0) \
+                -topoInstance $topo \
+                -agentTrace ON \
+                -routerTrace ON \
+                -macTrace OFF \
+                -movementTrace OFF \
+                -ifNum $val(ni)    \
+                -workMode -1 \
+                -noiseChannel -1
 
-# Create nodes
 puts "begin to create noise nodes"
 for {set i 0} {$i < $val(nnoise)} {incr i} {
     set nnoise($i) [$ns_ node]
@@ -148,7 +163,7 @@ for {set i 0} {$i < $val(nnoise)} {incr i} {
 puts "created noise nodes"
 
 $nnoise(0) set X_ 280
-$nnoise(0) set Y_ 160
+$nnoise(0) set Y_ 150
 $nnoise(0) set Z_ 0.0
 $ns_ initial_node_pos $nnoise(0) 20
 
@@ -185,7 +200,8 @@ for {set i 0} {$i < $val(nm)} {incr i} {
 puts "Setup CBR Application over UDP connection"
 
 # n(3) move and link(n(3)-n(4)) break
-$ns_ at 20.0 "$n(3) setdest 394 600 200"
+#$ns_ at 10.0 "$n(5) setdest 280 100 200"
+$ns_ at 20.0 "$n(3) setdest 400 600 200"
 # link 3->4 should change to 3->6->4
 
 
@@ -211,4 +227,5 @@ $ns_ at $val(stop) "$ns_ nam-end-wireless $val(stop)"
 $ns_ at $val(stop) "finish"
 $ns_ at $val(stop) "puts \"done\" ; $ns_ halt"
 $ns_ run
+
 

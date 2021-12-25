@@ -20,7 +20,7 @@ set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
 set pktsize 1000 ;# packet size in bytes
-set pktrate 0.01 ;# packet rate in seconds
+set pktrate 0.1 ;# packet rate in seconds
 set filename fxj_circ ;# trace file name
 puts "Ad-Hoc Wireless Network in Chain Topologies - $val(nn) Nodes, $val(nc) Channels, $val(ni) Interfaces"
 #======================================
@@ -84,38 +84,38 @@ puts "created nodes"
 
 # Set node positions in horizontal chain topology
 
-$n(0) set X_ 322
-$n(0) set Y_ 116
+$n(0) set X_ 300
+$n(0) set Y_ 100
 $n(0) set Z_ 0.0
 $ns_ initial_node_pos $n(0) 20
 
-$n(1) set X_ 532
-$n(1) set Y_ 113
+$n(1) set X_ 450
+$n(1) set Y_ 100
 $n(1) set Z_ 0.0
 $ns_ initial_node_pos $n(1) 20
 
-$n(2) set X_ 743
-$n(2) set Y_ 154
+$n(2) set X_ 600
+$n(2) set Y_ 150
 $n(2) set Z_ 0.0
 $ns_ initial_node_pos $n(2) 20
 
-$n(3) set X_ 862
-$n(3) set Y_ 306
+$n(3) set X_ 650
+$n(3) set Y_ 300
 $n(3) set Z_ 0.0
 $ns_ initial_node_pos $n(3) 20
 
-$n(4) set X_ 727
-$n(4) set Y_ 478
+$n(4) set X_ 600
+$n(4) set Y_ 450
 $n(4) set Z_ 0.0
 $ns_ initial_node_pos $n(4) 20
 
-$n(5) set X_ 511
-$n(5) set Y_ 490
+$n(5) set X_ 450
+$n(5) set Y_ 500
 $n(5) set Z_ 0.0
 $ns_ initial_node_pos $n(5) 20
 
-$n(6) set X_ 330
-$n(6) set Y_ 502
+$n(6) set X_ 300
+$n(6) set Y_ 500
 $n(6) set Z_ 0.0
 $ns_ initial_node_pos $n(6) 20
 
