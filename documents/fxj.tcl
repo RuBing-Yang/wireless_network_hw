@@ -20,7 +20,7 @@ set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
 set pktsize 1000 ;# packet size in bytes
-set pktrate 0.05 ;# packet rate in seconds
+set pktrate 0.08 ;# packet rate in seconds
 set filename fxj ;# trace file name
 puts "Ad-Hoc Wireless Network in Chain Topologies - $val(nn) Nodes, $val(nc) Channels, $val(ni) Interfaces"
 #======================================
@@ -118,15 +118,15 @@ $ns_ initial_node_pos $n(5) 20
 # Set links between the nodes
 
 
-$ns_ duplex-link $n(0) $n(1) 2Mb 10ms DropTail
-$ns_ duplex-link $n(1) $n(2) 2Mb 10ms DropTail
-$ns_ duplex-link $n(2) $n(3) 2Mb 10ms DropTail
-$ns_ duplex-link $n(3) $n(4) 2Mb 10ms DropTail
+# $ns_ duplex-link $n(0) $n(1) 2Mb 10ms DropTail
+# $ns_ duplex-link $n(1) $n(2) 2Mb 10ms DropTail
+# $ns_ duplex-link $n(2) $n(3) 2Mb 10ms DropTail
+# $ns_ duplex-link $n(3) $n(4) 2Mb 10ms DropTail
 
-$ns_ duplex-link-op $n(0) $n(1) orient right
-$ns_ duplex-link-op $n(1) $n(2) orient right
-$ns_ duplex-link-op $n(2) $n(3) orient right
-$ns_ duplex-link-op $n(3) $n(4) orient right
+# $ns_ duplex-link-op $n(0) $n(1) orient right
+# $ns_ duplex-link-op $n(1) $n(2) orient right
+# $ns_ duplex-link-op $n(2) $n(3) orient right
+# $ns_ duplex-link-op $n(3) $n(4) orient right
 
 
 

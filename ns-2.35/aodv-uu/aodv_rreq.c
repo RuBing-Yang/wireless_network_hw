@@ -750,7 +750,7 @@ printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.s
         else
             break;
     }
-	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));	
+	aodv_socket_send((AODV_msg*)rreq, nbr, sizeof(RREQ), 1, &DEV_NR(ifindex));	
 }
 #endif
 // fxj_end

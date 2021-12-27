@@ -14,7 +14,7 @@ set val(rp) AODVUU ;# routing protocol
 set val(x) 1000 ;# X dimension of topography
 set val(y) 1000 ;# Y dimension of topography
 set val(stop) 20.3 ;# nam stop time
-set val(nn) 7 ;# number of mobilenodes
+set val(nn) 8 ;# number of mobilenodes
 set val(nnoise) 0 ;# number of noise nodes
 set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
@@ -84,8 +84,8 @@ puts "created nodes"
 
 # Set node positions in horizontal chain topology
 
-$n(0) set X_ 300
-$n(0) set Y_ 100
+$n(0) set X_ 330
+$n(0) set Y_ 1
 $n(0) set Z_ 0.0
 $ns_ initial_node_pos $n(0) 20
 
@@ -99,7 +99,7 @@ $n(2) set Y_ 150
 $n(2) set Z_ 0.0
 $ns_ initial_node_pos $n(2) 20
 
-$n(3) set X_ 650
+$n(3) set X_ 690
 $n(3) set Y_ 300
 $n(3) set Z_ 0.0
 $ns_ initial_node_pos $n(3) 20
@@ -114,10 +114,15 @@ $n(5) set Y_ 500
 $n(5) set Z_ 0.0
 $ns_ initial_node_pos $n(5) 20
 
-$n(6) set X_ 300
-$n(6) set Y_ 500
+$n(6) set X_ 440
+$n(6) set Y_ 670
 $n(6) set Z_ 0.0
 $ns_ initial_node_pos $n(6) 20
+
+$n(7) set X_ 430
+$n(7) set Y_ 360
+$n(7) set Z_ 0.0
+$ns_ initial_node_pos $n(7) 20
 
 
 # $ns_ at 0.0 "$n(0) setdest 322 116 1000"
@@ -179,7 +184,7 @@ $ns_ at 20.0 "$cbr stop"
 
 
 # n(2) move and link(n(2)-n(3)) break
-$ns_ at 10.0 "$n(2) setdest 547 269 1000"
+$ns_ at 10.0 "$n(2) setdest 440 250 9000"
 
 #======================================
 # Simulation Termination
