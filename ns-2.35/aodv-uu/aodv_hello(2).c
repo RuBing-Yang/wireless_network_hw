@@ -48,9 +48,9 @@ static struct timer hello_timer;
 #endif
 
 /* #define DEBUG_HELLO */
-
 static FILE *fp_gcy = fopen("gcy_out.txt","w");
 static FILE *fp_cyo = fopen("cyo_out.txt","w");
+static FILE *fp_svm = fopen("svm.txt","w");
 
 long NS_CLASS hello_jitter() {
     if (hello_jittering) {
@@ -87,11 +87,8 @@ void NS_CLASS hello_start() {
                 this_host.hello_infos[i][j].hello_send_nb = 0;
                 this_host.hello_infos[i][j].hello_received_nb = 0;
                 this_host.hello_infos[i][j].isValid = 0;
-                //todo 未初始化ip
-                //this_host.nb_tbl[i][j].cost = 0;
-                //this_host.nb_tbl[i][j].isValid = 0;
-                //todo 未初始化ip
                 this_host.hello_infos[i][j].ipaddr.s_addr = -1;
+
                 this_host.nb_tbl[i][j].cost = 0;
                 this_host.nb_tbl[i][j].isValid = 0;
                 this_host.nb_tbl[i][j].ipaddr.s_addr = -1;
@@ -120,12 +117,13 @@ void NS_CLASS hello_start() {
         }
         for (i = 0; i < NUM_STATES; i++) {
             this_host.sta_self.isValid = 0;
-            this_host.sta_self.ipaddr.s_addr = -1;
+            this_host.sta_self.ipaddr.s_addr = this_host.self_addr;
             for (j = 0; j < NUM_STATES; j++) {
                 this_host.sta_self.node_sta[j] = 0;
             }
         }
         this_host.hello_send = 0;
+        this_host.hello_infos_init = 0;
         this_host.nb_optimized = 1;
     }
     /* end */
@@ -146,8 +144,6 @@ void NS_CLASS hello_stop() {
 }
 
 void NS_CLASS hello_send(void *arg) {
-
-    //if (YRB_OUT) printf("%x的hello计时器 [%d]\n", DEV_NR(0).ipaddr.s_addr, this_host.hello_infos_timer);
     RREP *rrep;
     AODV_ext *ext = NULL;
     u_int8_t flags = 0;
@@ -178,7 +174,7 @@ void NS_CLASS hello_send(void *arg) {
 #ifdef DEBUG_HELLO
             DEBUG(LOG_DEBUG, 0, "sending Hello to 255.255.255.255");
 #endif
-           //by cyo
+            //by cyo
             rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
                                this_host.seqno,
                                DEV_NR(i).ipaddr,
@@ -231,14 +227,12 @@ void NS_CLASS hello_send(void *arg) {
 
         //cyo_end
     } else {
-        if (HELLO_INTERVAL - time_diff + jitter < 0) {
-            timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff - jitter);
-        }
-            
-        else {
-            timer_set_timeout(&hello_timer, HELLO_INTERVAL - time_diff + jitter);
-        }
-            
+        if (HELLO_INTERVAL - time_diff + jitter < 0)
+            timer_set_timeout(&hello_timer,
+                              HELLO_INTERVAL - time_diff - jitter);
+        else
+            timer_set_timeout(&hello_timer,
+                              HELLO_INTERVAL - time_diff + jitter);
     }
 }
 
@@ -253,7 +247,7 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
     int i;
     struct timeval now;
     //by cyo
-    int channel; 
+    int channel;
     //cyo_end
     gettimeofday(&now, NULL);
     hello_dest.s_addr = hello->dest_addr;
@@ -266,38 +260,19 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
         else
             break;
     }
-    // fxj
-    #ifdef USE_FXJ
-    if (hello->n) {
-        int nb_id = neighbor_id(hello_dest);
-        if (nb_id != -1) {   // only proc nodes in nb_tbl
-            #ifdef FXJ_OUT
-            printf("fxj_: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
-            #endif
-            struct in_addr dest;
-            dest.s_addr = hello->dest_addr;
-            send_neighbor_table(dest, DEV_NR(i).ipaddr, i);
-        }  
-        return;
-    }
-    #endif
-    // fxj_end
-
     for (int j = 0; j < NUM_NODE; j++) {
-        if (hash_cmp(&(hello->union_data.hello_infos[j][channel].ipaddr), &(DEV_NR(i).ipaddr))) {
-            hello_send_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_send);
-            hello_received_add_nb(hello_dest, hello->channel, hello->union_data.hello_infos[j][channel].hello_received);
+        if (this_host.hello_infos[j][channel].ipaddr.s_addr == hello_dest.s_addr) {
+            // if (CYO_OUT) printf("%d receive %d 's hello   ; num is %d\n", i, j, hello->hello_infos[j][channel].hello_send);
+            hello_send_add_nb(hello_dest, hello->channel, hello->hello_infos[j][channel].hello_send);
+            hello_received_add_nb(hello_dest, hello->channel, hello->hello_infos[j][channel].hello_received);
             break;
         }
     }
-    hello_received_add(hello_dest, hello->channel, 1);
     hello_ip_add(hello_dest, channel);
+    hello_received_add(hello_dest, hello->channel, 1);
     nb_add(hello_dest);
     sta_nb_add(hello_dest, hello->sta_nb);
     //cyo_end
-
-    hello_dest.s_addr = hello->dest_addr;
-    hello_seqno = ntohl(hello->dest_seqno);
 
     rt = rt_table_find(hello_dest);
 
@@ -432,9 +407,9 @@ void NS_CLASS update_stability() {
     }
     int paraA = node_sum;
     int paraB = node_sum - temp;
-    int NP0 = maclist[0]->getNoisePower() > 0.01 ? 0 : 1;
-    int NP1 = maclist[1]->getNoisePower() > 0.01 ? 0 : 1;
-    int NP2 = maclist[2]->getNoisePower() > 0.01 ? 0 : 1;
+    int NP0 = maclist[0]->getNoisePower() > 0 ? 0 : 1;
+    int NP1 = maclist[1]->getNoisePower() > 0 ? 0 : 1;
+    int NP2 = maclist[2]->getNoisePower() > 0 ? 0 : 1;
     int paraC = NP0 + NP1 + NP2;
     double paraD;
     double INR0 = maclist[0]->getInfoNoiseRatio();
@@ -442,7 +417,12 @@ void NS_CLASS update_stability() {
     double INR2 = maclist[2]->getInfoNoiseRatio();
     paraD = INR0 > INR1 ? INR0 : INR1;
     paraD = paraD > INR2 ? paraD : INR2;
-    int cur_stability = (paraA + paraB + paraC + (int) paraD) > 3 ? 1 : 0;
+    int cur_stability;
+    if (paraA == 0 || paraC == 0 || paraD < 0.001) {
+        cur_stability = 0;
+    } else {
+        cur_stability = 1;
+    }
     this_host.stability.neighbor_sum = paraA;
     this_host.stability.neighbor_change = paraB;
     this_host.stability.available_channel_num = paraC;
@@ -457,7 +437,8 @@ void NS_CLASS update_stability() {
         }
     }
     //fprintf(fp_gcy, "noise: \t%f \t%f \t%f\n", maclist[0]->getNoisePower(), maclist[1]->getNoisePower(), maclist[2]->getNoisePower());
-    fprintf(fp_gcy, "node: %d \tA: %d \tB: %d \tC: %d \tD: %f\n", DEV_NR(i).ipaddr.s_addr, paraA, paraB, paraC, paraD);
+    fprintf(fp_gcy, "time: %f   \tnode: %d \tA: %d \tB: %d \tC: %d \tD: %f \tSTABILITY: %d\n", Scheduler::instance().clock(), DEV_NR(i).ipaddr.s_addr, paraA, paraB, paraC, paraD, cur_stability);
+    fprintf(fp_svm, "%d,%d,%d,%f,%d\n", paraA, paraB, paraC, paraD, cur_stability);
     if (this_host.sta_self.count < NUM_STATES){
         this_host.sta_self.isValid = 1;
         this_host.sta_self.node_sta[this_host.sta_self.count] = this_host.stability.stability;
@@ -469,11 +450,7 @@ void NS_CLASS update_stability() {
         this_host.sta_self.node_sta[NUM_STATES - 1] = this_host.stability.stability;
     }
 }
-/* end */
 
-
-
-//by cyo
 void NS_CLASS nb_add(struct in_addr ip_temp) {
     for (int i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][0].ipaddr), &ip_temp)) {
@@ -511,8 +488,9 @@ void NS_CLASS sta_nb_add(struct in_addr ip_temp, u_int8_t sta) {
             return;
         }
     }
-    for (int i = 0; i < NUM_STATES; i++) {
+    for (int i = 0; i < NUM_NODE; i++) {
         if (this_host.sta_tbl[i].isValid == 0) {
+            this_host.sta_tbl[i].isValid = 1;
             this_host.sta_tbl[i].ipaddr.s_addr = ip_temp.s_addr;
             this_host.sta_tbl[i].count = 1;
             this_host.sta_tbl[i].node_sta[0] = sta;
@@ -523,7 +501,7 @@ void NS_CLASS sta_nb_add(struct in_addr ip_temp, u_int8_t sta) {
 
 void NS_CLASS nb_update_cost(struct in_addr ip_temp, int channel, float cost_value) {      //仅在邻居表中存有该ip的时候才可有用，注意用法
     //if (CYO_OUT) printf("updateCost ip : %d\n", ip_temp.s_addr);
-    for (int i = 0; i < NUM_NODE; i++) {
+    for (int i = 0; i < this_host.stability.neighbor_sum; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][channel].ipaddr), &ip_temp)) {
             this_host.nb_tbl[i][channel].cost = cost_value;
             break;
@@ -532,7 +510,7 @@ void NS_CLASS nb_update_cost(struct in_addr ip_temp, int channel, float cost_val
 }
 
 void NS_CLASS nb_setIsValid(struct in_addr ip_temp, int channel, int isValid) {
-    for (int i = 0; i < NUM_NODE; i++) {
+    for (int i = 0; i < this_host.stability.neighbor_sum; i++) {
         if (hash_cmp(&(this_host.nb_tbl[i][channel].ipaddr), &ip_temp)) {
             this_host.nb_tbl[i][channel].isValid = isValid;
             this_host.nb_tbl[i][channel].isVisited = 1;
@@ -547,19 +525,16 @@ void NS_CLASS hello_received_add(struct in_addr ip_temp, int channel, int num) {
     for (i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_temp)) {
             this_host.hello_received_history[i][channel][10] = num;
-            break;
+            this_host.hello_infos[i][channel].isValid = 1;
+            return;
         }
     }
-    if (i == NUM_NODE) {
-        for (int j = 0; j < NUM_NODE; j++) {
-            if (this_host.hello_infos[j][channel].isValid == 0) {
-                this_host.hello_infos[j][channel].isValid = 1;
-                this_host.hello_infos[j][channel].ipaddr.s_addr = ip_temp.s_addr;
-                this_host.hello_received_history[i][channel][10] = num;
-                break;
-            }
-        }
-    }
+    this_host.hello_infos[this_host.hello_infos_init][0].ipaddr.s_addr = ip_temp.s_addr;
+    this_host.hello_infos[this_host.hello_infos_init][1].ipaddr.s_addr = ip_temp.s_addr;
+    this_host.hello_infos[this_host.hello_infos_init][2].ipaddr.s_addr = ip_temp.s_addr;
+    this_host.hello_infos[this_host.hello_infos_init][channel].isValid = 1;
+    this_host.hello_received_history[this_host.hello_infos_init][channel][10] = num;
+    this_host.hello_infos_init++;
 }
 
 u_int8_t NS_CLASS get_top_and_add(int i, int j) {
@@ -706,17 +681,21 @@ void NS_CLASS hello_infos_timer_add() {
                 this_host.nb_tbl[i][1].isValid = 1;
                 this_host.nb_tbl[i][2].isValid = 1;
             } else {
+                if(this_host.nb_tbl[i][0].ipaddr.s_addr != -1) {
+                    fprintf(fp_cyo, "time: %f \tip: %d neighbor is %d\n", Scheduler::instance().clock(),
+                            this_host.self_addr, this_host.nb_tbl[i][0].ipaddr.s_addr);
+                }
                 this_host.nb_tbl[i][0].isValid = 0;
                 this_host.nb_tbl[i][1].isValid = 0;
                 this_host.nb_tbl[i][2].isValid = 0;
                     for (int k = 0; k < 3; k++) {
                         this_host.hello_infos[i][k].isValid = 0;
-                        this_host.hello_infos[i][k].hello_send_nb = 0;
-                        this_host.hello_infos[i][k].hello_received_nb = 0;
-                        this_host.hello_infos[i][k].hello_received = 0;
-                        for(int h = 0;h<10;h++) {
-                            this_host.hello_received_history[i][k][h] = 0;
-                        }
+//                        this_host.hello_infos[i][k].hello_send_nb = 0;
+//                        this_host.hello_infos[i][k].hello_received_nb = 0;
+//                        this_host.hello_infos[i][k].hello_received = 0;
+//                        for(int h = 0;h<10;h++) {
+//                            this_host.hello_received_history[i][k][h] = 0;
+//                        }
                     }
             }
         }
@@ -724,14 +703,14 @@ void NS_CLASS hello_infos_timer_add() {
     if(this_host.hello_infos_timer % TIMER_STA == 0){
         update_stability();
     }
-    if (this_host.hello_infos_timer % TIMER_COST == 0) {
+    if (this_host.hello_infos_timer == TIMER_COST) {
+        this_host.hello_infos_timer = 0;
         for (i = 0; i < MAX_NR_INTERFACES; i++) {
             if (!DEV_NR(i).enabled)
                 continue;
             else
                 break;
         }
-       // if (CYO_OUT)printf("ip %d TIME!!!\n", DEV_NR(i).ipaddr.s_addr);
         for (i = 0; i < NUM_NODE; i++) {
             for (int j = 0; j < 3; j++) {
                 //if (CYO_OUT) printf("nb_tbl[%d] is %d\n", i, this_host.nb_tbl[i][j].ipaddr.s_addr);
@@ -740,7 +719,6 @@ void NS_CLASS hello_infos_timer_add() {
         }
         //hello_infos_clear();
     }
-    if (this_host.hello_infos_timer == 256) this_host.hello_infos_timer = 0;
 }
 
 void NS_CLASS add_f_value(float f, struct in_addr ip_temp, int channel) {
@@ -790,6 +768,7 @@ float NS_CLASS getF(struct in_addr ip_temp, int channel) {
         float result = 0;
         for (int i = 0; i < this_host.f_tbl[node_id][channel].count; i++) {
             result += this_host.f_tbl[node_id][channel].f_history_value[i];
+            //fprintf(fp_cyo, "f[%d] %f\n", i,this_host.f_tbl[node_id][channel].f_history_value[i]);
         }
         result /= this_host.f_tbl[node_id][channel].count;
         //printf("f3\n");
@@ -800,17 +779,23 @@ float NS_CLASS getF(struct in_addr ip_temp, int channel) {
 float NS_CLASS getG(const struct node_info historyStab, int neighbor_sum, int neighbor_change) {
     float result = 0;
     int neighbor_change1 = (neighbor_change > 0) ? neighbor_change : -neighbor_change;
-    float k;
+    int k;
     int num = (this_host.sta_self.count > historyStab.count) ? historyStab.count : this_host.sta_self.count;
     for (int i = 1; i < num; i++) {
+
         int m_sum = this_host.sta_self.node_sta[i]+this_host.sta_self.node_sta[i-1]//todo 白色
                 + historyStab.node_sta[i]+historyStab.node_sta[i-1];
             k = (m_sum == 4)?1:0;
+       // fprintf(fp_cyo, "k %d\n", k);
             if (neighbor_sum == 0) {
                 result += k*MK;
             } else {
                 result += k*MK;
+               // result += k*MK * (float) (neighbor_sum - neighbor_change1) / (float) neighbor_sum;
             }
+    }
+    if(num == 0){
+        return 0;
     }
     return (result > 0) ? result/num : 0;
 }
@@ -827,21 +812,28 @@ void NS_CLASS updateCost(struct in_addr ip_temp, int channel) {
             break;
     }
     // if (CYO_OUT) printf("my ip is %d\n",DEV_NR(i).ipaddr.s_addr);
+    fprintf(fp_cyo, "time: %f \tip: %d\n", Scheduler::instance().clock(), DEV_NR(i).ipaddr.s_addr);
     float E = 0, F = 0, G = 0;
     for (i = 0; i < NUM_NODE; i++) {
         if (hash_cmp(&(this_host.hello_infos[i][channel].ipaddr), &ip_temp)) {
             if(this_host.hello_infos[i][channel].isValid == 0){
                 fprintf (fp_cyo, "this ip COST is USELESS\n");
             }
+            //fprintf(fp_cyo, "hello_send: %d \t hello_received: %d \t hello_received %d \t hello_received_nb %d \n",this_host.hello_infos[i][channel].hello_send, this_host.hello_infos[i][channel].hello_send_nb,
+            //         this_host.hello_infos[i][channel].hello_received,
+            //         this_host.hello_infos[i][channel].hello_received_nb);
             E = getE(this_host.hello_infos[i][channel].hello_send, this_host.hello_infos[i][channel].hello_send_nb,
                      this_host.hello_infos[i][channel].hello_received,
                      this_host.hello_infos[i][channel].hello_received_nb);
+            //fprintf(fp_cyo, "updateE %f\n", E);
             G = getG(this_host.sta_tbl[i], this_host.stability.neighbor_sum, this_host.stability.neighbor_change);
+            //fprintf(fp_cyo, "updateG %f\n", G);
             break;
         }
     }
     F = getF(ip_temp, channel);
-    fprintf(fp_cyo, "nb ip: %d \t channel: %d \t E: %f \t F: %f \t G: %f\n", ip_temp.s_addr, channel, E, F, G);
+    //fprintf(fp_cyo, "updateE %f\n", E);
+   fprintf(fp_cyo, "nb ip: %d \t channel: %d \t E: %f \t F: %f \t G: %f\n", ip_temp.s_addr, channel, E, F, G);
     float result = A1 * E + B1 * F + C1 * G;
     fprintf(fp_cyo, "updateCost %f\n", result);
     nb_update_cost(ip_temp, channel, result);
@@ -851,47 +843,4 @@ int NS_CLASS hash_cmp(struct in_addr *addr1, struct in_addr *addr2) {
     //hash_value hash;
     return addr1->s_addr == addr2->s_addr;
 }
-
-//cyo_end
-
-//fxj
-#ifdef USE_FXJ
-void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int device_i) {
-    RREP *rrep = rrep_create(0, 0, 0, src,
-    	                   this_host.seqno,
-    	                   DEV_NR(device_i).ipaddr,
-    	                   ALLOWED_HELLO_LOSS * HELLO_INTERVAL);
-    rrep->t = 1;
-    rrep->hcnt = 0;
-    for (int i = 0; i < NUM_NODE; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (this_host.nb_tbl[i][j].isValid) {
-                rrep->union_data.nexts[rrep->hcnt++] = this_host.nb_tbl[i][j].ipaddr;
-                break;
-            }
-        }
-    }
-    #ifdef FXJ_OUT
-    printf("fxj_:node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
-    if (rrep->hcnt > 0) {
-        printf("(");
-        for (int i = 0; i < rrep->hcnt; i++)
-            printf("%d, ", rrep->union_data.nexts[i]);
-        printf(")\n");
-    } else {
-        printf("\n");
-    }
-    #endif
-    aodv_socket_send((AODV_msg *) rrep, dest, RREQ_SIZE, 1, &DEV_NR(device_i));
-}
-
-int NS_CLASS neighbor_id(in_addr ip_temp) {
-    for (int i = 0; i < NUM_NODE; i++) {
-        if (hash_cmp(&(this_host.nb_tbl[i][0].ipaddr), &ip_temp)) {
-            return i;
-        }
-    }
-    return -1;
-}
-#endif
-// fxj_end
+/* end */
