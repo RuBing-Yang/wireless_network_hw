@@ -326,19 +326,20 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 
 	// fxj
 	#ifdef USE_FXJ
-
 	int fxj_fix = 0;
-
+	struct timeval now;
+    gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
 	if (rrep->t) {
 		#ifdef FXJ_OUT
-		printf("fxj_: %d recvd nb_tbl from %d, begin searching...\n", ip_dst.s_addr, ip_src.s_addr);
+		printf("[%.2f]fxj_: %d recvd nb_tbl from %d, begin searching...\n", theTime, ip_dst.s_addr, ip_src.s_addr);
 		#endif
 		recvd_nb_tbl(ip_src, ip_dst, rrep);
 		return;
 	}
 	if (rrep->A) {
 		#ifdef FXJ_OUT
-		printf("fxj_: %d comfirmed %d \'s alive...\n", ip_dst.s_addr, ip_src.s_addr);
+		printf("[%.2f]fxj_: %d comfirmed %d \'s alive...\n", theTime, ip_dst.s_addr, ip_src.s_addr);
 		#endif
 		in_addr src, dst;
 		src.s_addr = rrep->orig_addr;
@@ -349,7 +350,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	}
 	if (rrep->c) {
 		#ifdef FXJ_OUT
-		printf("fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", 
+		printf("[%.2f]fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", theTime, 
 			ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr, rrep->dest_addr);
 		#endif
 		in_addr nbr, dst;
@@ -361,7 +362,7 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	if (rrep->f) {
 		fxj_fix = 1;
 		#ifdef FXJ_OUT
-		printf("fxj_: %d will create a forward rt  %d -> %d ! !\n", 
+		printf("[%.2f]fxj_: %d will create a forward rt  %d -> %d ! !\n", theTime, 
 			ip_dst.s_addr, rrep->orig_addr, rrep->dest_addr);
 		#endif
 		create_forward_route(rrep, ifindex);
@@ -672,6 +673,9 @@ void NS_CLASS send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifi
 }
 
 void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex, RREP* rrep) {
+	struct timeval now;
+    gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
 	rt_table_t *rt_entry = rt_table_find(dst);
 	if (!rt_entry) return;
 	// send route table
@@ -702,9 +706,9 @@ void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst,
 		rt_entry->all_nexts[0].s_addr = mid.s_addr;
 		send_RRepF(mid, nbr, rt_entry, ifindex);
 		#ifdef FXJ_OUT
-		printf("fxj_: %d will forwar to %d -> %d finally to %d...\n", 
+		printf("[%.2f]fxj_: %d will forwar to %d -> %d finally to %d...\n", theTime, 
 			src.s_addr, mid.s_addr, nbr.s_addr, dst.s_addr);
-		printf("fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", 
+		printf("[%.2f]fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", theTime,
 			src.s_addr, dst.s_addr, mid.s_addr);
 		#endif		
 		packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
@@ -729,6 +733,9 @@ void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
 }
 
 void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
+	struct timeval now;
+    gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
 	#ifdef FXJ_OUT
 	printf("       valid neighbors: %d. ", rrep->hcnt);
 	if (rrep->hcnt > 0) {
@@ -763,7 +770,7 @@ void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
 					rt_entry->flags &= 0xfffffffd;
 					packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
 					#ifdef FXJ_OUT
-					printf("fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", 
+					printf("[%.2f]fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", theTime,
 						src.s_addr, sk_entry->dest_addr, mid.s_addr);
 					#endif
 					break;

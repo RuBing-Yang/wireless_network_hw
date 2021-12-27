@@ -187,6 +187,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
     unsigned int extlen = 0;
     struct in_addr rreq_dest, rreq_orig;
 	
+
 	/* added by yrb */
 	float weight = rreq->weight;
 	int cost_flag = 0; //当正向路由f存在且rreq.weight - f.weight > limit时置1
@@ -204,9 +205,12 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 
 	//fxj
 	#ifdef USE_FXJ
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
 	if (rreq->t) {
 		#ifdef FXJ_OUT
-		printf("fxj_: %d recvd rreqT from %d to comfirm if %d is alive..\n", 
+		printf("[%.2f]fxj_: %d recvd rreqT from %d to comfirm if %d is alive..\n", theTime,
 			ip_dst.s_addr, ip_src.s_addr, rreq->orig_addr);
 		#endif
 		in_addr nbr, dst;
@@ -217,7 +221,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	}
 	if (rreq->a) {
 		#ifdef FXJ_OUT
-		printf("fxj_: %d recvd rreqA from %d to comfirm if im alive, try to fix %d to %d via moi..\n", 
+		printf("[%.2f]fxj_: %d recvd rreqA from %d to comfirm if im alive, try to fix %d to %d via moi..\n", theTime, 
 			ip_dst.s_addr, ip_src.s_addr, rreq->orig_addr, rreq->dest_addr);
 		#endif
 		in_addr src, dst;
@@ -692,9 +696,9 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     	if (DEV_NR(i).enabled) break;
     }
 	#ifdef FXJ_OUT
-	printf("\nfxj_: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n",
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+	printf("[%.2f]fxj_: starting local_repair. Breakpoint: %d, unreachable next hop: %d, destination: %d\n", theTime, 
 			DEV_NR(i).ipaddr.s_addr, rt->next_hop.s_addr, rt->dest_addr.s_addr);
-	printf("fxj_: time now %d.%06d\n\n:", now.tv_sec, now.tv_usec);
 	#endif
     RREP *rrep = rrep_create(flags, 0, 0, DEV_NR(i).ipaddr,
                        this_host.seqno,
@@ -729,18 +733,24 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 // fxj
 #ifdef USE_FXJ
 void NS_CLASS send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex) {
-#ifdef FXJ_OUT
-printf("fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", src.s_addr, mid.s_addr, nbr.s_addr);
-#endif
+	#ifdef FXJ_OUT
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+	printf("[%.2f]fxj_: node %d sending RReqT to %d to confirm if %d is alive...\n", theTime, src.s_addr, mid.s_addr, nbr.s_addr);
+	#endif
 	RREQ *rreq = rreq_create(0, dst, 0, nbr);
 	rreq->t = 1;
 	aodv_socket_send((AODV_msg*)rreq, mid, sizeof(RREQ), 1, &DEV_NR(ifindex));
 }
 
 void NS_CLASS send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst) {
-#ifdef FXJ_OUT
-printf("fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", mid.s_addr, nbr.s_addr);
-#endif
+	#ifdef FXJ_OUT
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+	printf("[%.2f]fxj_: node %d sending RReqA to %d to confirm if it is alive...\n", theTime, mid.s_addr, nbr.s_addr);
+	#endif
 	RREQ *rreq = rreq_create(0, dst, 0, src);
 	rreq->a = 1;
 	int ifindex;

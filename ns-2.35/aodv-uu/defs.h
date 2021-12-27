@@ -119,8 +119,8 @@
 #define CYO_OUT 1
 #define YRB_OUT 1
 #define FXJ_OUT 
-#define FXJ_OUT_1
-#define FXJ_OUT_2
+// #define FXJ_OUT_1
+// #define FXJ_OUT_2
 #define GLO_OUT 
 /* end */
 

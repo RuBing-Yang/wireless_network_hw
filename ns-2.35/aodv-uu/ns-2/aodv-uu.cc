@@ -299,10 +299,7 @@ void NS_CLASS packetFailed(Packet *p)
 	if (1 && rt->hcnt <= MAX_REPAIR_TTL
 		/* && ch->num_forwards() > rt->hcnt */
 			) {
-		struct timeval now;
-		gettimeofday(&now, NULL);
-		printf("fxj_:  SHOULD BE LOCAL REPAIR    ");
-		printf("time now %d.%06d\n\n", now.tv_sec, now.tv_usec);
+		
 		/* Buffer the current packet */
 		packet_queue_add(p, dest_addr);
 

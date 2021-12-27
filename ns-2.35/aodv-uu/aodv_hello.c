@@ -272,7 +272,8 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
         int nb_id = neighbor_id(hello_dest);
         if (nb_id != -1) {   // only proc nodes in nb_tbl
             #ifdef FXJ_OUT
-            printf("fxj_: node %d recvd Hello(N=1) from node %d\n", DEV_NR(i).ipaddr, (int)(hello->dest_addr));
+		    double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+            printf("[%.2f]fxj_: node %d recvd Hello(N=1) from node %d\n", theTime, DEV_NR(i).ipaddr, (int)(hello->dest_addr));
             #endif
             struct in_addr dest;
             dest.s_addr = hello->dest_addr;
@@ -865,7 +866,10 @@ void  NS_CLASS send_neighbor_table(struct in_addr dest, struct in_addr src, int 
         }
     }
     #ifdef FXJ_OUT
-    printf("fxj_:node %d send nb_tbl to node %d, containing %d valid neighbors. ", src, dest, rrep->hcnt);
+    struct timeval now;
+    gettimeofday(&now, NULL);
+	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+    printf("[%.2f]fxj_:node %d send nb_tbl to node %d, containing %d valid neighbors. ", theTime, src, dest, rrep->hcnt);
     if (rrep->hcnt > 0) {
         printf("(");
         for (int i = 0; i < rrep->hcnt; i++)
