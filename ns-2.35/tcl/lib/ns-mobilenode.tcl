@@ -395,7 +395,7 @@ Node/MobileNode instproc add-target-rtagent { agent port } {
 # The following setups up link layer, mac layer, network interface
 # and physical layer structures for the mobile node.
 #
-Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qlen iftype anttype topo inerrproc outerrproc fecproc index } {
+Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qlen iftype anttype topo inerrproc outerrproc fecproc } {
 	$self instvar arptable_ nifs_ netif_ mac_ ifq_ ll_ imep_ inerr_ outerr_ fec_
 
 	set ns [Simulator instance]
@@ -552,7 +552,7 @@ Node/MobileNode instproc add-interface { channel pmodel lltype mactype qtype qle
         set workMode_ [$ns get-workMode]
         set noiseChannel_ [$ns get-noiseChannel]
         if {$workMode_ != "" && $noiseChannel_ != ""} {
-            $mac set-workMode $workMode_ $noiseChannel_ $index
+            $mac set-workMode workMode_ noiseChannel_
         }
     }
     # End buaa g410

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -39,9 +39,7 @@
 typedef struct {
     u_int8_t type;
 #if defined(__LITTLE_ENDIAN)
-    u_int8_t res1:2;   // bits modified by fxj
-    u_int8_t a:1;    
-    u_int8_t t:1;    
+    u_int8_t res1:4;
     u_int8_t d:1;
     u_int8_t g:1;
     u_int8_t r:1;
@@ -51,9 +49,7 @@ typedef struct {
     u_int8_t r:1;		/* Repair flag */
     u_int8_t g:1;		/* Gratuitous RREP flag */
     u_int8_t d:1;		/* Destination only respond */
-    u_int8_t t:1;
-    u_int8_t a:1;    
-    u_int8_t res1:2;
+    u_int8_t res1:4;
 #else
 #error "Adjust your <bits/endian.h> defines"
 #endif
@@ -64,18 +60,6 @@ typedef struct {
     u_int32_t dest_seqno;
     u_int32_t orig_addr;
     u_int32_t orig_seqno;
-    /* by gcy */
-    u_int32_t channel;
-    /* end gcy*/
-
-
-    /* by yrb */
-    /* 回路稳定概率，为之前经过To dest的link稳定性概率乘积 */
-    float weight; 
-    //rreq经过的所有link的cost乘积
-    //是rev_table的next_all，for_table的last_all，需要在正向与rreq相比较
-    /* end yrb*/
-
 } RREQ;
 
 #define RREQ_SIZE sizeof(RREQ)
@@ -110,13 +94,6 @@ struct blacklist *rreq_blacklist_insert(struct in_addr dest_addr);
 void rreq_blacklist_timeout(void *arg);
 void rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
 		       struct ip_data *ipd);
-
-// fxj            
-#ifdef USE_FXJ
-void send_RReqT(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int ifindex);   
-void send_RReqA(in_addr nbr, in_addr mid, in_addr src, in_addr dst);  
-#endif
-// fxj_end
 
 #ifdef NS_PORT
 struct rreq_record *rreq_record_insert(struct in_addr orig_addr,

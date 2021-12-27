@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -42,33 +42,6 @@ void hello_process_non_hello(AODV_msg * aodv_msg, struct in_addr source,
 			     unsigned int ifindex);
 NS_INLINE void hello_update_timeout(rt_table_t * rt, struct timeval *now,
 				    long time);
-
-void update_stability();
-void  nb_add(in_addr ip_temp);
-// fxj
-#ifdef USE_FXJ
-int   neighbor_id(struct in_addr ip_temp);    // return -1 if in nb_tbl, or id in nb_tbl
-void  send_neighbor_table(struct in_addr dest, struct in_addr src, int device_i);  // send back valid neighbors in RREP
-#endif
-// fxj_end
-void  nb_update_cost(in_addr ip_temp,int channel,float cost_value);
-
-void  nb_setIsValid(in_addr ip_temp,int channel,int isValid);
-void  hello_received_add(in_addr ip_temp, int channel, int num);
-void  hello_ip_add(in_addr ip_temp, int channel);
-void  hello_send_add();
-void  hello_received_add_nb(in_addr ip_temp, int channel, int num);
-void  hello_send_add_nb(in_addr ip_temp, int channel, int num);
-void  hello_infos_clear();
-void  add_f_value(float f, in_addr ip_temp, int channel);
-float getE(u_int8_t A_send,  u_int8_t B_send, u_int8_t A_received, u_int8_t B_received);
-float getF(in_addr ip_temp, int channel);
-float getG(const struct node_info historyStab, int neighbor_sum, int neighbor_change);
-void  updateCost(in_addr ip_temp,int channel);
-void  hello_infos_timer_add();
-int hash_cmp(struct in_addr *addr1, struct in_addr *addr2);
-u_int8_t get_top_and_add(int i,int j); //by gcy
-void sta_nb_add(struct in_addr ip_temp,u_int8_t sta); //by gcy
 
 #ifdef NS_PORT
 long hello_jitter();

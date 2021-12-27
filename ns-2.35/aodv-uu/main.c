@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Author: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
+ * Author: Erik Nordström, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 #include <stdio.h>
@@ -53,7 +53,7 @@ int unidir_hack = 0;
 int rreq_gratuitous = 0;
 int expanding_ring_search = 1;
 int internet_gw_mode = 0;
-int local_repair = 1;
+int local_repair = 0;
 int receive_n_hellos = 0;
 int hello_jittering = 1;
 int optimized_hellos = 0;
@@ -122,7 +122,7 @@ void usage(int status)
 	 "-R, --rate-limit        Toggle rate limiting of RREQs and RERRs (default ON).\n"
 	 "-q, --quality-threshold Set a minimum signal quality threshold for control packets.\n"
 	 "-V, --version           Show version.\n\n"
-	 "Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>\n\n",
+	 "Erik Nordström, <erik.nordstrom@it.uu.se>\n\n",
 	 progname, AODV_LOG_PATH, AODV_RT_LOG_PATH);
 
     exit(status);
@@ -582,7 +582,7 @@ int main(int argc, char **argv)
 	    expanding_ring_search = !expanding_ring_search;
 	    break;
 	case 'L':
-	    local_repair = 1;
+	    local_repair = !local_repair;
 	    break;
 	case 'D':
 	    wait_on_reboot = !wait_on_reboot;
@@ -592,7 +592,7 @@ int main(int argc, char **argv)
 	    break;
 	case 'V':
 	    printf
-		("\nAODV-UU v%s, %s ï¿½ Uppsala University & Ericsson AB.\nAuthor: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>\n\n",
+		("\nAODV-UU v%s, %s © Uppsala University & Ericsson AB.\nAuthor: Erik Nordström, <erik.nordstrom@it.uu.se>\n\n",
 		 AODV_UU_VERSION, DRAFT_VERSION);
 	    exit(0);
 	    break;

@@ -269,9 +269,6 @@ Mac802_11::Mac802_11() :
     noisePower = 0;
     validInterval = 1;
     /* End buaa g410 */
-    /* by gcy */
-    infoPower = 0;
-    /* end */
 }
 
 
@@ -323,20 +320,13 @@ Mac802_11::command(int argc, const char*const* argv)
                         return (TCL_OK);
         }
 	}
-    if (argc == 5) {
+    if (argc == 4) {
         if (strcmp(argv[1], "set-workMode") == 0) {
             workMode = atoi(argv[2]);
             noiseChannel = atoi(argv[3]);
-            currChannel = atoi(argv[4]);
             noiseInterval = 0.01;
             if (workMode < 0) {
-                if (noiseChannel >= 0 && currChannel == noiseChannel) {
-                    mhNoise_.start(noiseInterval); //单信道干扰
-                } else if (noiseChannel >= 0 && currChannel != noiseChannel) {
-                   ; //单信道干扰且不是当前信道，啥都不干
-                } else if (noiseChannel < 0) {
-                    mhNoise_.start(noiseInterval); //广播干扰
-                }
+                mhNoise_.start(noiseInterval);
             }
             return TCL_OK;
         }
@@ -502,11 +492,6 @@ Mac802_11::discard(Packet *p, const char* why)
 	}
 
 	switch(mh->dh_fc.fc_type) {
-		case MAC_Type_Reserved: {
-			Packet::free(p);
-		}
-		break;
-
 	case MAC_Type_Management:
 		switch(mh->dh_fc.fc_subtype) {
 		case MAC_Subtype_Auth:
@@ -1843,13 +1828,11 @@ Mac802_11::recv_timer()
         switch(subtype) {
         case MAC_Subtype_Noise:
             recvNoise(pktRx_);
-			break;
         default:
             fprintf(stderr, "recv_timer4:Invalid MAC Data Subtype %x\n",
                     subtype);
             exit(1);
         }
-		break;
 	/* End buaa g410 */
 	default:
 		fprintf(stderr, "recv_timer5:Invalid MAC Type %x\n", subtype);
@@ -1953,10 +1936,6 @@ Mac802_11::recvCTS(Packet *p)
 void
 Mac802_11::recvDATA(Packet *p)
 {
-    /* by gcy */
-    infoPower += p->txinfo_.RxPr;
-    /* end */
-
 	struct hdr_mac802_11 *dh = HDR_MAC802_11(p);
 	u_int32_t dst, src, size;
 	struct hdr_cmn *ch = HDR_CMN(p);
@@ -3388,17 +3367,3 @@ Mac802_11::getNoisePower()
 }
 
 /* End buaa g410 */
-
-/* by gcy */
-double
-Mac802_11::getInfoPower()
-{
-    return 10000 * infoPower;
-}
-
-double
-Mac802_11::getInfoNoiseRatio()
-{
-    return getInfoPower() / (getNoisePower() + 0.00001);
-}
-/* end */

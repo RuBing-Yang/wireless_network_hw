@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -33,15 +33,6 @@
 void neighbor_add(AODV_msg * aodv_msg, struct in_addr source,
 		  unsigned int ifindex);
 void neighbor_link_break(rt_table_t * rt);
-
-// fxj
-#ifdef USE_FXJ
-int nb_table_find(in_addr nb_addr); //  return index in nb_tbl, -1 when not nb or all channels down
-int nb_best_channel(in_addr nb_addr);  //  return best channel to bnr, -1 when link break
-int nb_table_find(int nb_addr); //  return index in nb_tbl, -1 when not nb or all channels down
-int nb_best_channel(int nb_addr);  //  return best channel to bnr, -1 when link break
-#endif
-// fxj_end
 
 #endif				/* NS_NO_DECLARATIONS */
 

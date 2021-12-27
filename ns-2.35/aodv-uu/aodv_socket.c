@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstrï¿½m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordström, <erik.nordstrom@it.uu.se>
  *
  *****************************************************************************/
 
@@ -215,15 +215,10 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 {
 
     /* If this was a HELLO message... Process as HELLO. */
-	//
-	// fxj_notes: Hellos include requests for neighbors' nb_tbl, all proced in hello_process
-	//
-
-
-    if ((aodv_msg->type == AODV_RREP && ttl == 1 && dst.s_addr == AODV_BROADCAST)) {
-		
-		hello_process((RREP *) aodv_msg, len, ifindex);
-		return;
+    if ((aodv_msg->type == AODV_RREP && ttl == 1 &&
+	 dst.s_addr == AODV_BROADCAST)) {
+	hello_process((RREP *) aodv_msg, len, ifindex);
+	return;
     }
 
     /* Make sure we add/update neighbors */
@@ -234,26 +229,25 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
     switch (aodv_msg->type) {
 
     case AODV_RREQ:
-		rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
-		break;
+	rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
+	break;
     case AODV_RREP:
-		 //if (YRB_OUT) printf("[socket process]AODV_RREP, rrep channel %d, interface %d, ttl %d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl);
-		DEBUG(LOG_DEBUG, 0, "Received RREP");
-		rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
-		break;
-	case AODV_RERR:
-		DEBUG(LOG_DEBUG, 0, "Received RERR");
-		rerr_process((RERR *) aodv_msg, len, src, dst);
-		break;
+	DEBUG(LOG_DEBUG, 0, "Received RREP");
+	rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
+	break;
+    case AODV_RERR:
+	DEBUG(LOG_DEBUG, 0, "Received RERR");
+	rerr_process((RERR *) aodv_msg, len, src, dst);
+	break;
     case AODV_RREP_ACK:
-		DEBUG(LOG_DEBUG, 0, "Received RREP_ACK");
-		rrep_ack_process((RREP_ack *) aodv_msg, len, src, dst);
-		break;
+	DEBUG(LOG_DEBUG, 0, "Received RREP_ACK");
+	rrep_ack_process((RREP_ack *) aodv_msg, len, src, dst);
+	break;
     default:
-		alog(LOG_WARNING, 0, __FUNCTION__,
-			"Unknown msg type %u rcvd from %s to %s", aodv_msg->type,
-			ip_to_str(src), ip_to_str(dst));
-		}
+	alog(LOG_WARNING, 0, __FUNCTION__,
+	     "Unknown msg type %u rcvd from %s to %s", aodv_msg->type,
+	     ip_to_str(src), ip_to_str(dst));
+    }
 }
 
 #ifdef NS_PORT
@@ -376,7 +370,6 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
     struct timeval now;
     /* Rate limit stuff: */
 
-	
 #ifndef NS_PORT
 
     struct sockaddr_in dst_addr;
@@ -506,7 +499,7 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
 
 #ifdef NS_PORT
 	ch->addr_type() = NS_AF_NONE;
-	 //if (YRB_OUT) printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
+
 	sendPacket(p, dst, 0.0);
 #else
 

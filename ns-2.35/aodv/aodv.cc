@@ -555,7 +555,6 @@ Packet *p;
 
 void
 AODV::recv(Packet *p, Handler*) {
-  
 struct hdr_cmn *ch = HDR_CMN(p);
 struct hdr_ip *ih = HDR_IP(p);
 

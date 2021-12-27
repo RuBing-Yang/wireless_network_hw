@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
+ * Authors: Erik Nordstr�m, <erik.nordstrom@it.uu.se>
  *          
  *
  *****************************************************************************/
@@ -26,7 +26,6 @@
 #else
 #include <netinet/in.h>
 #include "aodv_rrep.h"
-#include "aodv_rreq.h"
 #include "aodv_neighbor.h"
 #include "aodv_hello.h"
 #include "routing_table.h"
@@ -38,12 +37,6 @@
 #include "params.h"
 
 extern int unidir_hack, optimized_hellos, llfeedback;
-
-// fxj
-#ifdef USE_FXJ
-extern list_t seekhead; 
-#endif 
-// fxj_end
 
 #endif
 
@@ -82,55 +75,7 @@ RREP *NS_CLASS rrep_create(u_int8_t flags,
 
     return rrep;
 }
-//by cyo
 
-RREP *NS_CLASS rrep_create(u_int8_t flags,
-                           u_int8_t prefix,
-                           u_int8_t hcnt,
-                           struct in_addr dest_addr,
-                           u_int32_t dest_seqno,
-                           struct in_addr orig_addr,
-						   u_int32_t life,
-						   struct hello_info hello_infos[][3],
-						   u_int8_t sta_nb) //by cyo
-{
-    RREP *rrep;
-
-    rrep = (RREP *) aodv_socket_new_msg();
-    rrep->type = AODV_RREP;
-    rrep->res1 = 0;
-    rrep->res2 = 0;
-    rrep->prefix = prefix;
-    rrep->hcnt = hcnt;
-    rrep->dest_addr = dest_addr.s_addr;
-    rrep->dest_seqno = htonl(dest_seqno);
-    rrep->orig_addr = orig_addr.s_addr;
-    rrep->lifetime = htonl(life);
-    //by cyo
-    for(int i = 0;i<NUM_NODE;i++){
-        for(int j = 0;j<3;j++){
-            rrep->union_data.hello_infos[i][j] = hello_infos[i][j];
-        }
-    }
-	rrep->sta_nb = sta_nb;
-    //cyo_end
-    if (flags & RREP_REPAIR)
-        rrep->r = 1;
-    if (flags & RREP_ACK)
-        rrep->a = 1;
-
-    /* Don't print information about hello messages...*/
-#ifdef DEBUG_OUTPUT
-    if (rrep->dest_addr != rrep->orig_addr) {
-    DEBUG(LOG_DEBUG, 0, "Assembled RREP:");
-    log_pkt_fields((AODV_msg *) rrep);
-    }
-#endif
-
-    return rrep;
-}
-
-//cyo_end
 RREP_ack *NS_CLASS rrep_ack_create()
 {
     RREP_ack *rrep_ack;
@@ -250,14 +195,6 @@ void NS_CLASS rrep_forward(RREP * rrep, int size, rt_table_t * rev_rt,
 
     DEBUG(LOG_DEBUG, 0, "Forwarding RREP to %s", ip_to_str(rev_rt->next_hop));
 
-	
-	if (YRB_OUT) {
-		struct timeval now;
-		gettimeofday(&now, NULL);
-		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-		printf("[%.2f][%d->%d] %d rrep forward %d\n", theTime, rrep->orig_addr, rrep->dest_addr, DEV_NR(0).ipaddr.s_addr, rev_rt->next_hop.s_addr);
-	}
-
     /* Here we should do a check if we should request a RREP_ACK,
        i.e we suspect a unidirectional link.. But how? */
     if (0) {
@@ -285,9 +222,6 @@ void NS_CLASS rrep_forward(RREP * rrep, int size, rt_table_t * rev_rt,
     rrep = (RREP *) aodv_socket_queue_msg((AODV_msg *) rrep, size);
     rrep->hcnt = fwd_rt->hcnt;	/* Update the hopcount */
 
-	//rrep->cost = rev_rt->cost; //by yrb
-	rrep->channel = rev_rt->channel; //by yrb
-
     aodv_socket_send((AODV_msg *) rrep, rev_rt->next_hop, size, ttl,
 		     &DEV_IFINDEX(rev_rt->ifindex));
 
@@ -313,63 +247,6 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     struct in_addr inet_dest_addr;
     int inet_rrep = 0;
 #endif
-
-
-	/* added by yrb */
-	// to ori_node的上一跳link_cost
-	float last_cost = 0;
-	float weight = rrep->weight;
-	if (!USE_YRB) weight = 1;
-	/* end yrb */
-
-
-
-	// fxj
-	#ifdef USE_FXJ
-	int fxj_fix = 0;
-	struct timeval now;
-    gettimeofday(&now, NULL);
-	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-	if (rrep->t) {
-		#ifdef FXJ_OUT
-		printf("[%.2f]fxj_: %d recvd nb_tbl from %d, begin searching...\n", theTime, ip_dst.s_addr, ip_src.s_addr);
-		#endif
-		recvd_nb_tbl(ip_src, ip_dst, rrep);
-		return;
-	}
-	if (rrep->A) {
-		#ifdef FXJ_OUT
-		printf("[%.2f]fxj_: %d comfirmed %d \'s alive...\n", theTime, ip_dst.s_addr, ip_src.s_addr);
-		#endif
-		in_addr src, dst;
-		src.s_addr = rrep->orig_addr;
-		dst.s_addr = rrep->dest_addr;
-		int dest_seqno = rrep->dest_seqno;
-		send_RRepC(src, ip_dst, ip_src, dst, dest_seqno);
-		return;
-	}
-	if (rrep->c) {
-		#ifdef FXJ_OUT
-		printf("[%.2f]fxj_: %d recved %d\'s conform -> %d finally to %d.. ! !\n", theTime, 
-			ip_dst.s_addr, ip_src.s_addr, rrep->orig_addr, rrep->dest_addr);
-		#endif
-		in_addr nbr, dst;
-		nbr.s_addr = rrep->orig_addr;
-		dst.s_addr = rrep->dest_addr;
-		confirm_repair(ip_src, ip_dst, nbr, dst, ifindex, rrep);
-		// return;
-	}
-	if (rrep->f) {
-		fxj_fix = 1;
-		#ifdef FXJ_OUT
-		printf("[%.2f]fxj_: %d will create a forward rt  %d -> %d ! !\n", theTime, 
-			ip_dst.s_addr, rrep->orig_addr, rrep->dest_addr);
-		#endif
-		create_forward_route(rrep, ifindex);
-		return;
-	}
-	#endif
-	// fxj_end
 
     /* Convert to correct byte order on affeected fields: */
     rrep_dest.s_addr = rrep->dest_addr;
@@ -435,94 +312,27 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     fwd_rt = rt_table_find(rrep_dest);
     rev_rt = rt_table_find(rrep_orig);
 
-	/* added by yrb */
-	
-	/* end yrb */
-
     if (!fwd_rt) {
 	/* We didn't have an existing entry, so we insert a new one. */
 	fwd_rt = rt_table_insert(rrep_dest, ip_src, rrep_new_hcnt, rrep_seqno,
-				 rrep_lifetime, VALID, rt_flags, ifindex,
-				 weight, rrep->channel); //added by yrb
-		if (rev_rt) {
-			rev_rt->weight = weight; //added by yrb
-		}
-		if (YRB_OUT) {
-			struct timeval now;
-			gettimeofday(&now, NULL);
-			double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-
-			printf("[%.2f][%d->%d] %d<-%d rrep insert: cost(%f) weight(%f) channel(%d)\n", theTime, rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, weight, rrep->channel);
-
-			if (DEV_NR(0).ipaddr.s_addr == rrep_orig.s_addr) 
-				printf("[%d->%d connected]\n", rrep_orig.s_addr, rrep_dest.s_addr);
-		}
-		// fxj
-		#ifdef USE_FXJ
-		if (fxj_fix) {
-				
-			} else {
-				// by fxj: add nexts to rt_tbl
-				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-				}
-			}
-		#endif
-		// fxj_end
-    } 
-    /* 更新正向路由 */
-	else if (fwd_rt->dest_seqno == 0 ||
+				 rrep_lifetime, VALID, rt_flags, ifindex);
+    } else if (fwd_rt->dest_seqno == 0 ||
 	       (int32_t) rrep_seqno > (int32_t) fwd_rt->dest_seqno ||
-		   (rrep_seqno == fwd_rt->dest_seqno &&
-		   (fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR || 
-		   (rrep_new_hcnt < fwd_rt->hcnt && rrep->weight > fwd_rt->weight - D_W))))
-			//added by yrb
-			// yrb note: 不用管cost，因为序列号rrep_create会更新
-			// 但是注意：序列号相同时，虽然跳数少但不稳定的路，不更新！
-	{
-		
-		if (YRB_OUT) {
-			struct timeval now;
-			gettimeofday(&now, NULL);
-			double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-			
-			printf("[%.2f][%d->%d] %d<-%d rrep update: cost(%f) weight(%f) channel(%d)\n", theTime, rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr, last_cost, weight, rrep->channel);
-			
-			if (fwd_rt != NULL) 
-				printf("[%.2f][%d->%d] %d<-%d rrep update change: oldweight(%f) newweight(%f) channel(%d)\n", theTime, rrep_orig.s_addr, rrep_dest.s_addr, DEV_NR(0).ipaddr.s_addr, ip_src.s_addr,  fwd_rt->weight, weight, rrep->channel);
-			
-			if (DEV_NR(0).ipaddr.s_addr == rrep_orig.s_addr) 
-				printf("[%d->%d connected]\n", rrep_orig.s_addr, rrep_dest.s_addr);
-		}
-		
-		pre_repair_hcnt = fwd_rt->hcnt;
-		pre_repair_flags = fwd_rt->flags;
+	       (rrep_seqno == fwd_rt->dest_seqno &&
+		(fwd_rt->state == INVALID || fwd_rt->flags & RT_UNIDIR ||
+		 rrep_new_hcnt < fwd_rt->hcnt))) {
+	pre_repair_hcnt = fwd_rt->hcnt;
+	pre_repair_flags = fwd_rt->flags;
 
-    	/* 传递cost值 */
-		fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
-					rrep_lifetime, VALID,
-					rt_flags | fwd_rt->flags,
-					weight, rrep->channel); //added by yrb
-		if (rev_rt) {
-			rev_rt->weight = weight; //added by yrb
-		}
-		#ifdef USE_FXJ
-		if (fxj_fix) {
-				
-			} else {
-				// by fxj: add nexts to rt_tbl
-				for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-					fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-				}
-			}
-		#endif
-    } 
-	else {
-		if (fwd_rt->hcnt > 1) {
-			DEBUG(LOG_DEBUG, 0,
-			"Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
-			fwd_rt->hcnt, fwd_rt->dest_seqno);
-		}
+	fwd_rt = rt_table_update(fwd_rt, ip_src, rrep_new_hcnt, rrep_seqno,
+				 rrep_lifetime, VALID,
+				 rt_flags | fwd_rt->flags);
+    } else {
+	if (fwd_rt->hcnt > 1) {
+	    DEBUG(LOG_DEBUG, 0,
+		  "Dropping RREP, fwd_rt->hcnt=%d fwd_rt->seqno=%ld",
+		  fwd_rt->hcnt, fwd_rt->dest_seqno);
+	}
 	return;
     }
 
@@ -550,29 +360,13 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	    /* Add a "fake" route indicating that this is an Internet
 	     * destination, thus should be encapsulated and routed through a
 	     * gateway... */
-	    if (!inet_rt) {
-			rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
-				rrep_lifetime, VALID, RT_INET_DEST, ifindex,
-				rev_rt->weight, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			#ifdef USE_FXJ
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-			#endif
-			// fxj_end
-		} else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
-			rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
-							rrep_lifetime, VALID, RT_INET_DEST |
-							inet_rt->flags,
-				 			rev_rt->weight, rev_rt->channel);
-			// by fxj: add nexts to rt_tbl
-			#ifdef USE_FXJ
-			for (unsigned int i = 0; i < rrep_new_hcnt; i++) {
-				fwd_rt->all_nexts[i] = rrep->union_data.nexts[i];
-			}
-			#endif
-			// fxj_end
+	    if (!inet_rt)
+		rt_table_insert(inet_dest_addr, rrep_dest, rrep_new_hcnt, 0,
+				rrep_lifetime, VALID, RT_INET_DEST, ifindex);
+	    else if (inet_rt->state == INVALID || rrep_new_hcnt < inet_rt->hcnt) {
+		rt_table_update(inet_rt, rrep_dest, rrep_new_hcnt, 0,
+				rrep_lifetime, VALID, RT_INET_DEST |
+				inet_rt->flags);
 	    } else {
 		DEBUG(LOG_DEBUG, 0, "INET Response, but no update %s",
 		      ip_to_str(inet_dest_addr));
@@ -606,13 +400,6 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
     } else {
 	/* --- Here we FORWARD the RREP on the REVERSE route --- */
 	if (rev_rt && rev_rt->state == VALID) {
-		// fxj_: add himself into the chain
-		#ifdef USE_FXJ
-		if (!fxj_fix) {
-			rrep->union_data.nexts[rrep_new_hcnt] = ip_dst;
-		}
-		#endif
-		// fxj_end
 	    rrep_forward(rrep, rreplen, rev_rt, fwd_rt, --ip_ttl);
 	} else {
 	    DEBUG(LOG_DEBUG, 0, "Could not forward RREP - NO ROUTE!!!");
@@ -638,152 +425,3 @@ int rrep_add_hello_ext(RREP * rrep, int offset, u_int32_t interval)
 
     return (offset + AODV_EXT_SIZE(ext));
 }
-
-// fxj
-#ifdef USE_FXJ
-void NS_CLASS send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex) {
-	rt_table_t *rt_entry = rt_table_find(dst);
-	if (rt_entry) {
-		RREP *rrep = rrep_create(0, 0, 1, dst, rt_entry->dest_seqno, src, 1);
-		rrep->A = 1;
-		aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
-	}
-}
-
-void NS_CLASS send_RRepC(in_addr src, in_addr mid, in_addr nbr, in_addr dst, int dest_seqno) {
-	RREP *rrep = rrep_create(0, 0, 1, dst, dest_seqno, nbr, 1);
-	rrep->c = 1;
-	int ifindex = 0;
-	for (ifindex = 0; ifindex < MAX_NR_INTERFACES; ifindex++) {
-        if (!DEV_NR(ifindex).enabled)
-            continue;
-        else
-            break;
-    }
-	aodv_socket_send((AODV_msg*)rrep, src, sizeof(RREP), 1, &DEV_NR(ifindex));
-}
-
-void NS_CLASS send_RRepF(in_addr mid, in_addr nbr, rt_table_t *rt_entry, int ifindex) {
-	RREP *rrep = rrep_create(0, 0, rt_entry->hcnt - 1, rt_entry->dest_addr, 0, nbr, 1);
-	rrep->f = 1;
-	for (int i = 0; i < rrep->hcnt; i++) {
-		rrep->union_data.nexts[i].s_addr = rt_entry->all_nexts[i + 1].s_addr;
-	}
-	aodv_socket_send((AODV_msg*)rrep, mid, sizeof(RREP), 1, &DEV_NR(ifindex));
-}
-
-void NS_CLASS confirm_repair(in_addr mid, in_addr src, in_addr nbr, in_addr dst, int ifindex, RREP* rrep) {
-	struct timeval now;
-    gettimeofday(&now, NULL);
-	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-	rt_table_t *rt_entry = rt_table_find(dst);
-	if (!rt_entry) return;
-	// send route table
-	// remove sk list and send cached pack
-	list_t *pos, *temp__;
-	list_foreach_safe(pos, temp__, &seekhead) {
-		seek_list_t *sk_entry = (seek_list_t *) pos;
-		if (sk_entry->dest_addr.s_addr != dst.s_addr) continue;
-		list_detach(pos);
-		sk_entry->seek_timer.handler = 0;
-		rt_entry->flags &= 0xfffffffd;
-		rt_entry->next_hop.s_addr = mid.s_addr;
-		int i;
-		for (i = 0; i < rt_entry->hcnt; i++) {
-			if (nbr.s_addr = rt_entry->all_nexts[i].s_addr) 
-				break;
-		}
-		if (i == 0) {
-			for (int j = rt_entry->hcnt; j > 0; j--)
-				rt_entry->all_nexts[j].s_addr = rt_entry->all_nexts[j - 1].s_addr;
-			rt_entry->hcnt++;
-		} else if (i >= 2) {
-			for (int j = 1; j < rt_entry->hcnt + 1 - i; j++)
-				rt_entry->all_nexts[j].s_addr = rt_entry->all_nexts[j + i - 1].s_addr;
-			rt_entry->hcnt -= i - 1;
-		}
-		rrep->hcnt = rt_entry->hcnt;
-		rt_entry->all_nexts[0].s_addr = mid.s_addr;
-		send_RRepF(mid, nbr, rt_entry, ifindex);
-		#ifdef FXJ_OUT
-		printf("[%.2f]fxj_: %d will forwar to %d -> %d finally to %d...\n", theTime, 
-			src.s_addr, mid.s_addr, nbr.s_addr, dst.s_addr);
-		printf("[%.2f]fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", theTime,
-			src.s_addr, dst.s_addr, mid.s_addr);
-		#endif		
-		packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
-		break;
-    }
-}
-
-void NS_CLASS create_forward_route(RREP *rrep, int ifindex) {
-	in_addr dest, next; 
-	next.s_addr = rrep->orig_addr;
-	dest.s_addr = rrep->dest_addr;
-	rt_table_t *re = rt_table_find(dest);
-	if (re) return;
-	int channel = nb_best_channel(next);
-	re = rt_table_insert(dest, next, rrep->hcnt - 1, 0,
-				 MY_ROUTE_TIMEOUT, VALID, 0, ifindex,
-				 1, channel); //added by yrb
-		// by fxj: add nexts to rt_tbl
-	for (int i = 1; i < rrep->hcnt - 1; i++) {
-		re->all_nexts[i - 1] = rrep->union_data.nexts[i];
-	}
-}
-
-void NS_CLASS recvd_nb_tbl(in_addr mid, in_addr src, RREP* rrep) {
-	struct timeval now;
-    gettimeofday(&now, NULL);
-	double theTime = now.tv_sec + (0.000001f * now.tv_usec);
-	#ifdef FXJ_OUT
-	printf("       valid neighbors: %d. ", rrep->hcnt);
-	if (rrep->hcnt > 0) {
-        printf("(");
-        for (int i = 0; i < rrep->hcnt; i++)
-            printf("%d, ", rrep->union_data.nexts[i]);
-        printf(")\n");
-    } else {
-        printf("\n");
-    }
-	#endif
-	list_t *pos, *temp__;
-    list_foreach_safe(pos, temp__, &seekhead) {
-		seek_list_t *sk_entry = (seek_list_t *) pos;
-		// sk_entry->dest_addr.s_addr
-		rt_table_t *rt_entry = rt_table_find(sk_entry->dest_addr);
-		#ifdef FXJ_OUT_1
-		printf("fxj_: searching dest %d.\n", sk_entry->dest_addr.s_addr);
-		#endif
-		if (rt_entry) {
-			for (int i = 0; i < rt_entry->hcnt; i++) {
-				#ifdef FXJ_OUT_2
-				printf("       searching next %d.\n", rt_entry->all_nexts[i].s_addr);
-				#endif
-				if (rt_entry->all_nexts[i].s_addr == mid.s_addr) {
-					#ifdef FXJ_OUT
-					printf("fxj_: %d found a next %d in range, GREAT ! ! \n", src.s_addr, mid.s_addr);
-					#endif
-					list_detach(pos);
-					sk_entry->seek_timer.handler = 0;
-					rt_entry->next_hop.s_addr = mid.s_addr;
-					rt_entry->flags &= 0xfffffffd;
-					packet_queue_set_verdict(sk_entry->dest_addr, PQ_SEND);
-					#ifdef FXJ_OUT
-					printf("[%.2f]fxj_: %d is sending all cached packets to dst %d via %d...A SUCCESSFUL REPAIR ! !\n", theTime,
-						src.s_addr, sk_entry->dest_addr, mid.s_addr);
-					#endif
-					break;
-				}
-				for (int j = 0; j < rrep->hcnt; j++) {
-					if (rt_entry->all_nexts[i].s_addr == rrep->union_data.nexts[j].s_addr) {
-						send_RReqT(src, mid, rrep->union_data.nexts[j], sk_entry->dest_addr, ifindex);
-					}
-				}
-			}
-		}
-    }
-}
-
-#endif
-//fxj_end

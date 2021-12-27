@@ -27,9 +27,6 @@
 #include "../../common/encap.h"
 #include "aodv-uu.h"
 #include "../../mac/mac-802_11.h"
-/* by gcy */
-#include "../defs.h"
-/* end */
 
 
 /* Method for determining the size of the AODVUU packet header type */
@@ -165,7 +162,7 @@ tqtimer(this), ifqueue(0)
 	packet_queue_init();
 
 	// Added by buaa g410
-	nIfaces = 3; // by gcy
+	nIfaces = 0;
 	fixed_interface = 0;
 }
 
@@ -296,10 +293,10 @@ void NS_CLASS packetFailed(Packet *p)
 	}
 
 	/* Do local repair? */
-	if (1 && rt->hcnt <= MAX_REPAIR_TTL
+	if (local_repair && rt->hcnt <= MAX_REPAIR_TTL
 		/* && ch->num_forwards() > rt->hcnt */
 			) {
-		
+
 		/* Buffer the current packet */
 		packet_queue_add(p, dest_addr);
 
@@ -391,7 +388,7 @@ void NS_CLASS recv(Packet *p, Handler *)
 
 #endif /* CONFIG_GATEWAY */
 		default:
-			processPacket(p);   // Data path  // for yrb to modified 
+			processPacket(p);   // Data path
 	}
 
 	end:
@@ -399,16 +396,8 @@ void NS_CLASS recv(Packet *p, Handler *)
 	scheduleNextEvent();
 }
 
-/* added by yrb */
 /* Sends a packet using the specified next hop and delay */
-void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay) {
-	sendPacket(p, next_hop, delay, 255);
-}
-/* end yrb */
-
-/* Sends a packet using the specified next hop and delay */
-void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
-						u_int8_t channel) //added by yrb
+void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay)
 {
 	struct hdr_cmn *ch = HDR_CMN(p);
 	struct hdr_ip *ih = HDR_IP(p);
@@ -451,43 +440,13 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_NONE;
 		jitter = 0.02 * Random::uniform();
-		
-        /* by gcy && modified by yrb */
-        AODV_msg* aodv_msg = HDR_AODVUU(p);
-		int temp = 0;
-		if (aodv_msg->type == AODV_RREP) {
-			temp = ((RREP *)aodv_msg)->channel;
-		}
-		if (aodv_msg->type == AODV_RREQ) {
-			temp = ((RREQ *)aodv_msg)->channel;
-		}
-
 		if (nIfaces > 0) {
-			if (USE_YRB) {
-				for (int i = 0; i < nIfaces; i++) {
-					if (aodv_msg->type == AODV_RREP || aodv_msg->type == AODV_RREQ) {
-						if (aodv_msg->type == AODV_RREP) {
-							//printf("[RREP] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
-							((RREP *)aodv_msg)->channel = i;
-						} else {
-							//printf("[RREQ] Broadcast NR_INTERFACE %d, nIface %d\n", temp, i);
-							((RREQ *)aodv_msg)->channel = i;
-						}
-						Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
-					} else {
-						Scheduler::instance().schedule(lllist[i], p->copy(), jitter);
-					}
-				}
-			} else {
-				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
-			}
-        	/* end gcy*/
+			Scheduler::instance().schedule(lllist[fixed_interface], p, jitter);
 		} else {
 			Scheduler::instance().schedule(ll, p, jitter);
 		}
 	} else {
-		/* Unicast packet 单信道 */
-		
+		/* Unicast packet */
 		ch->next_hop_ = next_hop.s_addr;
 		ch->prev_hop_ = DEV_NR(NS_DEV_NR).ipaddr.s_addr;
 		ch->addr_type() = NS_AF_INET;
@@ -497,19 +456,7 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 			ch->xmit_failure_data_ = (void *) this;
 		}
 		if (nIfaces > 0) {
-			/* added by yrb */
-			AODV_msg* aodv_msg = HDR_AODVUU(p);
-			if (channel != 255) {
-				//printf("[data] 单信道%d\n", channel);
-				Scheduler::instance().schedule(lllist[channel], p, delay);
-			}
-			else if (USE_YRB && aodv_msg->type == AODV_RREP) {
-				int rrep_channel = ((RREP *)aodv_msg)->channel;
-				Scheduler::instance().schedule(lllist[rrep_channel], p, delay);
-			} else {
-				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
-			}
-			/* end yrb */
+			Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
 		} else {
 			Scheduler::instance().schedule(ll, p, delay);
 		}
@@ -602,8 +549,7 @@ int NS_CLASS startAODVUUAgent()
 				  DELETE_PERIOD);
 		}
 		/* Schedule the first HELLO */
-        // start hello
-		// if (!llfeedback && !optimized_hellos)
+		if (!llfeedback && !optimized_hellos)
 			hello_start();
 
 		/* Initialize routing table logging */

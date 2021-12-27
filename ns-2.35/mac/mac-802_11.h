@@ -393,10 +393,6 @@ public:
     inline int bss_id() { return bss_id_; }
     int getNoiseFlag();
     double getNoisePower();
-    /* by gcy */
-    double getInfoPower();
-    double getInfoNoiseRatio();
-    /* end */
     // Added by Sushmita to support event tracing
     void trace_event(char *, Packet *);
     EventTrace *et_;
@@ -658,10 +654,6 @@ private:
     double noisePower;
     double validInterval;
     /* End buaa g410 */
-    /* by gcy */
-    double infoPower;
-    int currChannel; //by yrb
-    /* by gcy */
 
 };
 
