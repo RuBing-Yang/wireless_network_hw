@@ -105,6 +105,8 @@ rt_table_t *NS_CLASS rt_table_insert(struct in_addr dest_addr,
 	struct in_addr nm;
 	nm.s_addr = 0;
 
+	//if (YRB_OUT) printf("【rt_table_insert】\n");
+
 	/* Calculate hash key */
 	index = hashing(&dest_addr, &hash);
 
@@ -222,6 +224,9 @@ rt_table_t *NS_CLASS rt_table_update(rt_table_t * rt, struct in_addr next,
 {
 	struct in_addr nm;
 	nm.s_addr = 0;
+
+	
+	//if (YRB_OUT) printf("【rt_table_update】\n");
 
 	if (rt->state == INVALID && state == VALID) {
 

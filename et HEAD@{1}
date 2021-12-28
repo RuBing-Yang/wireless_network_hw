@@ -1,0 +1,345 @@
+[33mcommit c3c0956698d47267ff86f1bb38f3e57a50e88486[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 27 19:54:00 2021 +0800
+
+    fxj time stamped
+
+[33mcommit c6d742b94d26a9b64b6c019f3976993ed99e9614[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 27 19:30:03 2021 +0800
+
+    de a little mais lethal bug
+
+[33mcommit 702dc3b591781204f0f5e415bbbe80fa4465dead[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Sat Dec 25 21:24:15 2021 +0800
+
+    解决冲突
+
+[33mcommit 4c7aa1e7050598c01c66f610dadda1625135706f[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Sat Dec 25 21:09:54 2021 +0800
+
+    解决冲突
+
+[33mcommit b2cb7734a9e4a045fa3192701eb28d757b332eb3[m
+Merge: bb2763f 6d19118
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Sat Dec 25 21:03:40 2021 +0800
+
+    解决冲突
+
+[33mcommit 6d19118748392ec234266097f29e16fb3d49b391[m[33m ([m[1;31morigin/yrb2[m[33m)[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Sat Dec 25 20:57:43 2021 +0800
+
+    好起来了！！！
+
+[33mcommit 76e0214015745d4f1e0ab99cc6c9d49b74428e72[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Fri Dec 24 23:42:25 2021 +0800
+
+    打时间戳
+
+[33mcommit bb2763f7fbb92bd7d3409c13fec1f922f3d95e53[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 22 09:16:05 2021 +0800
+
+    strange bug
+
+[33mcommit ed449fdc9dfbb20d4b76f12963bdac03f148f2fa[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 15 09:10:18 2021 +0800
+
+    try to rebase
+
+[33mcommit 866de33d8b57a62ce9e21429465e14f341462fa0[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 15 03:39:32 2021 +0800
+
+    part3可以运行了
+
+[33mcommit 8b49a7c42a6ea49a49a4b84f08fe699e2ebe565a[m
+Merge: c974a94 cce6fab
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 14 22:37:53 2021 +0800
+
+    修改输出语句
+
+[33mcommit cce6fab62decc6963bae877b242aea91336a3086[m[33m ([m[1;32myrb1[m[33m)[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 14 22:28:19 2021 +0800
+
+    更改输出形式
+
+[33mcommit c974a94f7ad8bf2b6924cab8f917e952a6dd7543[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Tue Dec 14 22:11:16 2021 +0800
+
+    todo 在路由更新时加入下游节点所nexts
+
+[33mcommit 928b6565ddb430602bb60232c647ada19e9f5e14[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Tue Dec 14 21:31:01 2021 +0800
+
+    may be AC, maybe...
+
+[33mcommit 9674a9cf70cd0eaa86e5c40872636311b0f300da[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Tue Dec 14 21:00:08 2021 +0800
+
+    fuck the Git
+
+[33mcommit ea2549b349b9128efe9baa1c38fdd11f0bac9f49[m[33m ([m[1;31morigin/yrb1[m[33m)[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 14 18:12:19 2021 +0800
+
+    part3 修复段错误 & volat改为cost
+
+[33mcommit ef9033ddd7e8ba148de55386f6c0c4f7a8e5ff07[m[33m ([m[1;31morigin/fxj1[m[33m)[m
+Merge: dd28dc6 a2f9a96
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 14 02:23:59 2021 +0800
+
+    Merge remote-tracking branch 'origin/fxj1' into fxj1
+
+[33mcommit a2f9a96e8daf22ffa054a8d8be9a836b64f0a7a6[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 13 23:31:55 2021 +0800
+
+    修改了采用与debug显示的宏判断方式
+
+[33mcommit a6d9978d7281abb5934ddc651dd65cdb60df0d9f[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 13 23:15:16 2021 +0800
+
+    de CE bug
+
+[33mcommit 4d9b26d7b9bdbcc42e985158a89f6ea05354ba00[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 13 22:26:35 2021 +0800
+
+    还差发消息的处理
+
+[33mcommit dd28dc66dbaf5964e1e901201cf93bdf534577f3[m
+Merge: 728c65b 98db82a
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Mon Dec 13 22:03:23 2021 +0800
+
+    add gitignore
+
+[33mcommit 98db82a30fccd47b1a39b854725ed4ab4aed5b35[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Mon Dec 13 21:23:45 2021 +0800
+
+    part 3 multi channel
+
+[33mcommit 728c65b72cdc0a33bd02d0a4fed3638dc1c3ede9[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Mon Dec 13 21:02:55 2021 +0800
+
+    nearly end
+
+[33mcommit 64a37bc2a3a2dae9af24c7429489790d6803ef0e[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Sat Dec 11 07:02:31 2021 +0800
+
+    手动merge1234单元 && cost还是0
+
+[33mcommit 534612b0f38da56972390748e9a4cc6c756f82ba[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Fri Dec 10 06:45:08 2021 +0800
+
+    为干扰节点指定信道 & 出现cost=0的问题
+
+[33mcommit 351eecece955cbc587de97c7b01b25d7533b66df[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Fri Dec 10 06:16:51 2021 +0800
+
+    为干扰节点指定信道 & 出现cost=0的问题
+
+[33mcommit 268d5d627c6d2b8028a6152b7064838d08172d80[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 8 23:01:31 2021 +0800
+
+    助教发群里的更改
+
+[33mcommit e9d5ba0bfe565e487bc59049813f4b9283d2451b[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 22:34:59 2021 +0800
+
+    fxj:debug
+
+[33mcommit 47f70c60151edcd7defd5f228927d911dd5ff28b[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 8 22:20:41 2021 +0800
+
+    修复rrep_forward声明定义不一致问题
+
+[33mcommit 2180e23ddce67bf1f082911c14ca8362a036c193[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 8 21:59:14 2021 +0800
+
+    修复rreq_forward channel->interface->nb->cost的问题
+
+[33mcommit 8b226cdf03eaf71abdb8298f64936e1a4e760775[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 8 21:11:46 2021 +0800
+
+    重载路由表更新函数 & 添加USE_YRB
+
+[33mcommit b7d33745b69476b7e591ee6f2b8943ed9b195b3f[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 20:43:24 2021 +0800
+
+    fxj: debug
+
+[33mcommit 64e0f0907ee2e3bb58faecdddebe3b4e73cc9d5b[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Wed Dec 8 20:15:50 2021 +0800
+
+    修改volitile关键字
+
+[33mcommit 175013330004538e2ff10a616f166f5876605a1f[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 19:41:23 2021 +0800
+
+    nodes can now return nb_tlb
+
+[33mcommit 6119f17d98e1d957b4cfa1c38adfeb4dfeb6535d[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 18:23:18 2021 +0800
+
+    fxj: de CE bug
+
+[33mcommit 47b1fc78d11ba7a242180be0b20b1068ce76806d[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 18:09:38 2021 +0800
+
+    fxj_todo
+
+[33mcommit 72624106149b90dbeecddad1c4ead7d8f2858d0a[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 02:51:11 2021 +0800
+
+    add func: Broadcast Hello(N=1) to Neighbors when link fails
+
+[33mcommit a9087eb9efb1422a03cffc51eb25743454eb9692[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 8 01:08:37 2021 +0800
+
+    stored fwd_nexts into rt_tbl
+
+[33mcommit 389142ad2439390be76cbf282abb12238af846ac[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 7 22:53:17 2021 +0800
+
+    更改寻路rrep替换不稳定路由部分
+
+[33mcommit 2a0acc077af3d094bee0162b6b1622308015c91f[m
+Author: alex <fxj5060@buaa.edu.cn>
+Date:   Tue Dec 7 20:32:58 2021 +0800
+
+    rreq.h for unit 4
+
+[33mcommit d7fa4a8576ba4313508bcf338f0d2854494d491c[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Dec 7 19:59:32 2021 +0800
+
+    对寻路正向过程进行更改
+
+[33mcommit 0600c323b53042326749e68fd3d2f5ee8ef1c7a7[m
+Author: cyo <3011894006@qq.com>
+Date:   Tue Dec 7 01:04:56 2021 +0800
+
+    ns-2
+
+[33mcommit 73bf4b426e579d2a35224dffbd227699e09b30eb[m
+Author: wonder <3011894006@qq.com>
+Date:   Mon Dec 6 17:05:11 2021 +0000
+
+    删除文件 aodv-uu-0.9.6
+
+[33mcommit 38f1a14477dfc0f14bf5434b2267531daa3597c1[m
+Author: cyo <3011894006@qq.com>
+Date:   Mon Dec 6 09:26:16 2021 +0800
+
+    增加hello_send 等的计数
+
+[33mcommit 5842820881e1307848d7dd002ecb0b937125d31e[m
+Author: cyo <3011894006@qq.com>
+Date:   Sun Dec 5 17:14:37 2021 +0800
+
+    完善cost的计算方法
+
+[33mcommit 167fc91c9276d4cd1fec20beb1b39d3fee7c8c0c[m
+Author: cyo <3011894006@qq.com>
+Date:   Sun Dec 5 01:49:46 2021 +0800
+
+    改了一些细节
+
+[33mcommit e6e9e0110691ee45a72bebb6add1eb12d598ec39[m
+Author: cyo <3011894006@qq.com>
+Date:   Sun Dec 5 01:27:50 2021 +0800
+
+    修改了个人字段的位置，在rrep消息中增加了个人字段，不影响原先使用可忽略
+
+[33mcommit 5dfdea31e79badaf7618dfd8718a2533e80a36aa[m
+Author: cyo <3011894006@qq.com>
+Date:   Fri Dec 3 23:08:02 2021 +0800
+
+    增加cost的计算方法，修改node_stability为数组，增加第一第二单元的字段“
+
+[33mcommit 99ace91d03f1841016e0d1c764e79680216cd81a[m
+Author: aalex1945 <fxj5060@buaa.edu.cn>
+Date:   Wed Dec 1 02:33:52 2021 +0800
+
+    改了一堆，都是个人字段
+
+[33mcommit aba3c7d92c54822b09f286ddbf4d4d92693bfdf6[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Nov 30 23:52:47 2021 +0800
+
+    add global definition use_optimization
+
+[33mcommit 366df076c48c7651e0fe07b2c6e5f02aab346f78[m
+Author: aalex1945 <fxj5060@buaa.edu.cn>
+Date:   Tue Nov 30 23:19:39 2021 +0800
+
+    改了一下nbtbl的架子
+
+[33mcommit 93365b4a8b9921588182209162d10f99f83fc96b[m
+Author: aalex1945 <fxj5060@buaa.edu.cn>
+Date:   Tue Nov 30 22:58:21 2021 +0800
+
+    修改了host_info，nb_tbl搭了架子，内容没动
+
+[33mcommit 2b0fa4628cf9452e465a99f8c7df6e9d2474ba35[m
+Author: aalex1945 <fxj5060@buaa.edu.cn>
+Date:   Tue Nov 30 22:34:14 2021 +0800
+
+    init again
+
+[33mcommit 2bf8cac6ab0062a6f95c39fb5cff855d8c73b7c1[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Nov 30 22:30:01 2021 +0800
+
+    init
+
+[33mcommit 56453d39722e3a23de26f1ff04bbbf1e41bdd315[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Nov 30 22:20:16 2021 +0800
+
+    init
+
+[33mcommit 86e42afa21b106163d8828e9905580c9c96b5592[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Nov 30 22:19:21 2021 +0800
+
+    init
+
+[33mcommit 96640bfd1a2e87eae661e8baa466040248ba217e[m
+Author: 杨濡冰 <19373263@buaa.edu.cn>
+Date:   Tue Nov 30 22:13:44 2021 +0800
+
+    init

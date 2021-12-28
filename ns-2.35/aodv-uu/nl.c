@@ -231,8 +231,12 @@ static void nl_kaodv_callback(int sock)
 
 		fwd_rt = rt_table_find(dest_addr);
 
-		if (fwd_rt)
+		if (fwd_rt) {
+			if (YRB_OUT)
+				printf("【nl.c nl_kaodv_callback】case KAODVM_REPAIR && has fwd_rt\n");
 			rreq_local_repair(fwd_rt, src_addr, NULL);
+		}
+			
 
 		break;
 	case KAODVM_ROUTE_UPDATE:

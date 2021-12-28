@@ -200,8 +200,13 @@ void NS_CLASS processPacket(Packet * p)
 
 		packet_queue_add(p, dest_addr);
 
-		if (fwd_rt && (fwd_rt->flags & RT_REPAIR))
+		if (fwd_rt && (fwd_rt->flags & RT_REPAIR)) {
+			
+		if (YRB_OUT)
+			printf("【packet-input.cc processPacket】fwd_rt && (fwd_rt->flags & RT_REPAIR)\n");
 			rreq_local_repair(fwd_rt, src_addr, ipd);
+		}
+			
 		else
 			rreq_route_discovery(dest_addr, rreq_flags, ipd);
 

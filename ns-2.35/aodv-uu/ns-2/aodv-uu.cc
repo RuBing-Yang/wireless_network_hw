@@ -294,9 +294,15 @@ void NS_CLASS packetFailed(Packet *p)
 		drop(p, DROP_RTR_MAC_CALLBACK);
 		goto end;
 	}
-
+	if (YRB_OUT) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		printf("[%.2f][aodv-uu.cc packetFailed] src(%d)->now(%d)->next(%d)->dest(%d)\n", theTime, src_addr.s_addr, DEV_NR(0).ipaddr.s_addr, next_hop.s_addr, dest_addr.s_addr);
+	}
 	/* Do local repair? */
 	if (1 && rt->hcnt <= MAX_REPAIR_TTL
+		&& rt->weight > D_W // added by yrb
 		/* && ch->num_forwards() > rt->hcnt */
 			) {
 		
@@ -309,6 +315,8 @@ void NS_CLASS packetFailed(Packet *p)
 		/* Mark the route to be repaired */
 		rt_next_hop->flags |= RT_REPAIR;
 		neighbor_link_break(rt_next_hop);
+		if (YRB_OUT)
+			printf("【aodv-uu.cc packetFailed】rt->hcnt <= MAX_REPAIR_TTL\n");
 		rreq_local_repair(rt, src_addr, NULL);
 
 	} else {

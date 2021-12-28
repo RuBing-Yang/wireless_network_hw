@@ -114,6 +114,9 @@
 // cyo_end
 
 /* added by cyo & gcy */
+
+#define STA_SWITCH 0
+
 /*是否打印printf内容 */
 #define GCY_OUT 1
 #define CYO_OUT 1

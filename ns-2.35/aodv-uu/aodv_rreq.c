@@ -658,6 +658,9 @@ void NS_CLASS rreq_local_repair(rt_table_t * rt, struct in_addr src_addr,
     int ttl;
     u_int8_t flags = 0;
 
+	if (YRB_OUT)
+		printf("【aodv_rreq.c rreq_local_repair】\n");
+
     if (!rt) return;
 
     if (seek_list_find(rt->dest_addr)) return;

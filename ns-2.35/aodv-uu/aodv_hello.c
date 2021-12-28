@@ -370,7 +370,8 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
            new entry... */
 
         rt = rt_table_insert(hello_dest, hello_dest, 1,
-                             hello_seqno, timeout, state, flags, ifindex);
+                             hello_seqno, timeout, state, flags, ifindex,
+                             0, 0); //added by yrb
 
         if (flags & RT_UNIDIR) {
             DEBUG(LOG_INFO, 0, "%s new NEIGHBOR, link UNI-DIR",
@@ -396,7 +397,8 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
             memcpy(&rt->last_hello_time, &now, sizeof(struct timeval));
             return;
         }
-        rt_table_update(rt, hello_dest, 1, hello_seqno, timeout, VALID, flags);
+        rt_table_update(rt, hello_dest, 1, hello_seqno, timeout, VALID, flags,
+                             0, 0); //added by yrb
     }
 
     hello_update:
@@ -431,24 +433,41 @@ void NS_CLASS update_stability() {
         }
         chan_sum += flag;
     }
+
     int paraA = node_sum;
     int paraB = node_sum - temp;
-    int NP0 = maclist[0]->getNoisePower() > 0.01 ? 0 : 1;
-    int NP1 = maclist[1]->getNoisePower() > 0.01 ? 0 : 1;
-    int NP2 = maclist[2]->getNoisePower() > 0.01 ? 0 : 1;
+
+    int NP0 = maclist[0]->getNoisePower() > 0 ? 0 : 1;
+    int NP1 = maclist[1]->getNoisePower() > 0 ? 0 : 1;
+    int NP2 = maclist[2]->getNoisePower() > 0 ? 0 : 1;
     int paraC = NP0 + NP1 + NP2;
+
     double paraD;
     double INR0 = maclist[0]->getInfoNoiseRatio();
     double INR1 = maclist[1]->getInfoNoiseRatio();
     double INR2 = maclist[2]->getInfoNoiseRatio();
     paraD = INR0 > INR1 ? INR0 : INR1;
     paraD = paraD > INR2 ? paraD : INR2;
-    int cur_stability = (paraA + paraB + paraC + (int) paraD) > 3 ? 1 : 0;
+
+    int cur_stability;
+    if (STA_SWITCH) {
+        double df = 1.9519 * paraA + 1.9541 * paraB + 1.9054 * paraC + 0.0034 * paraD;
+        if (df > 0) cur_stability = 1;
+        else cur_stability = 0;
+    } else {
+        if (paraA == 0 || paraB < -0.5 * paraA || paraC == 0 || paraD < 0.001) {
+            cur_stability = 0;
+        } else {
+            cur_stability = 1;
+        }
+    }
+
     this_host.stability.neighbor_sum = paraA;
     this_host.stability.neighbor_change = paraB;
     this_host.stability.available_channel_num = paraC;
     this_host.stability.best_info_noise_ratio = paraD;
     this_host.stability.stability = cur_stability;
+
     int i = 0;
     for (i = 0; i < MAX_NR_INTERFACES; i++) {
         if (!DEV_NR(i).enabled)
@@ -457,8 +476,10 @@ void NS_CLASS update_stability() {
             break;
         }
     }
-    //fprintf(fp_gcy, "noise: \t%f \t%f \t%f\n", maclist[0]->getNoisePower(), maclist[1]->getNoisePower(), maclist[2]->getNoisePower());
-    fprintf(fp_gcy, "node: %d \tA: %d \tB: %d \tC: %d \tD: %f\n", DEV_NR(i).ipaddr.s_addr, paraA, paraB, paraC, paraD);
+    fprintf(fp_gcy, "time: %f   \tnode: %d \tA: %d \tB: %d \tC: %d \tD: %f \tSTABILITY: %d\n", Scheduler::instance().clock(), DEV_NR(i).ipaddr.s_addr, paraA, paraB, paraC, paraD, cur_stability);
+    //fprintf(fp_svm, "%d,%d,%d,%f,%d\n", paraA, paraB, paraC, paraD, cur_stability);
+    //fprintf(fp_data, "%d\t%f\t%d\t%d\t%d\t%f\n", DEV_NR(i).ipaddr.s_addr, Scheduler::instance().clock(), paraA, paraB, paraC, paraD);
+
     if (this_host.sta_self.count < NUM_STATES){
         this_host.sta_self.isValid = 1;
         this_host.sta_self.node_sta[this_host.sta_self.count] = this_host.stability.stability;
