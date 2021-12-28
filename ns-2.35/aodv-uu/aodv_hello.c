@@ -692,6 +692,14 @@ void NS_CLASS hello_infos_timer_add() {
                     hello_received += this_host.hello_received_history[i][j][k];
                 }
                 this_host.hello_infos[i][j].hello_received = hello_received;
+            }else if(this_host.hello_infos[i][j].ipaddr.s_addr != -1 && this_host.hello_infos[i][j].isValid == 0){
+                this_host.hello_received_history[i][j][get_top_and_add(i,j)] = this_host.hello_received_history[i][j][10];
+                this_host.hello_received_history[i][j][10] = 0;
+                int hello_received = 0;
+                for (int k = 5; k < 10; k++) {
+                    hello_received += this_host.hello_received_history[i][j][k];
+                }
+                this_host.hello_infos[i][j].hello_received = hello_received;
             }
         }
     }//滑动改变hello_received的值
@@ -823,11 +831,10 @@ float NS_CLASS getG(const struct node_info historyStab, int neighbor_sum, int ne
             if (neighbor_sum == 0) {
                 result += k*MK;
             } else {
-                result += k*MK * (float) (neighbor_sum - neighbor_change1) / (float) neighbor_sum;
+                result += k*MK;
             }
     }
-
-    return (result > 0) ? (result / ((float) num-1))*(0.5+(float)num/(float)(2*NUM_STATES)) : 0;
+    return (result > 0) ? result/num : 0;
 }
 
 void NS_CLASS updateCost(struct in_addr ip_temp, int channel) {
