@@ -221,8 +221,7 @@ void NS_CLASS rrep_send(RREP * rrep, rt_table_t * rev_rt,
 	  ip_to_str(rev_rt->next_hop), ip_to_str(rev_rt->dest_addr),
 	  ip_to_str(dest));
 
-	if (YRB_OUT) 
-		printf("%d aodv_socket_send next(%d) dest(%d)\n", DEV_IFINDEX(0).ipaddr.s_addr, rev_rt->next_hop.s_addr, dest.s_addr);
+	//if (YRB_OUT)  printf("%d aodv_socket_send next(%d) dest(%d)\n", DEV_IFINDEX(0).ipaddr.s_addr, rev_rt->next_hop.s_addr, dest.s_addr);
     aodv_socket_send((AODV_msg *) rrep, rev_rt->next_hop, size, MAXTTL,
 		     &DEV_IFINDEX(rev_rt->ifindex));
 
@@ -650,6 +649,7 @@ int rrep_add_hello_ext(RREP * rrep, int offset, u_int32_t interval)
 // fxj
 #ifdef USE_FXJ
 void NS_CLASS send_RRepA(in_addr mid, in_addr nbr, in_addr src, in_addr dst, int ifindex) {
+	if (YRB_OUT) printf("send_RRepA\n");
 	rt_table_t *rt_entry = rt_table_find(dst);
 	if (rt_entry) {
 		RREP *rrep = rrep_create(0, 0, 1, dst, rt_entry->dest_seqno, src, 1);

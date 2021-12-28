@@ -375,7 +375,7 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
     int retval = 0;
     struct timeval now;
     /* Rate limit stuff: */
-
+	
 	
 #ifndef NS_PORT
 
@@ -455,92 +455,95 @@ void NS_CLASS aodv_socket_send(AODV_msg * aodv_msg, struct in_addr dst,
 	gettimeofday(&now, NULL);
 
 	switch (aodv_msg->type) {
-	case AODV_RREQ:
-	    if (num_rreq == (RREQ_RATELIMIT - 1)) {
-		if (timeval_diff(&now, &rreq_ratel[0]) < 1000) {
-		    DEBUG(LOG_DEBUG, 0, "RATELIMIT: Dropping RREQ %ld ms",
-			  timeval_diff(&now, &rreq_ratel[0]));
-#ifdef NS_PORT
-		  	Packet::free(p);
-#endif
-		    return;
-		} else {
-		    memmove(rreq_ratel, &rreq_ratel[1],
-			    sizeof(struct timeval) * (num_rreq - 1));
-		    memcpy(&rreq_ratel[num_rreq - 1], &now,
-			   sizeof(struct timeval));
+		case AODV_RREQ:
+			if (num_rreq == (RREQ_RATELIMIT - 1)) {
+				if (timeval_diff(&now, &rreq_ratel[0]) < 1000) {
+					DEBUG(LOG_DEBUG, 0, "RATELIMIT: Dropping RREQ %ld ms",
+					timeval_diff(&now, &rreq_ratel[0]));
+		#ifdef NS_PORT
+					Packet::free(p);
+		#endif
+					return;
+				} else {
+					memmove(rreq_ratel, &rreq_ratel[1],
+						sizeof(struct timeval) * (num_rreq - 1));
+					memcpy(&rreq_ratel[num_rreq - 1], &now,
+					sizeof(struct timeval));
+				}
+			} else {
+				memcpy(&rreq_ratel[num_rreq], &now, sizeof(struct timeval));
+				num_rreq++;
+			}
+			break;
+		case AODV_RERR:
+			if (num_rerr == (RERR_RATELIMIT - 1)) {
+			if (timeval_diff(&now, &rerr_ratel[0]) < 1000) {
+				DEBUG(LOG_DEBUG, 0, "RATELIMIT: Dropping RERR %ld ms",
+				timeval_diff(&now, &rerr_ratel[0]));
+			#ifdef NS_PORT
+				Packet::free(p);
+			#endif
+				return;
+			} else {
+				memmove(rerr_ratel, &rerr_ratel[1],
+					sizeof(struct timeval) * (num_rerr - 1));
+				memcpy(&rerr_ratel[num_rerr - 1], &now,
+				sizeof(struct timeval));
+			}
+			} else {
+			memcpy(&rerr_ratel[num_rerr], &now, sizeof(struct timeval));
+			num_rerr++;
+			}
+			break;
 		}
-	    } else {
-		memcpy(&rreq_ratel[num_rreq], &now, sizeof(struct timeval));
-		num_rreq++;
-	    }
-	    break;
-	case AODV_RERR:
-	    if (num_rerr == (RERR_RATELIMIT - 1)) {
-		if (timeval_diff(&now, &rerr_ratel[0]) < 1000) {
-		    DEBUG(LOG_DEBUG, 0, "RATELIMIT: Dropping RERR %ld ms",
-			  timeval_diff(&now, &rerr_ratel[0]));
-#ifdef NS_PORT
-		  	Packet::free(p);
-#endif
-		    return;
-		} else {
-		    memmove(rerr_ratel, &rerr_ratel[1],
-			    sizeof(struct timeval) * (num_rerr - 1));
-		    memcpy(&rerr_ratel[num_rerr - 1], &now,
-			   sizeof(struct timeval));
-		}
-	    } else {
-		memcpy(&rerr_ratel[num_rerr], &now, sizeof(struct timeval));
-		num_rerr++;
-	    }
-	    break;
-	}
     }
 
     /* If we broadcast this message we update the time of last broadcast
        to prevent unnecessary broadcasts of HELLO msg's */
-    if (dst.s_addr == AODV_BROADCAST) {
+    if (dst.s_addr == AODV_BROADCAST) 
+	{
 
-	gettimeofday(&this_host.bcast_time, NULL);
+		gettimeofday(&this_host.bcast_time, NULL);
 
-#ifdef NS_PORT
-	ch->addr_type() = NS_AF_NONE;
-	 //if (YRB_OUT) printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
-	sendPacket(p, dst, 0.0);
-#else
+		#ifdef NS_PORT
+		ch->addr_type() = NS_AF_NONE;
+		//if (YRB_OUT) printf("[socket send] sendPacket AODV_BROADCAST dst %d, UID %d\n", dst, ch->uid_);
+		sendPacket(p, dst, 0.0);
+		#else
 
-	retval = sendto(dev->sock, send_buf, len, 0,
-			(struct sockaddr *) &dst_addr, sizeof(dst_addr));
+		retval = sendto(dev->sock, send_buf, len, 0,
+				(struct sockaddr *) &dst_addr, sizeof(dst_addr));
 
-	if (retval < 0) {
+		if (retval < 0) {
 
-	    alog(LOG_WARNING, errno, __FUNCTION__, "Failed send to bc %s",
-		 ip_to_str(dst));
-	    return;
-	}
-#endif
+			alog(LOG_WARNING, errno, __FUNCTION__, "Failed send to bc %s",
+			ip_to_str(dst));
+			return;
+		}
+		#endif
 
-    } else {
+    } 
+	else 
+	{
 
-#ifdef NS_PORT
-	ch->addr_type() = NS_AF_INET;
-	/* We trust the decision of next hop for all AODV messages... */
+		#ifdef NS_PORT
+		ch->addr_type() = NS_AF_INET;
+		/* We trust the decision of next hop for all AODV messages... */
 
-	if (dst.s_addr == AODV_BROADCAST)
-	    sendPacket(p, dst, 0.001 * Random::uniform());
-	else
-	    sendPacket(p, dst, 0.0);
-#else
-	retval = sendto(dev->sock, send_buf, len, 0,
-			(struct sockaddr *) &dst_addr, sizeof(dst_addr));
+		if (dst.s_addr == AODV_BROADCAST)
+			sendPacket(p, dst, 0.001 * Random::uniform());
+		else
+			sendPacket(p, dst, 0.0);
+		#else
+		retval = sendto(dev->sock, send_buf, len, 0,
+				(struct sockaddr *) &dst_addr, sizeof(dst_addr));
 
-	if (retval < 0) {
-	    alog(LOG_WARNING, errno, __FUNCTION__, "Failed send to %s",
-		 ip_to_str(dst));
-	    return;
-	}
-#endif
+		if (retval < 0) {
+			alog(LOG_WARNING, errno, __FUNCTION__, "Failed send to %s",
+			ip_to_str(dst));
+			return;
+		}
+		#endif
     }
 
     /* Do not print hello msgs... */

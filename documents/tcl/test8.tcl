@@ -13,8 +13,9 @@ set val(ifqlen) 50 ;# max packet in ifq
 set val(rp) AODVUU ;# routing protocol
 set val(x) 1200 ;# X dimension of topography
 set val(y) 1200 ;# Y dimension of topography
+set val(nnoise) 3 ;
 set val(stop) 42 ;# nam stop time
-set val(nn) 8 ;# number of mobilenodes
+set val(nn) 11 ;# number of mobilenodes
 set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
@@ -82,30 +83,29 @@ for {set i 0} {$i < $val(nn)} {incr i} {
 puts "created nodes"
 
 # Set node positions in horizontal chain topology
- 
+
 $n(0) set X_ 731
 $n(0) set Y_ 563
 $n(0) set Z_ 0.0
 $ns_ initial_node_pos $n(0) 20
- 
+
 $n(1) set X_ 877
 $n(1) set Y_ 681
 $n(1) set Z_ 0.0
 $ns_ initial_node_pos $n(1) 20
- 
+
 $n(2) set X_ 827
 $n(2) set Y_ 431
 $n(2) set Z_ 0.0
 $ns_ initial_node_pos $n(2) 20
- 
-$n(3) set X_ 929
-$n(3) set Y_ 539
+
+$n(3) set X_ 885
+$n(3) set Y_ 536
 $n(3) set Z_ 0.0
 $ns_ initial_node_pos $n(3) 20
 
-
-$n(4) set X_ 931
-$n(4) set Y_ 360
+$n(4) set X_ 924
+$n(4) set Y_ 318
 $n(4) set Z_ 0.0
 $ns_ initial_node_pos $n(4) 20
 
@@ -114,8 +114,8 @@ $n(5) set Y_ 631
 $n(5) set Z_ 0.0
 $ns_ initial_node_pos $n(5) 20
 
-$n(6) set X_ 1069
-$n(6) set Y_ 502
+$n(6) set X_ 1058
+$n(6) set Y_ 447
 $n(6) set Z_ 0.0
 $ns_ initial_node_pos $n(6) 20
 
@@ -124,51 +124,104 @@ $n(7) set Y_ 347
 $n(7) set Z_ 0.0
 $ns_ initial_node_pos $n(7) 20
 
+$n(8) set X_ 1254
+$n(8) set Y_ 617
+$n(8) set Z_ 0.0
+$ns_ initial_node_pos $n(8) 20
+
+$n(9) set X_ 1198
+$n(9) set Y_ 453
+$n(9) set Z_ 0.0
+$ns_ initial_node_pos $n(9) 20
+
+$n(10) set X_ 1064
+$n(10) set Y_ 755
+$n(10) set Z_ 0.0
+$ns_ initial_node_pos $n(10) 20
+
 # set n[0-9]+ \[\$ns_ node\]
 # (\$n)([0-9]+)
 # $1($2)
-# (\$ns)([^_])
+# (\$ns)([^_)])
 # $1_$2
 
 #======================================
 # add Noise Node
 #======================================
 # 全信道干扰： noiseChannel = -1
+$ns_ node-config -workMode -1 \
+                -noiseChannel 0
+set n(11) [$ns_ node]
+$n(11) set X_ 831
+$n(11) set Y_ 716
+$n(11) set Z_ 0.0
+$ns_ initial_node_pos $n(11) 20
 
+$ns_ node-config -workMode -1 \
+                -noiseChannel 1
+set n(12) [$ns_ node]
+$n(12) set X_ 853
+$n(12) set Y_ 836
+$n(12) set Z_ 0.0
+$ns_ initial_node_pos $n(12) 20
+
+$ns_ node-config -workMode -1 \
+                -noiseChannel -1
+set n(13) [$ns_ node]
+$n(13) set X_ 0
+$n(13) set Y_ 0
+$n(13) set Z_ 0.0
+$ns_ initial_node_pos $n(13) 20
+
+$ns_ node-config -workMode 0 \
+                -noiseChannel 0
 
 #======================================
 # UDP Agents Definition
 #======================================
-set last_node_id [expr $val(nn)-1]
+set last_node_id [expr $val(nn) + $val(nnoise) -1]
 
 puts "begin to definite UDP Agent"
-for {set i 0} {$i < $val(nm)} {incr i} {
-    set udp($i) [new Agent/UDP]
-    $ns_ attach-agent $n(0) $udp($i)
-    set null($i) [new Agent/Null]
-    $ns_ attach-agent $n(6) $null($i)
-    $ns_ connect $udp($i) $null($i)
-}
-puts "definite UDP Agent"
+set i 0
+set udp($i) [new Agent/UDP]
+$ns_ attach-agent $n(0) $udp($i)
+set null($i) [new Agent/Null]
+$ns_ attach-agent $n(8) $null($i)
+$ns_ connect $udp($i) $null($i)
 
+set i 1
+set udp($i) [new Agent/UDP]
+$ns_ attach-agent $n(4) $udp($i)
+set null($i) [new Agent/Null]
+$ns_ attach-agent $n(10) $null($i)
+$ns_ connect $udp($i) $null($i)
+puts "definite UDP Agent"
 	
 #======================================
 # Applications Definition
 #======================================
 # Setup CBR Application over UDP connection
 puts "begin to Setup CBR Application"
-for {set i 0} {$i < $val(nm)} {incr i} {
-    set cbr($i) [new Application/Traffic/CBR]
-    $cbr($i) attach-agent $udp($i)
-    $cbr($i) set packetSize_ $pktsize
-    $cbr($i) set interval_ $pktrate
-    $ns_ at 1.0 "$cbr($i) start"
-    $ns_ at 40.0 "$cbr($i) stop"
-}
+set i 0
+set cbr($i) [new Application/Traffic/CBR]
+$cbr($i) attach-agent $udp($i)
+$cbr($i) set packetSize_ $pktsize
+$cbr($i) set interval_ $pktrate
+$ns_ at 1.0 "$cbr($i) start"
+$ns_ at 40.0 "$cbr($i) stop"
+set i 1
+set cbr($i) [new Application/Traffic/CBR]
+$cbr($i) attach-agent $udp($i)
+$cbr($i) set packetSize_ $pktsize
+$cbr($i) set interval_ $pktrate
+$ns_ at 1.0 "$cbr($i) start"
+$ns_ at 40.0 "$cbr($i) stop"
 puts "Setup CBR Application over UDP connection"
 
-# $ns_ at 20.0 "$n(3) setdest 998 528 400"
-$ns_ at 20.0 "$n(6) setdest 1160 400 800"
+$ns_ at 10 "$n(13) setdest 963 544 1200"
+$ns_ at 15 "$n(3) setdest 1155 549 1200"
+$ns_ at 20.0 "$n(6) setdest 873 522 1200"
+#$ns_ at 13.0 "$n(8) setdest 1027 480 800"
 
 
 #======================================
@@ -186,7 +239,7 @@ proc finish {} {
     # exec awk -f avgStats.awk src=0 dst=$last_node_id flow=0 pkt=$pktsize $filename.tr &
     exit 0
 }
-for {set i 0} {$i < $val(nn)} { incr i } {
+for {set i 0} {$i < $val(nn) + $val(nnoise)} { incr i } {
     $ns_ at $val(stop) "$n($i) reset"
 } 
 $ns_ at $val(stop) "$ns_ nam-end-wireless $val(stop)"

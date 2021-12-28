@@ -30,6 +30,9 @@
 /* by gcy */
 #include "../defs.h"
 /* end */
+/* by fxj */
+#include "../aodv_neighbor.h"
+/* end */
 
 
 /* Method for determining the size of the AODVUU packet header type */
@@ -513,6 +516,15 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 			}
 			else if (USE_YRB && aodv_msg->type == AODV_RREP) {
 				int rrep_channel = ((RREP *)aodv_msg)->channel;
+				//if (YRB_OUT) printf("sendPacket rrep_channel=%d\n", rrep_channel);
+				if (rrep_channel > 3 || rrep_channel < 0) {
+					#ifdef USE_FXJ
+						rrep_channel = nb_best_channel(next_hop);
+						if (rrep_channel > 3 || rrep_channel < 0) rrep_channel = 0;
+					#else
+						rrep_channel = 0;
+					#endif
+				}
 				Scheduler::instance().schedule(lllist[rrep_channel], p->copy(), delay);
 			} else {
 				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);

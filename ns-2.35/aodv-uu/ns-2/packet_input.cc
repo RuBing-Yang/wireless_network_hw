@@ -40,6 +40,7 @@ extern struct timer worb_timer;
 static double use_time[10000];
 static map<int, double> packId_sendTime;
 static int send_num = 0, recv_num = 0;
+static double max_using_time = 0.0;
 //end yrb
 
 
@@ -78,18 +79,22 @@ void NS_CLASS processPacket(Packet * p)
 		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
 		if (packId_sendTime.count(ch->uid_) > 0) {
 			//use_time.push_back(theTime - packId_sendTime[ch->uid_]);
-			use_time[recv_num-1] = theTime - packId_sendTime[ch->uid_];
+			double temp = theTime - packId_sendTime[ch->uid_];
+			if (temp > max_using_time) max_using_time = temp;
+			use_time[recv_num-1] = temp;
 		}
 		//printf("[%.2f]node(%d) get data package(%d)!\n", theTime, DEV_NR(0).ipaddr.s_addr, ch->uid_);
 		if (recv_num % 5 == 0 && recv_num != 0) {
 			double temp = (double) recv_num / send_num;
-			printf("[%.2f]recv_num / send_num = %.1f%%\n", theTime, temp * 100.0);
+			printf("[%.2f] recv_num / send_num = %f\n", theTime, temp);
+			printf("[%.2f] lose data package %d times\n", theTime, send_num - recv_num);
+			printf("[%.2f] max using time: %f(s)\n", theTime, max_using_time);
 			temp = 0.0;
 			for (int i = 0; i < recv_num; i++) {
 				temp += use_time[i];
 			}
 			temp /= (double) recv_num;
-			//printf("[%.2f]average use time = %.3f(s)\n", theTime, temp);
+			printf("[%.2f]average using time = %.3f(s)\n", theTime, temp);
 		}
 	}
 	// end yrb

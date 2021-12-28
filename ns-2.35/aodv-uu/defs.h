@@ -144,6 +144,7 @@
 /* cost寻路和快速修复的开关 */
 /* 用来跑tcl验证时区分原AODV协议和我们的策略 */
 #define USE_YRB 1
+#define YRB_ALONE 0 //YRB_ALONE=1时第三单元独立，不使用二单元cost值
 #define USE_FXJ
 /* end yrb */
 
