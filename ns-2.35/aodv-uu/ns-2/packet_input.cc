@@ -24,10 +24,24 @@
 
 #include "aodv-uu.h"
 
+//added by yrb
+#include <map>
+#include <vector>
+//end yrb
+
 extern int internet_gw_mode, wait_on_reboot, optimized_hellos, llfeedback;
 extern struct timer worb_timer;
 /* Set this if you want lots of debug printouts: */
 /* #define DEBUG_PACKET */
+
+
+//added by yrb
+//static vector<double> use_time;
+static double use_time[10000];
+static map<int, double> packId_sendTime;
+static int send_num = 0, recv_num = 0;
+//end yrb
+
 
 void NS_CLASS processPacket(Packet * p)
 {
@@ -45,6 +59,40 @@ void NS_CLASS processPacket(Packet * p)
     src_addr.s_addr = ih->saddr();
     dest_addr.s_addr = ih->daddr();
     prev_hop.s_addr = ch->prev_hop_;
+
+	// added by yrb
+	// data起始节点发送数据包
+	if (src_addr.s_addr == DEV_NR(0).ipaddr.s_addr) {
+		send_num++;
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		packId_sendTime[ch->uid_] = theTime;
+		//printf("[%.2f]node(%d) send data package(%d) src(%d)->prev(%d)->now(%d)->dest(%d)\n", theTime, DEV_NR(0).ipaddr.s_addr, ch->uid_, src_addr.s_addr, prev_hop.s_addr, DEV_NR(0).ipaddr.s_addr, dest_addr.s_addr);
+	}
+	// data目标节点收到数据包
+	if (dest_addr.s_addr == DEV_NR(0).ipaddr.s_addr) {
+		recv_num++;
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		if (packId_sendTime.count(ch->uid_) > 0) {
+			//use_time.push_back(theTime - packId_sendTime[ch->uid_]);
+			use_time[recv_num-1] = theTime - packId_sendTime[ch->uid_];
+		}
+		//printf("[%.2f]node(%d) get data package(%d)!\n", theTime, DEV_NR(0).ipaddr.s_addr, ch->uid_);
+		if (recv_num % 5 == 0 && recv_num != 0) {
+			double temp = (double) recv_num / send_num;
+			printf("[%.2f]recv_num / send_num = %.1f%%\n", theTime, temp * 100.0);
+			temp = 0.0;
+			for (int i = 0; i < recv_num; i++) {
+				temp += use_time[i];
+			}
+			temp /= (double) recv_num;
+			//printf("[%.2f]average use time = %.3f(s)\n", theTime, temp);
+		}
+	}
+	// end yrb
 
     if (ch->direction() == hdr_cmn::NONE) {
 	    DEBUG(LOG_DEBUG, 0,
@@ -137,8 +185,22 @@ void NS_CLASS processPacket(Packet * p)
 	return;
 
     }
-    if (!fwd_rt || fwd_rt->state == INVALID ||
-	(fwd_rt->hcnt == 1 && (fwd_rt->flags & RT_UNIDIR))) {
+
+	if (0) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		packId_sendTime[ch->uid_] = theTime;
+		if (fwd_rt)
+		printf("[%.2f]node(%d) data fwd_rt next(%d) dest(%d) weight(%f) channel(%d)\n", theTime, DEV_NR(0).ipaddr.s_addr, fwd_rt->next_hop.s_addr, fwd_rt->dest_addr.s_addr, fwd_rt->weight, fwd_rt->channel);
+		else 
+		printf("[%.2f]node(%d) data fwd_rt=NULL\n", theTime, DEV_NR(0).ipaddr.s_addr);
+	}
+
+    if (!fwd_rt || fwd_rt->state == INVALID 
+		|| (fwd_rt->hcnt == 1 && (fwd_rt->flags & RT_UNIDIR))
+		|| fwd_rt->weight < D_W ) // added by yrb
+	{
 
 		/* Check if the route is marked for repair or is INVALID. In
 		* that case, do a route discovery. */

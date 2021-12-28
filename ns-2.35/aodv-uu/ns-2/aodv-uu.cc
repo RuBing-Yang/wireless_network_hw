@@ -513,7 +513,7 @@ void NS_CLASS sendPacket(Packet *p, struct in_addr next_hop, double delay,
 			}
 			else if (USE_YRB && aodv_msg->type == AODV_RREP) {
 				int rrep_channel = ((RREP *)aodv_msg)->channel;
-				Scheduler::instance().schedule(lllist[rrep_channel], p, delay);
+				Scheduler::instance().schedule(lllist[rrep_channel], p->copy(), delay);
 			} else {
 				Scheduler::instance().schedule(lllist[fixed_interface], p, delay);
 			}

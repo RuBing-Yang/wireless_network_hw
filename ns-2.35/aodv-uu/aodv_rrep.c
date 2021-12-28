@@ -221,13 +221,15 @@ void NS_CLASS rrep_send(RREP * rrep, rt_table_t * rev_rt,
 	  ip_to_str(rev_rt->next_hop), ip_to_str(rev_rt->dest_addr),
 	  ip_to_str(dest));
 
+	if (YRB_OUT) 
+		printf("%d aodv_socket_send next(%d) dest(%d)\n", DEV_IFINDEX(0).ipaddr.s_addr, rev_rt->next_hop.s_addr, dest.s_addr);
     aodv_socket_send((AODV_msg *) rrep, rev_rt->next_hop, size, MAXTTL,
 		     &DEV_IFINDEX(rev_rt->ifindex));
 
     /* Update precursor lists */
     if (fwd_rt) {
-	precursor_add(fwd_rt, rev_rt->next_hop);
-	precursor_add(rev_rt, fwd_rt->next_hop);
+		precursor_add(fwd_rt, rev_rt->next_hop);
+		precursor_add(rev_rt, fwd_rt->next_hop);
     }
 
     if (!llfeedback && optimized_hellos)
@@ -322,6 +324,12 @@ void NS_CLASS rrep_process(RREP * rrep, int rreplen, struct in_addr ip_src,
 	if (!USE_YRB) weight = 1;
 	/* end yrb */
 
+	if (YRB_OUT) {
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		double theTime = now.tv_sec + (0.000001f * now.tv_usec);
+		printf("[%.2f][%d->%d] %d rrep received from %d\n", theTime, rrep->orig_addr, rrep->dest_addr,  DEV_NR(0).ipaddr.s_addr, ip_src.s_addr);
+	}
 
 
 	// fxj

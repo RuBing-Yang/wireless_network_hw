@@ -475,6 +475,7 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 
     } else {
 		/* yrb note: 注意！！！cost_flag置0时，需要目标节点更新序列号，不能由中间节点直接回复RREP  */
+		/* yrb note: 注意！！！weight很小时，需要目标节点更新序列号，不能由中间节点直接回复RREP  */
 		/* We are an INTERMEDIATE node. - check if we have an active
 		* route entry */
 
@@ -531,21 +532,25 @@ void NS_CLASS rreq_process(RREQ * rreq, int rreqlen, struct in_addr ip_src,
 	    /* Respond only if the sequence number is fresh enough... */
 		/* yrb note: 注意当由于cost值更大需要更新路由表时，不能由中间节点提前回复RREQ */
 		if (cost_flag) goto forward; //added by yrb
+		
+		/* yrb note: weight很小时，需要目标节点更新序列号，不能由中间节点直接回复RREP  */
+		else if (fwd_rt->weight < D_W) goto forward;  //added by yrb
 
-	    else if (fwd_rt->dest_seqno != 0 &&
-		(int32_t) fwd_rt->dest_seqno >= (int32_t) rreq_dest_seqno) {
-		lifetime = timeval_diff(&fwd_rt->rt_timer.timeout, &now);
-		rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
-				   fwd_rt->dest_seqno, rev_rt->dest_addr,
-				   lifetime);
-		// by fxj_: add node to the chain.
-		#ifdef USE_FXJ
-		// by fxj: add node to the chain.
-		rrep->weight = weight; //by yrb
-		rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
-		#endif
-		// fxj_end
-		rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
+	    else if (fwd_rt->dest_seqno != 0 
+		&& (int32_t) fwd_rt->dest_seqno >= (int32_t) rreq_dest_seqno) 
+		{
+			lifetime = timeval_diff(&fwd_rt->rt_timer.timeout, &now);
+			rrep = rrep_create(0, 0, fwd_rt->hcnt, fwd_rt->dest_addr,
+					fwd_rt->dest_seqno, rev_rt->dest_addr,
+					lifetime);
+			// by fxj_: add node to the chain.
+			#ifdef USE_FXJ
+			// by fxj: add node to the chain.
+			rrep->weight = weight; //by yrb
+			rrep->union_data.nexts[rrep->hcnt] = DEV_IFINDEX(rev_rt->ifindex).ipaddr;
+			#endif
+			// fxj_end
+			rrep_send(rrep, rev_rt, fwd_rt, rrep_size);
 	    } else {
 			goto forward;
 	    }

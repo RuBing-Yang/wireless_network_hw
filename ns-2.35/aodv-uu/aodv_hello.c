@@ -398,7 +398,7 @@ void NS_CLASS hello_process(RREP *hello, int rreplen, unsigned int ifindex) {
             return;
         }
         rt_table_update(rt, hello_dest, 1, hello_seqno, timeout, VALID, flags,
-                             0, 0); //added by yrb
+                             rt->weight, 0); //added by yrb
     }
 
     hello_update:

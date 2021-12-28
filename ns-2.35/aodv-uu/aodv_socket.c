@@ -237,7 +237,7 @@ void NS_CLASS aodv_socket_process_packet(AODV_msg * aodv_msg, int len,
 		rreq_process((RREQ *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
     case AODV_RREP:
-		 //if (YRB_OUT) printf("[socket process]AODV_RREP, rrep channel %d, interface %d, ttl %d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl);
+		 //if (YRB_OUT) printf("[socket process]AODV_RREP, rrep channel=%d, interface=%d, tt=%d, dst.s_addr=%d\n", ((RREP *)aodv_msg)->channel, ifindex, ttl, dst.s_addr);
 		DEBUG(LOG_DEBUG, 0, "Received RREP");
 		rrep_process((RREP *) aodv_msg, len, src, dst, ttl, ifindex);
 		break;
