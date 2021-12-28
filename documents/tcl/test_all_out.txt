@@ -1,0 +1,2065 @@
+Ad-Hoc Wireless Network in Chain Topologies - 11 Nodes, 3 Channels, 3 Interfaces
+begin to add channel
+begin to create nodes
+created nodes
+begin to definite UDP Agent
+definite UDP Agent
+begin to Setup CBR Application
+Setup CBR Application over UDP connection
+num_nodes is set 33
+channel.cc:sendUp - Calc highestAntennaZ_ and distCST_
+highestAntennaZ_ = 1.5,  distCST_ = 550.0
+[1.01][4->10]0 7 rreq received from 4
+[1.01][4->10]0 4->7 rreq: weight(0.266667)
+[1.01][4->10]0 4->7 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.01][4->10]0 2 rreq received from 4
+[1.01][4->10]0 4->2 rreq: weight(0.266667)
+[1.01][4->10]0 4->2 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.01][4->10]0 6 rreq received from 4
+[1.01][4->10]0 4->6 rreq: weight(0.266667)
+[1.01][4->10]0 4->6 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.01][4->10]0 3 rreq received from 4
+[1.01][4->10]0 4->3 rreq: weight(0.266667)
+[1.01][4->10]0 4->3 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.01][4->10]0 7 rreq received from 4
+[1.01][4->10]0 2 rreq received from 4
+[1.01][4->10]0 6 rreq received from 4
+[1.01][4->10]0 3 rreq received from 4
+[1.02][4->10]0 7 rreq received from 4
+[1.02][4->10]0 2 rreq received from 4
+[1.02][4->10]0 6 rreq received from 4
+[1.02][4->10]0 3 rreq received from 4
+[1.02][0->8]0 3 rreq received from 0
+[1.02][0->8]0 0->3 rreq: weight(0.266667)
+[1.02][0->8]0 0->3 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.02][0->8]0 2 rreq received from 0
+[1.02][0->8]0 0->2 rreq: weight(0.266667)
+[1.02][0->8]0 0->2 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.02][0->8]0 1 rreq received from 0
+[1.02][0->8]0 0->1 rreq: weight(0.266667)
+[1.02][0->8]0 0->1 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.05][0->8]0 3 rreq received from 0
+[1.05][0->8]0 2 rreq received from 0
+[1.05][0->8]0 1 rreq received from 0
+[1.06][0->8]0 3 rreq received from 0
+[1.06][0->8]0 2 rreq received from 0
+[1.06][0->8]0 1 rreq received from 0
+[1.25][0->8]1 3 rreq received from 0
+[1.25][0->8]1 0->3 rreq: weight(0.266667)
+[1.25][0->8]1 0->3 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][0->8]1 3 rreq forward BROADCAST
+[1.25][0->8]1 2 rreq received from 0
+[1.25][0->8]1 0->2 rreq: weight(0.266667)
+[1.25][0->8]1 0->2 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][0->8]1 2 rreq forward BROADCAST
+[1.25][0->8]1 1 rreq received from 0
+[1.25][0->8]1 0->1 rreq: weight(0.266667)
+[1.25][0->8]1 0->1 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][0->8]1 1 rreq forward BROADCAST
+[1.25][0->8]1 3 rreq received from 0
+[1.25][0->8]1 2 rreq received from 0
+[1.25][0->8]1 1 rreq received from 0
+[1.25][0->8]1 3 rreq received from 0
+[1.25][0->8]1 2 rreq received from 0
+[1.25][0->8]1 1 rreq received from 0
+[1.25][4->10]1 7 rreq received from 4
+[1.25][4->10]1 4->7 rreq: weight(0.266667)
+[1.25][4->10]1 4->7 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][4->10]1 7 rreq forward BROADCAST
+[1.25][4->10]1 2 rreq received from 4
+[1.25][4->10]1 4->2 rreq: weight(0.266667)
+[1.25][4->10]1 4->2 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][4->10]1 2 rreq forward BROADCAST
+[1.25][4->10]1 6 rreq received from 4
+[1.25][4->10]1 4->6 rreq: weight(0.266667)
+[1.25][4->10]1 4->6 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][4->10]1 6 rreq forward BROADCAST
+[1.25][4->10]1 3 rreq received from 4
+[1.25][4->10]1 4->3 rreq: weight(0.266667)
+[1.25][4->10]1 4->3 rreq update: cost(0.266667) weight(0.266667) channel(0)
+[1.25][4->10]1 3 rreq forward BROADCAST
+[1.25][4->10]1 7 rreq received from 4
+[1.25][4->10]1 2 rreq received from 4
+[1.25][4->10]1 6 rreq received from 4
+[1.25][4->10]1 3 rreq received from 4
+[1.26][4->10]1 7 rreq received from 4
+[1.26][4->10]1 2 rreq received from 4
+[1.26][4->10]1 6 rreq received from 4
+[1.26][4->10]1 3 rreq received from 4
+[1.26][4->10]1 6 rreq received from 7
+[1.26][4->10]1 4 rreq received from 7
+[1.26][4->10]1 9 rreq received from 7
+[1.26][4->10]1 7->9 rreq: weight(0.266667)
+[1.26][4->10]1 7->9 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.26][4->10]1 9 rreq forward BROADCAST
+[1.26][4->10]1 6 rreq received from 7
+[1.26][4->10]1 4 rreq received from 7
+[1.26][4->10]1 9 rreq received from 7
+[1.26][4->10]1 2 rreq received from 3
+[1.26][4->10]1 1 rreq received from 3
+[1.26][4->10]1 3->1 rreq: weight(0.266667)
+[1.26][4->10]1 3->1 rreq insert: cost(0.266667) weight(0.266667) channel(1)
+[1.26][4->10]1 1 rreq forward BROADCAST
+[1.26][4->10]1 0 rreq received from 3
+[1.26][4->10]1 3->0 rreq: weight(0.266667)
+[1.26][4->10]1 3->0 rreq insert: cost(0.266667) weight(0.266667) channel(1)
+[1.26][4->10]1 0 rreq forward BROADCAST
+[1.26][4->10]1 6 rreq received from 3
+[1.26][4->10]1 5 rreq received from 3
+[1.26][4->10]1 3->5 rreq: weight(0.266667)
+[1.26][4->10]1 3->5 rreq insert: cost(0.266667) weight(0.266667) channel(1)
+[1.26][4->10]1 5 rreq forward BROADCAST
+[1.26][4->10]1 4 rreq received from 3
+[1.26][4->10]1 3 rreq received from 0
+[1.26][4->10]1 2 rreq received from 0
+[1.26][4->10]1 1 rreq received from 0
+[1.26][4->10]1 3 rreq received from 0
+[1.26][4->10]1 2 rreq received from 0
+[1.26][4->10]1 1 rreq received from 0
+[1.26][4->10]1 3 rreq received from 0
+[1.26][4->10]1 2 rreq received from 0
+[1.26][4->10]1 1 rreq received from 0
+[1.26][4->10]1 2 rreq received from 3
+[1.26][4->10]1 1 rreq received from 3
+[1.26][4->10]1 0 rreq received from 3
+[1.26][4->10]1 6 rreq received from 3
+[1.26][4->10]1 5 rreq received from 3
+[1.26][4->10]1 4 rreq received from 3
+[1.26][0->8]1 2 rreq received from 3
+[1.26][0->8]1 1 rreq received from 3
+[1.26][0->8]1 0 rreq received from 3
+[1.26][0->8]1 6 rreq received from 3
+[1.26][0->8]1 3->6 rreq: weight(0.266667)
+[1.26][0->8]1 3->6 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.26][0->8]1 6 rreq forward BROADCAST
+[1.26][0->8]1 5 rreq received from 3
+[1.26][0->8]1 3->5 rreq: weight(0.266667)
+[1.26][0->8]1 3->5 rreq insert: cost(0.266667) weight(0.266667) channel(1)
+[1.26][0->8]1 5 rreq forward BROADCAST
+[1.26][0->8]1 4 rreq received from 3
+[1.26][0->8]1 3->4 rreq: weight(0.266667)
+[1.26][0->8]1 3->4 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.26][0->8]1 4 rreq forward BROADCAST
+[1.26][4->10]1 2 rreq received from 3
+[1.26][4->10]1 1 rreq received from 3
+[1.26][4->10]1 0 rreq received from 3
+[1.26][4->10]1 6 rreq received from 3
+[1.26][4->10]1 5 rreq received from 3
+[1.26][4->10]1 4 rreq received from 3
+[1.26][0->8]1 2 rreq received from 3
+[1.26][0->8]1 1 rreq received from 3
+[1.26][0->8]1 0 rreq received from 3
+[1.26][0->8]1 6 rreq received from 3
+[1.26][0->8]1 5 rreq received from 3
+[1.26][0->8]1 4 rreq received from 3
+[1.26][0->8]1 2 rreq received from 3
+[1.26][0->8]1 0 rreq received from 3
+[1.26][0->8]1 6 rreq received from 3
+[1.26][0->8]1 4 rreq received from 3
+[1.26][4->10]1 7 rreq received from 6
+[1.26][4->10]1 9 rreq received from 6
+[1.26][4->10]1 4 rreq received from 6
+[1.26][4->10]1 7 rreq received from 6
+[1.26][4->10]1 9 rreq received from 6
+[1.26][4->10]1 5 rreq received from 6
+[1.26][4->10]1 4 rreq received from 6
+[1.26][4->10]1 3 rreq received from 6
+[1.26][4->10]1 2 rreq received from 6
+[1.26][0->8]1 3 rreq received from 2
+[1.26][0->8]1 4 rreq received from 2
+[1.26][0->8]1 0 rreq received from 2
+[1.26][0->8]1 6 rreq received from 2
+[1.26][0->8]1 3 rreq received from 2
+[1.26][0->8]1 4 rreq received from 2
+[1.26][0->8]1 0 rreq received from 2
+[1.26][0->8]1 6 rreq received from 2
+[1.26][0->8]1 3 rreq received from 2
+[1.26][0->8]1 4 rreq received from 2
+[1.26][0->8]1 0 rreq received from 2
+[1.26][0->8]1 6 rreq received from 2
+[1.26][4->10]1 3 rreq received from 2
+[1.26][4->10]1 4 rreq received from 2
+[1.26][4->10]1 0 rreq received from 2
+[1.26][4->10]1 6 rreq received from 2
+[1.26][4->10]1 3 rreq received from 2
+[1.26][4->10]1 4 rreq received from 2
+[1.26][4->10]1 0 rreq received from 2
+[1.26][4->10]1 6 rreq received from 2
+[1.26][4->10]1 7 rreq received from 6
+[1.26][4->10]1 9 rreq received from 6
+[1.26][4->10]1 5 rreq received from 6
+[1.26][4->10]1 4 rreq received from 6
+[1.26][4->10]1 3 rreq received from 6
+[1.26][4->10]1 2 rreq received from 6
+[1.26][4->10]1 3 rreq received from 2
+[1.26][4->10]1 4 rreq received from 2
+[1.26][4->10]1 0 rreq received from 2
+[1.26][4->10]1 6 rreq received from 2
+[1.26][4->10]1 6 rreq received from 7
+[1.26][4->10]1 4 rreq received from 7
+[1.26][4->10]1 9 rreq received from 7
+[1.27][0->8]1 3 rreq received from 1
+[1.27][0->8]1 0 rreq received from 1
+[1.27][0->8]1 5 rreq received from 1
+[1.27][0->8]1 10 rreq received from 1
+[1.27][0->8]1 1->10 rreq: weight(0.266667)
+[1.27][0->8]1 1->10 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][0->8]1 10 rreq forward BROADCAST
+[1.27][0->8]1 3 rreq received from 1
+[1.27][0->8]1 0 rreq received from 1
+[1.27][0->8]1 5 rreq received from 1
+[1.27][0->8]1 10 rreq received from 1
+[1.27][0->8]1 3 rreq received from 1
+[1.27][0->8]1 0 rreq received from 1
+[1.27][0->8]1 5 rreq received from 1
+[1.27][0->8]1 10 rreq received from 1
+[1.27][0->8]1 10 rreq received from 5
+[1.27][0->8]1 6 rreq received from 5
+[1.27][0->8]1 1 rreq received from 5
+[1.27][0->8]1 8 rreq received from 5
+[1.27][0->8]1 5->8 rreq: weight(0.266667)
+[1.27][0->8]1 5->8 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][0->8]1 3 rreq received from 5
+[1.27][0->8]1 9 rreq received from 5
+[1.27][0->8]1 5->9 rreq: weight(0.266667)
+[1.27][0->8]1 5->9 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][0->8]1 10 rreq received from 5
+[1.27][0->8]1 6 rreq received from 5
+[1.27][0->8]1 1 rreq received from 5
+[1.27][0->8]1 8 rreq received from 5
+[1.27][0->8]1 3 rreq received from 5
+[1.27][0->8]1 9 rreq received from 5
+[1.27][0->8]1 10 rreq received from 5
+[1.27][0->8]1 6 rreq received from 5
+[1.27][0->8]1 1 rreq received from 5
+[1.27][0->8]1 8 rreq received from 5
+[1.27][0->8]1 3 rreq received from 5
+[1.27][0->8]1 9 rreq received from 5
+[1.27][0->8]1 7 rreq received from 4
+[1.27][0->8]1 4->7 rreq: weight(0.266667)
+[1.27][0->8]1 4->7 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][0->8]1 2 rreq received from 4
+[1.27][0->8]1 6 rreq received from 4
+[1.27][0->8]1 3 rreq received from 4
+[1.27][0->8]1 7 rreq received from 4
+[1.27][0->8]1 2 rreq received from 4
+[1.27][0->8]1 6 rreq received from 4
+[1.27][0->8]1 3 rreq received from 4
+[1.27][0->8] 5 rrep received from 8
+[1.27][0->8] 5<-8 rrep update: cost(0.000000) weight(0.266667) channel(0)
+[1.27][0->8] 5<-8 rrep update change: oldweight(1.000000) newweight(0.266667) channel(0)
+[1.27][0->8] 5 rrep forward 3
+[1.27][0->8]1 5 rreq received from 10
+[1.27][0->8]1 1 rreq received from 10
+[1.27][0->8]1 8 rreq received from 10
+[1.27][0->8]1 5 rreq received from 10
+[1.27][0->8]1 1 rreq received from 10
+[1.27][0->8]1 8 rreq received from 10
+[1.27][4->10]1 10 rreq received from 5
+[1.27][4->10]1 5->10 rreq: weight(0.266667)
+[1.27][4->10]1 5->10 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][4->10]1 6 rreq received from 5
+[1.27][4->10]1 1 rreq received from 5
+[1.27][4->10]1 8 rreq received from 5
+[1.27][4->10]1 5->8 rreq: weight(0.266667)
+[1.27][4->10]1 5->8 rreq insert: cost(0.266667) weight(0.266667) channel(0)
+[1.27][4->10]1 3 rreq received from 5
+[1.27][4->10]1 9 rreq received from 5
+[1.27][4->10]1 10 rreq received from 5
+[1.27][4->10]1 6 rreq received from 5
+[1.27][4->10]1 1 rreq received from 5
+[1.27][4->10]1 8 rreq received from 5
+[1.27][4->10]1 3 rreq received from 5
+[1.27][4->10]1 9 rreq received from 5
+[1.27][4->10]1 6 rreq received from 9
+[1.27][4->10]1 7 rreq received from 9
+[1.27][4->10]1 8 rreq received from 9
+[1.27][4->10]1 5 rreq received from 9
+[1.28][4->10]1 3 rreq received from 1
+[1.28][4->10]1 0 rreq received from 1
+[1.28][4->10]1 5 rreq received from 1
+[1.28][4->10]1 10 rreq received from 1
+[1.28][4->10]1 6 rreq received from 9
+[1.28][4->10]1 7 rreq received from 9
+[1.28][4->10]1 8 rreq received from 9
+[1.28][4->10]1 5 rreq received from 9
+[1.28][4->10]1 10 rreq received from 5
+[1.28][4->10]1 6 rreq received from 5
+[1.28][4->10]1 1 rreq received from 5
+[1.28][4->10]1 8 rreq received from 5
+[1.28][4->10]1 3 rreq received from 5
+[1.28][4->10]1 9 rreq received from 5
+[1.28][4->10]1 3 rreq received from 1
+[1.28][4->10]1 0 rreq received from 1
+[1.28][4->10]1 5 rreq received from 1
+[1.28][4->10]1 10 rreq received from 1
+[1.28][4->10]1 6 rreq received from 9
+[1.28][4->10]1 7 rreq received from 9
+[1.28][4->10]1 8 rreq received from 9
+[1.28][4->10]1 5 rreq received from 9
+[1.28][4->10]1 3 rreq received from 1
+[1.28][4->10]1 0 rreq received from 1
+[1.28][4->10]1 5 rreq received from 1
+[1.28][4->10]1 10 rreq received from 1
+[1.28][0->8]1 5 rreq received from 10
+[1.28][0->8]1 1 rreq received from 10
+[1.28][0->8]1 8 rreq received from 10
+[1.28][0->8]1 7 rreq received from 6
+[1.28][0->8]1 9 rreq received from 6
+[1.28][0->8]1 5 rreq received from 6
+[1.28][0->8]1 4 rreq received from 6
+[1.28][0->8]1 3 rreq received from 6
+[1.28][0->8]1 2 rreq received from 6
+[1.28][4->10] 5 rrep received from 8
+[1.28][0->8]1 7 rreq received from 6
+[1.28][0->8]1 9 rreq received from 6
+[1.28][0->8]1 5 rreq received from 6
+[1.28][0->8]1 4 rreq received from 6
+[1.28][0->8]1 3 rreq received from 6
+[1.28][0->8]1 2 rreq received from 6
+[1.28][0->8] 3 rrep received from 5
+[1.28][0->8] 3<-5 rrep insert: cost(0.000000) weight(0.266667) channel(1)
+[1.28][0->8] 3 rrep forward 0
+[1.28][0->8]1 7 rreq received from 6
+[1.28][0->8]1 9 rreq received from 6
+[1.28][0->8]1 5 rreq received from 6
+[1.28][0->8]1 4 rreq received from 6
+[1.28][0->8]1 3 rreq received from 6
+[1.28][0->8]1 2 rreq received from 6
+[1.29][0->8]1 7 rreq received from 4
+[1.29][0->8]1 2 rreq received from 4
+[1.29][0->8]1 6 rreq received from 4
+[1.29][0->8]1 3 rreq received from 4
+[1.29][4->10] 5 rrep received from 10
+[1.29][4->10] 5<-10 rrep update: cost(0.000000) weight(0.266667) channel(0)
+[1.29][4->10] 5<-10 rrep update change: oldweight(1.000000) newweight(0.266667) channel(0)
+[1.29][4->10] 5 rrep forward 3
+[1.29][4->10] 3 rrep received from 5
+[1.29][4->10] 3<-5 rrep insert: cost(0.000000) weight(0.266667) channel(1)
+[1.29][4->10] 3 rrep forward 4
+[1.29][0->8] 0 rrep received from 3
+[1.29][0->8] 0<-3 rrep insert: cost(0.000000) weight(0.266667) channel(0)
+[0->8 connected]
+[1.30][4->10] 4 rrep received from 3
+[1.30][4->10] 4<-3 rrep insert: cost(0.000000) weight(0.266667) channel(0)
+[4->10 connected]
+[1.36] recv_num / send_num = 0.312500
+[1.36] lose data package 11 times
+[1.36] max using time: 0.312046(s)
+[1.36]average using time = 0.266(s)
+[1.39] recv_num / send_num = 0.625000
+[1.39] lose data package 6 times
+[1.39] max using time: 0.312046(s)
+[1.39]average using time = 0.232(s)
+[1.41] recv_num / send_num = 0.833333
+[1.41] lose data package 3 times
+[1.41] max using time: 0.312046(s)
+[1.41]average using time = 0.206(s)
+[1.46] recv_num / send_num = 1.000000
+[1.46] lose data package 0 times
+[1.46] max using time: 0.312046(s)
+[1.46]average using time = 0.162(s)
+[1.61] recv_num / send_num = 0.961538
+[1.61] lose data package 1 times
+[1.61] max using time: 0.312046(s)
+[1.61]average using time = 0.131(s)
+[1.71] recv_num / send_num = 1.000000
+[1.71] lose data package 0 times
+[1.71] max using time: 0.312046(s)
+[1.71]average using time = 0.112(s)
+[1.86] recv_num / send_num = 0.972222
+[1.86] lose data package 1 times
+[1.86] max using time: 0.312046(s)
+[1.86]average using time = 0.099(s)
+[1.97] recv_num / send_num = 1.000000
+[1.97] lose data package 0 times
+[1.97] max using time: 0.312046(s)
+[1.97]average using time = 0.088(s)
+[2.11] recv_num / send_num = 0.978261
+[2.11] lose data package 1 times
+[2.11] max using time: 0.312046(s)
+[2.11]average using time = 0.079(s)
+[2.21] recv_num / send_num = 1.000000
+[2.21] lose data package 0 times
+[2.21] max using time: 0.312046(s)
+[2.21]average using time = 0.073(s)
+[2.36] recv_num / send_num = 0.982143
+[2.36] lose data package 1 times
+[2.36] max using time: 0.312046(s)
+[2.36]average using time = 0.069(s)
+[2.46] recv_num / send_num = 1.000000
+[2.46] lose data package 0 times
+[2.46] max using time: 0.312046(s)
+[2.46]average using time = 0.064(s)
+[2.61] recv_num / send_num = 0.984848
+[2.61] lose data package 1 times
+[2.61] max using time: 0.312046(s)
+[2.61]average using time = 0.060(s)
+[2.71] recv_num / send_num = 1.000000
+[2.71] lose data package 0 times
+[2.71] max using time: 0.312046(s)
+[2.71]average using time = 0.057(s)
+[2.86] recv_num / send_num = 0.986842
+[2.86] lose data package 1 times
+[2.86] max using time: 0.312046(s)
+[2.86]average using time = 0.055(s)
+[2.96] recv_num / send_num = 1.000000
+[2.96] lose data package 0 times
+[2.96] max using time: 0.312046(s)
+[2.96]average using time = 0.052(s)
+[3.11] recv_num / send_num = 0.988372
+[3.11] lose data package 1 times
+[3.11] max using time: 0.312046(s)
+[3.11]average using time = 0.050(s)
+[3.21] recv_num / send_num = 1.000000
+[3.21] lose data package 0 times
+[3.21] max using time: 0.312046(s)
+[3.21]average using time = 0.047(s)
+[3.36] recv_num / send_num = 0.989583
+[3.36] lose data package 1 times
+[3.36] max using time: 0.312046(s)
+[3.36]average using time = 0.047(s)
+[3.46] recv_num / send_num = 1.000000
+[3.46] lose data package 0 times
+[3.46] max using time: 0.312046(s)
+[3.46]average using time = 0.045(s)
+[3.61] recv_num / send_num = 0.990566
+[3.61] lose data package 1 times
+[3.61] max using time: 0.312046(s)
+[3.61]average using time = 0.044(s)
+[3.71] recv_num / send_num = 1.000000
+[3.71] lose data package 0 times
+[3.71] max using time: 0.312046(s)
+[3.71]average using time = 0.042(s)
+[3.86] recv_num / send_num = 0.991379
+[3.86] lose data package 1 times
+[3.86] max using time: 0.312046(s)
+[3.86]average using time = 0.041(s)
+[3.96] recv_num / send_num = 1.000000
+[3.96] lose data package 0 times
+[3.96] max using time: 0.312046(s)
+[3.96]average using time = 0.040(s)
+[4.11] recv_num / send_num = 0.992063
+[4.11] lose data package 1 times
+[4.11] max using time: 0.312046(s)
+[4.11]average using time = 0.039(s)
+[4.21] recv_num / send_num = 1.000000
+[4.21] lose data package 0 times
+[4.21] max using time: 0.312046(s)
+[4.21]average using time = 0.038(s)
+[4.36] recv_num / send_num = 0.992647
+[4.36] lose data package 1 times
+[4.36] max using time: 0.312046(s)
+[4.36]average using time = 0.038(s)
+[4.46] recv_num / send_num = 1.000000
+[4.46] lose data package 0 times
+[4.46] max using time: 0.312046(s)
+[4.46]average using time = 0.037(s)
+[4.61] recv_num / send_num = 0.993151
+[4.61] lose data package 1 times
+[4.61] max using time: 0.312046(s)
+[4.61]average using time = 0.036(s)
+[4.71] recv_num / send_num = 1.000000
+[4.71] lose data package 0 times
+[4.71] max using time: 0.312046(s)
+[4.71]average using time = 0.035(s)
+[4.86] recv_num / send_num = 0.993590
+[4.86] lose data package 1 times
+[4.86] max using time: 0.312046(s)
+[4.86]average using time = 0.035(s)
+[4.96] recv_num / send_num = 1.000000
+[4.96] lose data package 0 times
+[4.96] max using time: 0.312046(s)
+[4.96]average using time = 0.034(s)
+[5.11] recv_num / send_num = 0.993976
+[5.11] lose data package 1 times
+[5.11] max using time: 0.312046(s)
+[5.11]average using time = 0.034(s)
+[5.21] recv_num / send_num = 1.000000
+[5.21] lose data package 0 times
+[5.21] max using time: 0.312046(s)
+[5.21]average using time = 0.033(s)
+[5.36] recv_num / send_num = 0.994318
+[5.36] lose data package 1 times
+[5.36] max using time: 0.312046(s)
+[5.36]average using time = 0.033(s)
+[5.46] recv_num / send_num = 1.000000
+[5.46] lose data package 0 times
+[5.46] max using time: 0.312046(s)
+[5.46]average using time = 0.032(s)
+[5.61] recv_num / send_num = 0.994624
+[5.61] lose data package 1 times
+[5.61] max using time: 0.312046(s)
+[5.61]average using time = 0.032(s)
+[5.71] recv_num / send_num = 1.000000
+[5.71] lose data package 0 times
+[5.71] max using time: 0.312046(s)
+[5.71]average using time = 0.031(s)
+[5.86] recv_num / send_num = 0.994898
+[5.86] lose data package 1 times
+[5.86] max using time: 0.312046(s)
+[5.86]average using time = 0.031(s)
+[5.96] recv_num / send_num = 1.000000
+[5.96] lose data package 0 times
+[5.96] max using time: 0.312046(s)
+[5.96]average using time = 0.031(s)
+[6.11] recv_num / send_num = 0.995146
+[6.11] lose data package 1 times
+[6.11] max using time: 0.312046(s)
+[6.11]average using time = 0.030(s)
+[6.21] recv_num / send_num = 1.000000
+[6.21] lose data package 0 times
+[6.21] max using time: 0.312046(s)
+[6.21]average using time = 0.030(s)
+[6.36] recv_num / send_num = 0.995370
+[6.36] lose data package 1 times
+[6.36] max using time: 0.312046(s)
+[6.36]average using time = 0.030(s)
+[6.46] recv_num / send_num = 1.000000
+[6.46] lose data package 0 times
+[6.46] max using time: 0.312046(s)
+[6.46]average using time = 0.029(s)
+[6.61] recv_num / send_num = 0.995575
+[6.61] lose data package 1 times
+[6.61] max using time: 0.312046(s)
+[6.61]average using time = 0.029(s)
+[6.71] recv_num / send_num = 1.000000
+[6.71] lose data package 0 times
+[6.71] max using time: 0.312046(s)
+[6.71]average using time = 0.028(s)
+[6.86] recv_num / send_num = 0.995763
+[6.86] lose data package 1 times
+[6.86] max using time: 0.312046(s)
+[6.86]average using time = 0.029(s)
+[6.96] recv_num / send_num = 1.000000
+[6.96] lose data package 0 times
+[6.96] max using time: 0.312046(s)
+[6.96]average using time = 0.028(s)
+[7.11] recv_num / send_num = 0.995935
+[7.11] lose data package 1 times
+[7.11] max using time: 0.312046(s)
+[7.11]average using time = 0.028(s)
+[7.21] recv_num / send_num = 1.000000
+[7.21] lose data package 0 times
+[7.21] max using time: 0.312046(s)
+[7.21]average using time = 0.028(s)
+[7.36] recv_num / send_num = 0.996094
+[7.36] lose data package 1 times
+[7.36] max using time: 0.312046(s)
+[7.36]average using time = 0.027(s)
+[7.46] recv_num / send_num = 1.000000
+[7.46] lose data package 0 times
+[7.46] max using time: 0.312046(s)
+[7.46]average using time = 0.027(s)
+[7.61] recv_num / send_num = 0.996241
+[7.61] lose data package 1 times
+[7.61] max using time: 0.312046(s)
+[7.61]average using time = 0.027(s)
+[7.71] recv_num / send_num = 1.000000
+[7.71] lose data package 0 times
+[7.71] max using time: 0.312046(s)
+[7.71]average using time = 0.027(s)
+[7.86] recv_num / send_num = 0.996377
+[7.86] lose data package 1 times
+[7.86] max using time: 0.312046(s)
+[7.86]average using time = 0.027(s)
+[7.96] recv_num / send_num = 1.000000
+[7.96] lose data package 0 times
+[7.96] max using time: 0.312046(s)
+[7.96]average using time = 0.026(s)
+[8.11] recv_num / send_num = 0.996503
+[8.11] lose data package 1 times
+[8.11] max using time: 0.312046(s)
+[8.11]average using time = 0.026(s)
+[8.21] recv_num / send_num = 1.000000
+[8.21] lose data package 0 times
+[8.21] max using time: 0.312046(s)
+[8.21]average using time = 0.026(s)
+[8.36] recv_num / send_num = 0.996622
+[8.36] lose data package 1 times
+[8.36] max using time: 0.312046(s)
+[8.36]average using time = 0.026(s)
+[8.46] recv_num / send_num = 1.000000
+[8.46] lose data package 0 times
+[8.46] max using time: 0.312046(s)
+[8.46]average using time = 0.026(s)
+[8.61] recv_num / send_num = 0.996732
+[8.61] lose data package 1 times
+[8.61] max using time: 0.312046(s)
+[8.61]average using time = 0.026(s)
+[8.71] recv_num / send_num = 1.000000
+[8.71] lose data package 0 times
+[8.71] max using time: 0.312046(s)
+[8.71]average using time = 0.026(s)
+[8.86] recv_num / send_num = 0.996835
+[8.86] lose data package 1 times
+[8.86] max using time: 0.312046(s)
+[8.86]average using time = 0.026(s)
+[8.96] recv_num / send_num = 1.000000
+[8.96] lose data package 0 times
+[8.96] max using time: 0.312046(s)
+[8.96]average using time = 0.026(s)
+[9.11] recv_num / send_num = 0.996933
+[9.11] lose data package 1 times
+[9.11] max using time: 0.312046(s)
+[9.11]average using time = 0.025(s)
+[9.21] recv_num / send_num = 1.000000
+[9.21] lose data package 0 times
+[9.21] max using time: 0.312046(s)
+[9.21]average using time = 0.025(s)
+[9.36] recv_num / send_num = 0.997024
+[9.36] lose data package 1 times
+[9.36] max using time: 0.312046(s)
+[9.36]average using time = 0.025(s)
+[9.47] recv_num / send_num = 1.000000
+[9.47] lose data package 0 times
+[9.47] max using time: 0.312046(s)
+[9.47]average using time = 0.025(s)
+[9.61] recv_num / send_num = 0.997110
+[9.61] lose data package 1 times
+[9.61] max using time: 0.312046(s)
+[9.61]average using time = 0.025(s)
+[9.71] recv_num / send_num = 1.000000
+[9.71] lose data package 0 times
+[9.71] max using time: 0.312046(s)
+[9.71]average using time = 0.025(s)
+[9.86] recv_num / send_num = 0.997191
+[9.86] lose data package 1 times
+[9.86] max using time: 0.312046(s)
+[9.86]average using time = 0.025(s)
+[9.96] recv_num / send_num = 1.000000
+[9.96] lose data package 0 times
+[9.96] max using time: 0.312046(s)
+[9.96]average using time = 0.025(s)
+[10.11] recv_num / send_num = 0.997268
+[10.11] lose data package 1 times
+[10.11] max using time: 0.312046(s)
+[10.11]average using time = 0.025(s)
+[10.21] recv_num / send_num = 1.000000
+[10.21] lose data package 0 times
+[10.21] max using time: 0.312046(s)
+[10.21]average using time = 0.024(s)
+[10.36] recv_num / send_num = 0.997340
+[10.36] lose data package 1 times
+[10.36] max using time: 0.312046(s)
+[10.36]average using time = 0.024(s)
+[10.47] recv_num / send_num = 1.000000
+[10.47] lose data package 0 times
+[10.47] max using time: 0.312046(s)
+[10.47]average using time = 0.024(s)
+[10.61] recv_num / send_num = 0.997409
+[10.61] lose data package 1 times
+[10.61] max using time: 0.312046(s)
+[10.61]average using time = 0.024(s)
+[10.71] recv_num / send_num = 1.000000
+[10.71] lose data package 0 times
+[10.71] max using time: 0.312046(s)
+[10.71]average using time = 0.024(s)
+[10.86] recv_num / send_num = 0.997475
+[10.86] lose data package 1 times
+[10.86] max using time: 0.312046(s)
+[10.86]average using time = 0.024(s)
+[10.96] recv_num / send_num = 1.000000
+[10.96] lose data package 0 times
+[10.96] max using time: 0.312046(s)
+[10.96]average using time = 0.024(s)
+[11.11] recv_num / send_num = 0.997537
+[11.11] lose data package 1 times
+[11.11] max using time: 0.312046(s)
+[11.11]average using time = 0.024(s)
+[11.21] recv_num / send_num = 1.000000
+[11.21] lose data package 0 times
+[11.21] max using time: 0.312046(s)
+[11.21]average using time = 0.023(s)
+[11.36] recv_num / send_num = 0.997596
+[11.36] lose data package 1 times
+[11.36] max using time: 0.312046(s)
+[11.36]average using time = 0.024(s)
+[11.46] recv_num / send_num = 1.000000
+[11.46] lose data package 0 times
+[11.46] max using time: 0.312046(s)
+[11.46]average using time = 0.023(s)
+[11.61] recv_num / send_num = 0.997653
+[11.61] lose data package 1 times
+[11.61] max using time: 0.312046(s)
+[11.61]average using time = 0.023(s)
+[11.71] recv_num / send_num = 1.000000
+[11.71] lose data package 0 times
+[11.71] max using time: 0.312046(s)
+[11.71]average using time = 0.023(s)
+[11.86] recv_num / send_num = 0.997706
+[11.86] lose data package 1 times
+[11.86] max using time: 0.312046(s)
+[11.86]average using time = 0.023(s)
+[11.96] recv_num / send_num = 1.000000
+[11.96] lose data package 0 times
+[11.96] max using time: 0.312046(s)
+[11.96]average using time = 0.023(s)
+[12.11] recv_num / send_num = 0.997758
+[12.11] lose data package 1 times
+[12.11] max using time: 0.312046(s)
+[12.11]average using time = 0.023(s)
+[12.21] recv_num / send_num = 1.000000
+[12.21] lose data package 0 times
+[12.21] max using time: 0.312046(s)
+[12.21]average using time = 0.023(s)
+[12.36] recv_num / send_num = 0.997807
+[12.36] lose data package 1 times
+[12.36] max using time: 0.312046(s)
+[12.36]average using time = 0.023(s)
+[12.47] recv_num / send_num = 1.000000
+[12.47] lose data package 0 times
+[12.47] max using time: 0.312046(s)
+[12.47]average using time = 0.023(s)
+[12.61] recv_num / send_num = 0.997854
+[12.61] lose data package 1 times
+[12.61] max using time: 0.312046(s)
+[12.61]average using time = 0.023(s)
+[12.71] recv_num / send_num = 1.000000
+[12.71] lose data package 0 times
+[12.71] max using time: 0.312046(s)
+[12.71]average using time = 0.023(s)
+[12.86] recv_num / send_num = 0.997899
+[12.86] lose data package 1 times
+[12.86] max using time: 0.312046(s)
+[12.86]average using time = 0.023(s)
+[12.96] recv_num / send_num = 1.000000
+[12.96] lose data package 0 times
+[12.96] max using time: 0.312046(s)
+[12.96]average using time = 0.023(s)
+[13.11] recv_num / send_num = 0.997942
+[13.11] lose data package 1 times
+[13.11] max using time: 0.312046(s)
+[13.11]average using time = 0.022(s)
+[13.21] recv_num / send_num = 1.000000
+[13.21] lose data package 0 times
+[13.21] max using time: 0.312046(s)
+[13.21]average using time = 0.022(s)
+[13.36][0->8]2 3 rreq received from 0
+[13.36][0->8]2 0->3 rreq: weight(0.462037)
+[13.36][0->8]2 0->3 rreq update: cost(0.462037) weight(0.462037) channel(1)
+[13.36][0->8]2 0->3 rreq update [cost_flag]: oldweight(0.266667) newweight(0.462037) channel(1)
+[13.36][0->8]2 3 rreq forward BROADCAST
+[13.36][0->8]2 2 rreq received from 0
+[13.36][0->8]2 0->2 rreq: weight(0.462037)
+[13.36][0->8]2 0->2 rreq update: cost(0.462037) weight(0.462037) channel(1)
+[13.36][0->8]2 2 rreq forward BROADCAST
+[13.36][0->8]2 1 rreq received from 0
+[13.36][0->8]2 0->1 rreq: weight(0.495926)
+[13.36][0->8]2 0->1 rreq update: cost(0.495926) weight(0.495926) channel(2)
+[13.36][0->8]2 1 rreq forward BROADCAST
+[13.36][0->8]2 3 rreq received from 0
+[13.36][0->8]2 2 rreq received from 0
+[13.36][0->8]2 1 rreq received from 0
+[13.36][0->8]2 3 rreq received from 0
+[13.36][0->8]2 2 rreq received from 0
+[13.36][0->8]2 1 rreq received from 0
+[13.36][0->8]2 3 rreq received from 2
+[13.36][0->8]2 4 rreq received from 2
+[13.36][0->8]2 2->4 rreq: weight(0.462037)
+[13.36][0->8]2 2->4 rreq update: cost(0.525926) weight(0.462037) channel(2)
+[13.36][0->8]2 4 rreq forward BROADCAST
+[13.36][0->8]2 0 rreq received from 2
+[13.36][0->8]2 6 rreq received from 2
+[13.36][0->8]2 2->6 rreq: weight(0.462037)
+[13.36][0->8]2 2->6 rreq update: cost(0.562037) weight(0.462037) channel(2)
+[13.36][0->8]2 6 rreq forward BROADCAST
+[13.36][0->8]2 3 rreq received from 2
+[13.36][0->8]2 3 rreq received from 2
+[13.36][0->8]2 4 rreq received from 2
+[13.36][0->8]2 4 rreq received from 2
+[13.36][0->8]2 0 rreq received from 2
+[13.36][0->8]2 0 rreq received from 2
+[13.36][0->8]2 6 rreq received from 2
+[13.36][0->8]2 6 rreq received from 2
+[13.36][0->8]2 7 rreq received from 4
+[13.36][0->8]2 4->7 rreq: weight(0.462037)
+[13.36][0->8]2 4->7 rreq insert: cost(0.559259) weight(0.462037) channel(1)
+[13.36][0->8]2 7 rreq forward BROADCAST
+[13.36][0->8]2 2 rreq received from 4
+[13.36][0->8]2 6 rreq received from 4
+[13.36][0->8]2 3 rreq received from 4
+[13.36][0->8]2 7 rreq received from 4
+[13.36][0->8]2 2 rreq received from 4
+[13.36][0->8]2 6 rreq received from 4
+[13.36][0->8]2 3 rreq received from 4
+[13.36][0->8]2 7 rreq received from 4
+[13.36][0->8]2 2 rreq received from 4
+[13.36][0->8]2 6 rreq received from 4
+[13.36][0->8]2 3 rreq received from 4
+[13.36][0->8]2 6 rreq received from 7
+[13.36][0->8]2 4 rreq received from 7
+[13.36][0->8]2 9 rreq received from 7
+[13.36][0->8]2 7->9 rreq: weight(0.462037)
+[13.36][0->8]2 7->9 rreq update: cost(0.549306) weight(0.462037) channel(2)
+[13.36][0->8]2 7->9 rreq update [cost_flag]: oldweight(0.000000) newweight(0.462037) channel(2)
+[13.36][0->8]2 9 rreq forward BROADCAST
+[13.36][0->8]2 6 rreq received from 7
+[13.36][0->8]2 4 rreq received from 7
+[13.36][0->8]2 9 rreq received from 7
+[13.36][0->8]2 6 rreq received from 7
+[13.36][0->8]2 4 rreq received from 7
+[13.36][0->8]2 9 rreq received from 7
+[13.37][4->10]2 7 rreq received from 4
+[13.37][4->10]2 4->7 rreq: weight(0.559259)
+[13.37][4->10]2 4->7 rreq update: cost(0.559259) weight(0.559259) channel(1)
+[13.37][4->10]2 7 rreq forward BROADCAST
+[13.37][4->10]2 2 rreq received from 4
+[13.37][4->10]2 4->2 rreq: weight(0.480404)
+[13.37][4->10]2 4->2 rreq update: cost(0.480404) weight(0.480404) channel(1)
+[13.37][4->10]2 2 rreq forward BROADCAST
+[13.37][4->10]2 6 rreq received from 4
+[13.37][4->10]2 4->6 rreq: weight(0.528704)
+[13.37][4->10]2 4->6 rreq update: cost(0.528704) weight(0.528704) channel(0)
+[13.37][4->10]2 6 rreq forward BROADCAST
+[13.37][4->10]2 3 rreq received from 4
+[13.37][4->10]2 4->3 rreq: weight(0.480404)
+[13.37][4->10]2 4->3 rreq update: cost(0.480404) weight(0.480404) channel(1)
+[13.37][4->10]2 4->3 rreq update [cost_flag]: oldweight(0.266667) newweight(0.480404) channel(1)
+[13.37][4->10]2 3 rreq forward BROADCAST
+[13.37][4->10]2 7 rreq received from 4
+[13.37][4->10]2 2 rreq received from 4
+[13.37][4->10]2 6 rreq received from 4
+[13.37][4->10]2 3 rreq received from 4
+[13.37][4->10]2 7 rreq received from 4
+[13.37][4->10]2 2 rreq received from 4
+[13.37][4->10]2 6 rreq received from 4
+[13.37][4->10]2 3 rreq received from 4
+[13.37][0->8]2 7 rreq received from 6
+[13.37][0->8]2 9 rreq received from 6
+[13.37][0->8]2 5 rreq received from 6
+[13.37][0->8]2 6->5 rreq: weight(0.462037)
+[13.37][0->8]2 6->5 rreq insert: cost(0.603935) weight(0.462037) channel(0)
+[13.37][0->8]2 5 rreq forward BROADCAST
+[13.37][0->8]2 4 rreq received from 6
+[13.37][0->8]2 3 rreq received from 6
+[13.37][0->8]2 2 rreq received from 6
+[13.37][0->8]2 7 rreq received from 6
+[13.37][0->8]2 9 rreq received from 6
+[13.37][0->8]2 5 rreq received from 6
+[13.37][0->8]2 4 rreq received from 6
+[13.37][0->8]2 3 rreq received from 6
+[13.37][0->8]2 2 rreq received from 6
+[13.37][0->8]2 7 rreq received from 6
+[13.37][0->8]2 9 rreq received from 6
+[13.37][0->8]2 5 rreq received from 6
+[13.37][0->8]2 4 rreq received from 6
+[13.37][0->8]2 3 rreq received from 6
+[13.37][0->8]2 2 rreq received from 6
+[13.37][0->8]2 2 rreq received from 3
+[13.37][0->8]2 1 rreq received from 3
+[13.37][0->8]2 0 rreq received from 3
+[13.37][0->8]2 6 rreq received from 3
+[13.37][0->8]2 5 rreq received from 3
+[13.37][0->8]2 4 rreq received from 3
+[13.37][0->8]2 2 rreq received from 3
+[13.37][0->8]2 1 rreq received from 3
+[13.37][0->8]2 0 rreq received from 3
+[13.37][0->8]2 6 rreq received from 3
+[13.37][0->8]2 5 rreq received from 3
+[13.37][0->8]2 4 rreq received from 3
+[13.37][0->8]2 2 rreq received from 3
+[13.37][0->8]2 1 rreq received from 3
+[13.37][0->8]2 0 rreq received from 3
+[13.37][0->8]2 6 rreq received from 3
+[13.37][0->8]2 5 rreq received from 3
+[13.37][0->8]2 4 rreq received from 3
+[13.37][0->8]2 6 rreq received from 9
+[13.37][0->8]2 7 rreq received from 9
+[13.37][0->8]2 8 rreq received from 9
+[13.37][0->8]2 9->8 rreq: weight(0.462037)
+[13.37][0->8]2 9->8 rreq insert: cost(0.525926) weight(0.462037) channel(2)
+[13.37][0->8]2 5 rreq received from 9
+[13.38][0->8]2 6 rreq received from 9
+[13.38][0->8]2 7 rreq received from 9
+[13.38][0->8]2 8 rreq received from 9
+[13.38][0->8]2 5 rreq received from 9
+[13.38][0->8]2 3 rreq received from 1
+[13.38][0->8]2 0 rreq received from 1
+[13.38][0->8]2 5 rreq received from 1
+[13.38][0->8]2 10 rreq received from 1
+[13.38][0->8]2 1->10 rreq: weight(0.495926)
+[13.38][0->8]2 1->10 rreq update: cost(0.784259) weight(0.495926) channel(2)
+[13.38][0->8]2 1->10 rreq update [cost_flag]: oldweight(0.000000) newweight(0.495926) channel(2)
+[13.38][0->8]2 10 rreq forward BROADCAST
+[13.38][0->8]2 3 rreq received from 1
+[13.38][0->8]2 0 rreq received from 1
+[13.38][0->8]2 5 rreq received from 1
+[13.38][0->8]2 10 rreq received from 1
+[13.38][0->8]2 6 rreq received from 9
+[13.38][0->8]2 7 rreq received from 9
+[13.38][0->8]2 8 rreq received from 9
+[13.38][0->8]2 5 rreq received from 9
+[13.38][0->8] 9 rrep received from 8
+[13.38][0->8] 9<-8 rrep update: cost(0.000000) weight(0.462037) channel(2)
+[13.38][0->8] 9<-8 rrep update change: oldweight(1.000000) newweight(0.462037) channel(2)
+[13.38][0->8] 9 rrep forward 7
+[13.38][4->10]2 7 rreq received from 6
+[13.38][4->10]2 9 rreq received from 6
+[13.38][4->10]2 6->9 rreq: weight(0.528704)
+[13.38][4->10]2 6->9 rreq update: cost(0.717593) weight(0.528704) channel(2)
+[13.38][4->10]2 9 rreq forward BROADCAST
+[13.38][4->10]2 5 rreq received from 6
+[13.38][4->10]2 6->5 rreq: weight(0.528704)
+[13.38][4->10]2 6->5 rreq insert: cost(0.603935) weight(0.528704) channel(0)
+[13.38][4->10]2 5 rreq forward BROADCAST
+[13.38][4->10]2 4 rreq received from 6
+[13.38][4->10]2 3 rreq received from 6
+[13.38][4->10]2 2 rreq received from 6
+[13.38][4->10]2 7 rreq received from 6
+[13.38][4->10]2 9 rreq received from 6
+[13.38][4->10]2 5 rreq received from 6
+[13.38][4->10]2 4 rreq received from 6
+[13.38][4->10]2 3 rreq received from 6
+[13.38][4->10]2 2 rreq received from 6
+[13.38][0->8]2 10 rreq received from 5
+[13.38][0->8]2 6 rreq received from 5
+[13.38][0->8]2 1 rreq received from 5
+[13.38][0->8]2 8 rreq received from 5
+[13.38][0->8]2 3 rreq received from 5
+[13.38][0->8]2 9 rreq received from 5
+[13.38][4->10]2 2 rreq received from 3
+[13.38][4->10]2 1 rreq received from 3
+[13.38][4->10]2 3->1 rreq: weight(0.480404)
+[13.38][4->10]2 3->1 rreq update: cost(0.511343) weight(0.480404) channel(2)
+[13.38][4->10]2 3->1 rreq update [cost_flag]: oldweight(1.000000) newweight(0.480404) channel(2)
+[13.38][4->10]2 1 rreq forward BROADCAST
+[13.38][4->10]2 0 rreq received from 3
+[13.38][4->10]2 3->0 rreq: weight(0.463148)
+[13.38][4->10]2 3->0 rreq update: cost(0.463148) weight(0.463148) channel(1)
+[13.38][4->10]2 0 rreq forward BROADCAST
+[13.38][4->10]2 6 rreq received from 3
+[13.38][4->10]2 5 rreq received from 3
+[13.38][4->10]2 4 rreq received from 3
+[13.38][0->8]2 10 rreq received from 5
+[13.38][0->8]2 6 rreq received from 5
+[13.38][0->8]2 1 rreq received from 5
+[13.38][0->8]2 8 rreq received from 5
+[13.38][0->8]2 3 rreq received from 5
+[13.38][0->8]2 9 rreq received from 5
+[13.38][0->8]2 10 rreq received from 5
+[13.38][0->8]2 6 rreq received from 5
+[13.38][0->8]2 1 rreq received from 5
+[13.38][0->8]2 8 rreq received from 5
+[13.38][0->8]2 3 rreq received from 5
+[13.38][0->8]2 9 rreq received from 5
+[13.38][4->10]2 7 rreq received from 6
+[13.38][4->10]2 9 rreq received from 6
+[13.38][4->10]2 5 rreq received from 6
+[13.38][4->10]2 4 rreq received from 6
+[13.38][4->10]2 3 rreq received from 6
+[13.38][4->10]2 2 rreq received from 6
+[13.38][4->10]2 3 rreq received from 2
+[13.38][4->10]2 4 rreq received from 2
+[13.38][4->10]2 0 rreq received from 2
+[13.38][4->10]2 6 rreq received from 2
+[13.38][4->10]2 3 rreq received from 2
+[13.38][4->10]2 4 rreq received from 2
+[13.38][4->10]2 0 rreq received from 2
+[13.38][4->10]2 6 rreq received from 2
+[13.38][4->10]2 2 rreq received from 3
+[13.38][4->10]2 1 rreq received from 3
+[13.38][4->10]2 0 rreq received from 3
+[13.38][4->10]2 6 rreq received from 3
+[13.38][4->10]2 5 rreq received from 3
+[13.38][4->10]2 4 rreq received from 3
+[13.39][0->8]2 3 rreq received from 1
+[13.39][0->8]2 0 rreq received from 1
+[13.39][0->8]2 5 rreq received from 1
+[13.39][0->8]2 10 rreq received from 1
+[13.39][4->10]2 6 rreq received from 9
+[13.39][4->10]2 7 rreq received from 9
+[13.39][4->10]2 8 rreq received from 9
+[13.39][4->10]2 9->8 rreq: weight(0.525926)
+[13.39][4->10]2 9->8 rreq update: cost(0.525926) weight(0.525926) channel(2)
+[13.39][4->10]2 9->8 rreq update [cost_flag]: oldweight(1.000000) newweight(0.525926) channel(2)
+[13.39][4->10]2 8 rreq forward BROADCAST
+[13.39][4->10]2 5 rreq received from 9
+[13.39][4->10]2 6 rreq received from 9
+[13.39][4->10]2 7 rreq received from 9
+[13.39][4->10]2 8 rreq received from 9
+[13.39][4->10]2 5 rreq received from 9
+[13.39][4->10]2 10 rreq received from 5
+[13.39][4->10]2 5->10 rreq: weight(0.528704)
+[13.39][4->10]2 5->10 rreq insert: cost(0.549306) weight(0.528704) channel(2)
+[13.39][4->10]2 6 rreq received from 5
+[13.39][4->10]2 1 rreq received from 5
+[13.39][4->10]2 8 rreq received from 5
+[13.39][4->10]2 3 rreq received from 5
+[13.39][4->10]2 9 rreq received from 5
+[13.39][4->10]2 6 rreq received from 9
+[13.39][4->10]2 7 rreq received from 9
+[13.39][4->10]2 8 rreq received from 9
+[13.39][4->10]2 5 rreq received from 9
+[13.39][4->10]2 10 rreq received from 5
+[13.39][4->10]2 6 rreq received from 5
+[13.39][4->10]2 1 rreq received from 5
+[13.39][4->10]2 8 rreq received from 5
+[13.39][4->10]2 3 rreq received from 5
+[13.39][4->10]2 9 rreq received from 5
+[13.39][4->10]2 10 rreq received from 5
+[13.39][4->10]2 6 rreq received from 5
+[13.39][4->10]2 1 rreq received from 5
+[13.39][4->10]2 8 rreq received from 5
+[13.39][4->10]2 3 rreq received from 5
+[13.39][4->10]2 9 rreq received from 5
+[13.39][4->10]2 6 rreq received from 7
+[13.39][4->10]2 4 rreq received from 7
+[13.39][4->10]2 9 rreq received from 7
+[13.39][4->10]2 6 rreq received from 7
+[13.39][4->10]2 4 rreq received from 7
+[13.39][4->10]2 9 rreq received from 7
+[13.39][4->10]2 3 rreq received from 1
+[13.39][4->10]2 0 rreq received from 1
+[13.39][4->10]2 5 rreq received from 1
+[13.39][4->10]2 10 rreq received from 1
+[13.39][4->10]2 3 rreq received from 1
+[13.39][4->10]2 0 rreq received from 1
+[13.39][4->10]2 5 rreq received from 1
+[13.39][4->10]2 10 rreq received from 1
+[13.39][4->10] 5 rrep received from 10
+[13.39][4->10] 5<-10 rrep update: cost(0.000000) weight(0.528704) channel(2)
+[13.39][4->10] 5<-10 rrep update change: oldweight(1.000000) newweight(0.528704) channel(2)
+[13.39][4->10] 5 rrep forward 6
+[13.39][4->10]2 3 rreq received from 0
+[13.39][4->10]2 2 rreq received from 0
+[13.39][4->10]2 1 rreq received from 0
+[13.40][4->10]2 3 rreq received from 0
+[13.40][4->10]2 2 rreq received from 0
+[13.40][4->10]2 1 rreq received from 0
+[13.40][0->8]2 5 rreq received from 10
+[13.40][0->8]2 1 rreq received from 10
+[13.40][0->8]2 8 rreq received from 10
+[13.40][0->8]2 5 rreq received from 10
+[13.40][0->8]2 1 rreq received from 10
+[13.40][0->8]2 8 rreq received from 10
+[13.40][4->10]2 9 rreq received from 8
+[13.40][4->10]2 5 rreq received from 8
+[13.40][4->10]2 10 rreq received from 8
+[13.40][4->10]2 3 rreq received from 1
+[13.40][4->10]2 0 rreq received from 1
+[13.40][4->10]2 5 rreq received from 1
+[13.40][4->10]2 10 rreq received from 1
+[13.40][4->10]2 9 rreq received from 8
+[13.40][4->10]2 5 rreq received from 8
+[13.40][4->10]2 10 rreq received from 8
+[13.40][4->10]2 3 rreq received from 0
+[13.40][4->10]2 2 rreq received from 0
+[13.40][4->10]2 1 rreq received from 0
+[13.40][0->8]2 5 rreq received from 10
+[13.40][0->8]2 1 rreq received from 10
+[13.40][0->8]2 8 rreq received from 10
+[13.40][4->10]2 3 rreq received from 2
+[13.40][4->10]2 4 rreq received from 2
+[13.40][4->10]2 0 rreq received from 2
+[13.40][4->10]2 6 rreq received from 2
+[13.40][4->10] 6 rrep received from 5
+[13.40][4->10] 6<-5 rrep insert: cost(0.000000) weight(0.528704) channel(0)
+[13.40][4->10] 6 rrep forward 4
+[13.40][0->8] 7 rrep received from 9
+[13.40][0->8] 7<-9 rrep insert: cost(0.000000) weight(0.462037) channel(2)
+[13.40][0->8] 7 rrep forward 4
+[13.41][4->10]2 9 rreq received from 8
+[13.41][4->10]2 5 rreq received from 8
+[13.41][4->10]2 10 rreq received from 8
+[13.41][0->8] 4 rrep received from 7
+[13.41][0->8] 4<-7 rrep insert: cost(0.000000) weight(0.462037) channel(1)
+[13.41][0->8] 4 rrep forward 2
+[13.41][4->10] 4 rrep received from 6
+[13.41][4->10] 4<-6 rrep update: cost(0.000000) weight(0.528704) channel(0)
+[13.41][4->10] 4<-6 rrep update change: oldweight(0.266667) newweight(0.528704) channel(0)
+[4->10 connected]
+[13.41][0->8] 2 rrep received from 4
+[13.41][0->8] 2<-4 rrep insert: cost(0.000000) weight(0.462037) channel(2)
+[13.41][0->8] 2 rrep forward 0
+[13.42] recv_num / send_num = 0.993976
+[13.42] lose data package 3 times
+[13.42] max using time: 0.312046(s)
+[13.42]average using time = 0.022(s)
+[13.43][0->8] 0 rrep received from 2
+[13.43][0->8] 0<-2 rrep update: cost(0.000000) weight(0.462037) channel(0)
+[13.43][0->8] 0<-2 rrep update change: oldweight(0.266667) newweight(0.462037) channel(0)
+[0->8 connected]
+[13.47] recv_num / send_num = 1.000000
+[13.47] lose data package 0 times
+[13.47] max using time: 0.312046(s)
+[13.47]average using time = 0.023(s)
+[13.61] recv_num / send_num = 0.998024
+[13.61] lose data package 1 times
+[13.61] max using time: 0.312046(s)
+[13.61]average using time = 0.023(s)
+[13.73] recv_num / send_num = 1.000000
+[13.73] lose data package 0 times
+[13.73] max using time: 0.312046(s)
+[13.73]average using time = 0.023(s)
+[13.86] recv_num / send_num = 0.998062
+[13.86] lose data package 1 times
+[13.86] max using time: 0.312046(s)
+[13.86]average using time = 0.022(s)
+[13.98] recv_num / send_num = 1.000000
+[13.98] lose data package 0 times
+[13.98] max using time: 0.312046(s)
+[13.98]average using time = 0.023(s)
+[14.11] recv_num / send_num = 0.998099
+[14.11] lose data package 1 times
+[14.11] max using time: 0.312046(s)
+[14.11]average using time = 0.023(s)
+[14.22] recv_num / send_num = 1.000000
+[14.22] lose data package 0 times
+[14.22] max using time: 0.312046(s)
+[14.22]average using time = 0.022(s)
+[14.37] recv_num / send_num = 0.998134
+[14.37] lose data package 1 times
+[14.37] max using time: 0.312046(s)
+[14.37]average using time = 0.022(s)
+[14.49] recv_num / send_num = 1.000000
+[14.49] lose data package 0 times
+[14.49] max using time: 0.312046(s)
+[14.49]average using time = 0.023(s)
+[14.61] recv_num / send_num = 0.998168
+[14.61] lose data package 1 times
+[14.61] max using time: 0.312046(s)
+[14.61]average using time = 0.023(s)
+[14.73] recv_num / send_num = 1.000000
+[14.73] lose data package 0 times
+[14.73] max using time: 0.312046(s)
+[14.73]average using time = 0.022(s)
+[14.86] recv_num / send_num = 0.998201
+[14.86] lose data package 1 times
+[14.86] max using time: 0.312046(s)
+[14.86]average using time = 0.022(s)
+[14.99] recv_num / send_num = 1.000000
+[14.99] lose data package 0 times
+[14.99] max using time: 0.312046(s)
+[14.99]average using time = 0.023(s)
+[15.11] recv_num / send_num = 0.998233
+[15.11] lose data package 1 times
+[15.11] max using time: 0.312046(s)
+[15.11]average using time = 0.023(s)
+[15.22] recv_num / send_num = 1.000000
+[15.22] lose data package 0 times
+[15.22] max using time: 0.312046(s)
+[15.22]average using time = 0.022(s)
+[15.36] recv_num / send_num = 0.998264
+[15.36] lose data package 1 times
+[15.36] max using time: 0.312046(s)
+[15.36]average using time = 0.022(s)
+[15.47][4->10]3 7 rreq received from 4
+[15.47][4->10]3 4->7 rreq: weight(0.536508)
+[15.47][4->10]3 4->7 rreq update: cost(0.536508) weight(0.536508) channel(1)
+[15.47][4->10]3 7 rreq forward BROADCAST
+[15.47][4->10]3 2 rreq received from 4
+[15.47][4->10]3 4->2 rreq: weight(0.429573)
+[15.47][4->10]3 4->2 rreq update: cost(0.429573) weight(0.429573) channel(1)
+[15.47][4->10]3 2 rreq forward BROADCAST
+[15.47][4->10]3 6 rreq received from 4
+[15.47][4->10]3 4->6 rreq: weight(0.481270)
+[15.47][4->10]3 4->6 rreq update: cost(0.481270) weight(0.481270) channel(0)
+[15.47][4->10]3 4->6 rreq update [cost_flag]: oldweight(0.528704) newweight(0.481270) channel(0)
+[15.47][4->10]3 6 rreq forward BROADCAST
+[15.47][4->10]3 3 rreq received from 4
+[15.47][4->10]3 4->3 rreq: weight(0.429573)
+[15.47][4->10]3 4->3 rreq update: cost(0.429573) weight(0.429573) channel(1)
+[15.47][4->10]3 4->3 rreq update [cost_flag]: oldweight(0.266667) newweight(0.429573) channel(1)
+[15.47][4->10]3 3 rreq forward BROADCAST
+[15.47][4->10]3 7 rreq received from 4
+[15.47][4->10]3 2 rreq received from 4
+[15.47][4->10]3 6 rreq received from 4
+[15.47][4->10]3 3 rreq received from 4
+[15.47][4->10]3 7 rreq received from 6
+[15.47][4->10]3 9 rreq received from 6
+[15.47][4->10]3 6->9 rreq: weight(0.481270)
+[15.47][4->10]3 6->9 rreq update: cost(0.587937) weight(0.481270) channel(2)
+[15.47][4->10]3 9 rreq forward BROADCAST
+[15.47][4->10]3 5 rreq received from 6
+[15.47][4->10]3 6->5 rreq: weight(0.481270)
+[15.47][4->10]3 6->5 rreq update: cost(0.551468) weight(0.481270) channel(0)
+[15.47][4->10]3 6->5 rreq update [cost_flag]: oldweight(1.000000) newweight(0.481270) channel(0)
+[15.47][4->10]3 5 rreq forward BROADCAST
+[15.47][4->10]3 4 rreq received from 6
+[15.47][4->10]3 3 rreq received from 6
+[15.47][4->10]3 2 rreq received from 6
+[15.47][4->10]3 7 rreq received from 6
+[15.47][4->10]3 9 rreq received from 6
+[15.47][4->10]3 5 rreq received from 6
+[15.47][4->10]3 4 rreq received from 6
+[15.47][4->10]3 3 rreq received from 6
+[15.47][4->10]3 2 rreq received from 6
+[15.47][4->10]3 7 rreq received from 4
+[15.47][4->10]3 2 rreq received from 4
+[15.47][4->10]3 6 rreq received from 4
+[15.47][4->10]3 3 rreq received from 4
+[15.47][4->10]3 7 rreq received from 6
+[15.47][4->10]3 9 rreq received from 6
+[15.47][4->10]3 5 rreq received from 6
+[15.47][4->10]3 4 rreq received from 6
+[15.47][4->10]3 3 rreq received from 6
+[15.47][4->10]3 2 rreq received from 6
+[15.47][4->10]3 3 rreq received from 2
+[15.47][4->10]3 4 rreq received from 2
+[15.47][4->10]3 0 rreq received from 2
+[15.47][4->10]3 2->0 rreq: weight(0.248704)
+[15.47][4->10]3 2->0 rreq update: cost(0.248704) weight(0.248704) channel(1)
+[15.47][4->10]3 0 rreq forward BROADCAST
+[15.47][4->10]3 6 rreq received from 2
+[15.47][4->10]3 3 rreq received from 2
+[15.47][4->10]3 4 rreq received from 2
+[15.47][4->10]3 0 rreq received from 2
+[15.47][4->10]3 6 rreq received from 2
+[15.47][4->10]3 3 rreq received from 2
+[15.47][4->10]3 4 rreq received from 2
+[15.47][4->10]3 0 rreq received from 2
+[15.47][4->10]3 6 rreq received from 2
+[15.47][4->10]3 6 rreq received from 7
+[15.47][4->10]3 4 rreq received from 7
+[15.47][4->10]3 9 rreq received from 7
+[15.47][4->10]3 6 rreq received from 7
+[15.47][4->10]3 4 rreq received from 7
+[15.47][4->10]3 9 rreq received from 7
+[15.48][4->10]3 10 rreq received from 5
+[15.48][4->10]3 5->10 rreq: weight(0.481270)
+[15.48][4->10]3 5->10 rreq update: cost(0.565079) weight(0.481270) channel(0)
+[15.48][4->10]3 6 rreq received from 5
+[15.48][4->10]3 1 rreq received from 5
+[15.48][4->10]3 5->1 rreq: weight(0.481270)
+[15.48][4->10]3 5->1 rreq update: cost(0.512607) weight(0.481270) channel(1)
+[15.48][4->10]3 5->1 rreq update [cost_flag]: oldweight(1.000000) newweight(0.481270) channel(1)
+[15.48][4->10]3 1 rreq forward BROADCAST
+[15.48][4->10]3 8 rreq received from 5
+[15.48][4->10]3 5->8 rreq: weight(0.478889)
+[15.48][4->10]3 5->8 rreq update: cost(0.478889) weight(0.478889) channel(2)
+[15.48][4->10]3 5->8 rreq update [cost_flag]: oldweight(1.000000) newweight(0.478889) channel(2)
+[15.48][4->10]3 8 rreq forward BROADCAST
+[15.48][4->10]3 3 rreq received from 5
+[15.48][4->10]3 9 rreq received from 5
+[15.48][4->10]3 10 rreq received from 5
+[15.48][4->10]3 6 rreq received from 5
+[15.48][4->10]3 1 rreq received from 5
+[15.48][4->10]3 8 rreq received from 5
+[15.48][4->10]3 3 rreq received from 5
+[15.48][4->10]3 9 rreq received from 5
+[15.48][4->10]3 10 rreq received from 5
+[15.48][4->10]3 6 rreq received from 5
+[15.48][4->10]3 1 rreq received from 5
+[15.48][4->10]3 8 rreq received from 5
+[15.48][4->10]3 3 rreq received from 5
+[15.48][4->10]3 9 rreq received from 5
+[15.48][4->10]3 3 rreq received from 0
+[15.48][4->10]3 2 rreq received from 0
+[15.48][4->10]3 1 rreq received from 0
+[15.48][4->10] 5 rrep received from 10
+[15.48][4->10] 5<-10 rrep update: cost(0.000000) weight(0.481270) channel(0)
+[15.48][4->10] 5<-10 rrep update change: oldweight(1.000000) newweight(0.481270) channel(0)
+[15.48][4->10] 5 rrep forward 6
+[15.48][4->10]3 6 rreq received from 7
+[15.48][4->10]3 4 rreq received from 7
+[15.48][4->10]3 9 rreq received from 7
+[15.48][4->10]3 3 rreq received from 0
+[15.48][4->10]3 2 rreq received from 0
+[15.48][4->10]3 1 rreq received from 0
+[15.48][4->10]3 3 rreq received from 1
+[15.48][4->10]3 0 rreq received from 1
+[15.48][4->10]3 1->0 rreq: weight(0.342421)
+[15.48][4->10]3 1->0 rreq update: cost(0.342421) weight(0.342421) channel(2)
+[15.48][4->10]3 0 rreq forward BROADCAST
+[15.48][4->10]3 5 rreq received from 1
+[15.48][4->10]3 10 rreq received from 1
+[15.48][4->10]3 3 rreq received from 1
+[15.48][4->10]3 0 rreq received from 1
+[15.48][4->10]3 5 rreq received from 1
+[15.48][4->10]3 10 rreq received from 1
+[15.48][4->10]3 2 rreq received from 3
+[15.48][4->10]3 1 rreq received from 3
+[15.48][4->10]3 0 rreq received from 3
+[15.48][4->10]3 6 rreq received from 3
+[15.48][4->10]3 5 rreq received from 3
+[15.48][4->10]3 4 rreq received from 3
+[15.48][4->10]3 2 rreq received from 3
+[15.48][4->10]3 1 rreq received from 3
+[15.48][4->10]3 0 rreq received from 3
+[15.48][4->10]3 6 rreq received from 3
+[15.48][4->10]3 5 rreq received from 3
+[15.48][4->10]3 4 rreq received from 3
+[15.49][4->10]3 2 rreq received from 3
+[15.49][4->10]3 1 rreq received from 3
+[15.49][4->10]3 0 rreq received from 3
+[15.49][4->10]3 6 rreq received from 3
+[15.49][4->10]3 5 rreq received from 3
+[15.49][4->10]3 4 rreq received from 3
+[15.49][4->10]3 9 rreq received from 8
+[15.49][4->10]3 5 rreq received from 8
+[15.49][4->10]3 10 rreq received from 8
+[15.49][4->10]3 9 rreq received from 8
+[15.49][4->10]3 5 rreq received from 8
+[15.49][4->10]3 10 rreq received from 8
+[15.49][4->10]3 3 rreq received from 1
+[15.49][4->10]3 0 rreq received from 1
+[15.49][4->10]3 5 rreq received from 1
+[15.49][4->10]3 10 rreq received from 1
+[15.49][4->10]3 3 rreq received from 0
+[15.49][4->10]3 2 rreq received from 0
+[15.49][4->10]3 1 rreq received from 0
+[15.49][4->10]3 6 rreq received from 9
+[15.49][4->10]3 7 rreq received from 9
+[15.49][4->10]3 8 rreq received from 9
+[15.49][4->10]3 5 rreq received from 9
+[15.49][4->10]3 6 rreq received from 9
+[15.49][4->10]3 7 rreq received from 9
+[15.49][4->10]3 8 rreq received from 9
+[15.49][4->10]3 5 rreq received from 9
+[15.49][4->10] 6 rrep received from 5
+[15.49][4->10] 6<-5 rrep update: cost(0.000000) weight(0.481270) channel(0)
+[15.49][4->10] 6<-5 rrep update change: oldweight(0.528704) newweight(0.481270) channel(0)
+[15.49][4->10] 6 rrep forward 4
+[15.49][4->10]3 3 rreq received from 0
+[15.49][4->10]3 2 rreq received from 0
+[15.49][4->10]3 1 rreq received from 0
+[15.49][4->10]3 3 rreq received from 0
+[15.49][4->10]3 2 rreq received from 0
+[15.49][4->10]3 1 rreq received from 0
+[15.49][4->10]3 9 rreq received from 8
+[15.49][4->10]3 5 rreq received from 8
+[15.49][4->10]3 10 rreq received from 8
+[15.50][4->10] 4 rrep received from 6
+[15.50][4->10] 4<-6 rrep update: cost(0.000000) weight(0.481270) channel(0)
+[15.50][4->10] 4<-6 rrep update change: oldweight(0.528704) newweight(0.481270) channel(0)
+[4->10 connected]
+[15.52] recv_num / send_num = 0.996564
+[15.52] lose data package 2 times
+[15.52] max using time: 0.312046(s)
+[15.52]average using time = 0.023(s)
+[15.61] recv_num / send_num = 0.998294
+[15.61] lose data package 1 times
+[15.61] max using time: 0.312046(s)
+[15.61]average using time = 0.023(s)
+[15.72] recv_num / send_num = 1.000000
+[15.72] lose data package 0 times
+[15.72] max using time: 0.312046(s)
+[15.72]average using time = 0.023(s)
+[15.86] recv_num / send_num = 0.998322
+[15.86] lose data package 1 times
+[15.86] max using time: 0.312046(s)
+[15.86]average using time = 0.022(s)
+[16.04] recv_num / send_num = 0.996678
+[16.04] lose data package 2 times
+[16.04] max using time: 0.312046(s)
+[16.04]average using time = 0.023(s)
+[16.11] recv_num / send_num = 0.998350
+[16.11] lose data package 1 times
+[16.11] max using time: 0.312046(s)
+[16.11]average using time = 0.023(s)
+[16.23] recv_num / send_num = 1.000000
+[16.23] lose data package 0 times
+[16.23] max using time: 0.312046(s)
+[16.23]average using time = 0.023(s)
+[16.36] recv_num / send_num = 0.998377
+[16.36] lose data package 1 times
+[16.36] max using time: 0.312046(s)
+[16.36]average using time = 0.023(s)
+[16.54] recv_num / send_num = 0.996785
+[16.54] lose data package 2 times
+[16.54] max using time: 0.312046(s)
+[16.54]average using time = 0.023(s)
+[16.61] recv_num / send_num = 0.998403
+[16.61] lose data package 1 times
+[16.61] max using time: 0.312046(s)
+[16.61]average using time = 0.023(s)
+[16.73] recv_num / send_num = 1.000000
+[16.73] lose data package 0 times
+[16.73] max using time: 0.312046(s)
+[16.73]average using time = 0.023(s)
+[16.87] recv_num / send_num = 0.998428
+[16.87] lose data package 1 times
+[16.87] max using time: 0.312046(s)
+[16.87]average using time = 0.023(s)
+[16.97] recv_num / send_num = 1.000000
+[16.97] lose data package 0 times
+[16.97] max using time: 0.312046(s)
+[16.97]average using time = 0.023(s)
+[17.11] recv_num / send_num = 0.998452
+[17.11] lose data package 1 times
+[17.11] max using time: 0.312046(s)
+[17.11]average using time = 0.023(s)
+[17.23] recv_num / send_num = 1.000000
+[17.23] lose data package 0 times
+[17.23] max using time: 0.312046(s)
+[17.23]average using time = 0.023(s)
+[17.36] recv_num / send_num = 0.998476
+[17.36] lose data package 1 times
+[17.36] max using time: 0.312046(s)
+[17.36]average using time = 0.023(s)
+[17.47] recv_num / send_num = 1.000000
+[17.47] lose data package 0 times
+[17.47] max using time: 0.312046(s)
+[17.47]average using time = 0.023(s)
+[17.61] recv_num / send_num = 0.998498
+[17.61] lose data package 1 times
+[17.61] max using time: 0.312046(s)
+[17.61]average using time = 0.023(s)
+[17.72] recv_num / send_num = 1.000000
+[17.72] lose data package 0 times
+[17.72] max using time: 0.312046(s)
+[17.72]average using time = 0.023(s)
+[17.86] recv_num / send_num = 0.998521
+[17.86] lose data package 1 times
+[17.86] max using time: 0.312046(s)
+[17.86]average using time = 0.023(s)
+[17.97] recv_num / send_num = 1.000000
+[17.97] lose data package 0 times
+[17.97] max using time: 0.312046(s)
+[17.97]average using time = 0.022(s)
+[18.11] recv_num / send_num = 0.998542
+[18.11] lose data package 1 times
+[18.11] max using time: 0.312046(s)
+[18.11]average using time = 0.023(s)
+[18.22] recv_num / send_num = 1.000000
+[18.22] lose data package 0 times
+[18.22] max using time: 0.312046(s)
+[18.22]average using time = 0.022(s)
+[18.36] recv_num / send_num = 0.998563
+[18.36] lose data package 1 times
+[18.36] max using time: 0.312046(s)
+[18.36]average using time = 0.022(s)
+[18.55] recv_num / send_num = 0.997151
+[18.55] lose data package 2 times
+[18.55] max using time: 0.312046(s)
+[18.55]average using time = 0.023(s)
+[18.61] recv_num / send_num = 0.998584
+[18.61] lose data package 1 times
+[18.61] max using time: 0.312046(s)
+[18.61]average using time = 0.023(s)
+[18.72] recv_num / send_num = 1.000000
+[18.72] lose data package 0 times
+[18.72] max using time: 0.312046(s)
+[18.72]average using time = 0.023(s)
+[18.86] recv_num / send_num = 0.998603
+[18.86] lose data package 1 times
+[18.86] max using time: 0.312046(s)
+[18.86]average using time = 0.022(s)
+[18.97] recv_num / send_num = 1.000000
+[18.97] lose data package 0 times
+[18.97] max using time: 0.312046(s)
+[18.97]average using time = 0.022(s)
+[19.11] recv_num / send_num = 0.998623
+[19.11] lose data package 1 times
+[19.11] max using time: 0.312046(s)
+[19.11]average using time = 0.023(s)
+[19.22] recv_num / send_num = 1.000000
+[19.22] lose data package 0 times
+[19.22] max using time: 0.312046(s)
+[19.22]average using time = 0.022(s)
+[19.36] recv_num / send_num = 0.998641
+[19.36] lose data package 1 times
+[19.36] max using time: 0.312046(s)
+[19.36]average using time = 0.022(s)
+[19.54] recv_num / send_num = 0.997305
+[19.54] lose data package 2 times
+[19.54] max using time: 0.312046(s)
+[19.54]average using time = 0.023(s)
+[19.61] recv_num / send_num = 0.998660
+[19.61] lose data package 1 times
+[19.61] max using time: 0.312046(s)
+[19.61]average using time = 0.023(s)
+[19.72] recv_num / send_num = 1.000000
+[19.72] lose data package 0 times
+[19.72] max using time: 0.312046(s)
+[19.72]average using time = 0.023(s)
+[19.86] recv_num / send_num = 0.998677
+[19.86] lose data package 1 times
+[19.86] max using time: 0.312046(s)
+[19.86]average using time = 0.022(s)
+[19.97] recv_num / send_num = 1.000000
+[19.97] lose data package 0 times
+[19.97] max using time: 0.312046(s)
+[19.97]average using time = 0.022(s)
+[20.11] recv_num / send_num = 0.998695
+[20.11] lose data package 1 times
+[20.11] max using time: 0.312046(s)
+[20.11]average using time = 0.023(s)
+[20.22] recv_num / send_num = 1.000000
+[20.22] lose data package 0 times
+[20.22] max using time: 0.312046(s)
+[20.22]average using time = 0.022(s)
+[20.36] recv_num / send_num = 0.998711
+[20.36] lose data package 1 times
+[20.36] max using time: 0.312046(s)
+[20.36]average using time = 0.022(s)
+[20.55] recv_num / send_num = 0.997442
+[20.55] lose data package 2 times
+[20.55] max using time: 0.312046(s)
+[20.55]average using time = 0.023(s)
+[20.61] recv_num / send_num = 0.998728
+[20.61] lose data package 1 times
+[20.61] max using time: 0.312046(s)
+[20.61]average using time = 0.023(s)
+[20.72] recv_num / send_num = 1.000000
+[20.72] lose data package 0 times
+[20.72] max using time: 0.312046(s)
+[20.72]average using time = 0.023(s)
+[20.86] recv_num / send_num = 0.998744
+[20.86] lose data package 1 times
+[20.86] max using time: 0.312046(s)
+[20.86]average using time = 0.022(s)
+[20.97] recv_num / send_num = 1.000000
+[20.97] lose data package 0 times
+[20.97] max using time: 0.312046(s)
+[20.97]average using time = 0.022(s)
+[21.11] recv_num / send_num = 0.998759
+[21.11] lose data package 1 times
+[21.11] max using time: 0.312046(s)
+[21.11]average using time = 0.022(s)
+[21.22] recv_num / send_num = 1.000000
+[21.22] lose data package 0 times
+[21.22] max using time: 0.312046(s)
+[21.22]average using time = 0.022(s)
+[21.36] recv_num / send_num = 0.998775
+[21.36] lose data package 1 times
+[21.36] max using time: 0.312046(s)
+[21.36]average using time = 0.022(s)
+[21.54] recv_num / send_num = 0.997567
+[21.54] lose data package 2 times
+[21.54] max using time: 0.312046(s)
+[21.54]average using time = 0.022(s)
+[21.61] recv_num / send_num = 0.998789
+[21.61] lose data package 1 times
+[21.61] max using time: 0.312046(s)
+[21.61]average using time = 0.023(s)
+[21.72] recv_num / send_num = 1.000000
+[21.72] lose data package 0 times
+[21.72] max using time: 0.312046(s)
+[21.72]average using time = 0.023(s)
+[21.86] recv_num / send_num = 0.998804
+[21.86] lose data package 1 times
+[21.86] max using time: 0.312046(s)
+[21.86]average using time = 0.022(s)
+[22.03] recv_num / send_num = 0.998811
+[22.03] lose data package 1 times
+[22.03] max using time: 0.312046(s)
+[22.03]average using time = 0.022(s)
+[22.21] recv_num / send_num = 1.000000
+[22.21] lose data package 0 times
+[22.21] max using time: 0.312046(s)
+[22.21]average using time = 0.022(s)
+[22.47] recv_num / send_num = 1.000000
+[22.47] lose data package 0 times
+[22.47] max using time: 0.312046(s)
+[22.47]average using time = 0.022(s)
+[22.71] recv_num / send_num = 1.000000
+[22.71] lose data package 0 times
+[22.71] max using time: 0.312046(s)
+[22.71]average using time = 0.022(s)
+[22.96] recv_num / send_num = 1.000000
+[22.96] lose data package 0 times
+[22.96] max using time: 0.312046(s)
+[22.96]average using time = 0.022(s)
+[23.22] recv_num / send_num = 1.000000
+[23.22] lose data package 0 times
+[23.22] max using time: 0.312046(s)
+[23.22]average using time = 0.022(s)
+[23.47] recv_num / send_num = 1.000000
+[23.47] lose data package 0 times
+[23.47] max using time: 0.312046(s)
+[23.47]average using time = 0.022(s)
+[23.71] recv_num / send_num = 1.000000
+[23.71] lose data package 0 times
+[23.71] max using time: 0.312046(s)
+[23.71]average using time = 0.022(s)
+[23.97] recv_num / send_num = 1.000000
+[23.97] lose data package 0 times
+[23.97] max using time: 0.312046(s)
+[23.97]average using time = 0.022(s)
+[24.22] recv_num / send_num = 1.000000
+[24.22] lose data package 0 times
+[24.22] max using time: 0.312046(s)
+[24.22]average using time = 0.022(s)
+[24.47] recv_num / send_num = 1.000000
+[24.47] lose data package 0 times
+[24.47] max using time: 0.312046(s)
+[24.47]average using time = 0.022(s)
+[24.72] recv_num / send_num = 1.000000
+[24.72] lose data package 0 times
+[24.72] max using time: 0.312046(s)
+[24.72]average using time = 0.022(s)
+[24.96] recv_num / send_num = 1.000000
+[24.96] lose data package 0 times
+[24.96] max using time: 0.312046(s)
+[24.96]average using time = 0.022(s)
+[25.20][aodv-uu.cc packetFailed] src(0)->now(4)->next(7)->dest(8)
+【aodv-uu.cc packetFailed】rt->hcnt <= MAX_REPAIR_TTL
+【aodv_rreq.c rreq_local_repair】
+[25.20]fxj_: starting local_repair. Breakpoint: 4, unreachable next hop: 7, destination: 8
+【packet-input.cc processPacket】fwd_rt && (fwd_rt->flags & RT_REPAIR)
+【aodv_rreq.c rreq_local_repair】
+[25.21]fxj_: node 2 recvd Hello(N=1) from node 4
+[25.21]fxj_:node 2 send nb_tbl to node 4, containing 4 valid neighbors. (0, 3, 6, 4, )
+[25.21]fxj_: node 2 recvd Hello(N=1) from node 4
+[25.21]fxj_:node 2 send nb_tbl to node 4, containing 4 valid neighbors. (0, 3, 6, 4, )
+[25.21]fxj_: node 2 recvd Hello(N=1) from node 4
+[25.21]fxj_:node 2 send nb_tbl to node 4, containing 4 valid neighbors. (0, 3, 6, 4, )
+[25.22][2->2] 4 rrep received from 2
+[25.22]fxj_: 4 recvd nb_tbl from 2, begin searching...
+       valid neighbors: 4. (0, 3, 6, 0, )
+【packet-input.cc processPacket】fwd_rt && (fwd_rt->flags & RT_REPAIR)
+【aodv_rreq.c rreq_local_repair】
+【packet-input.cc processPacket】fwd_rt && (fwd_rt->flags & RT_REPAIR)
+【aodv_rreq.c rreq_local_repair】
+[25.38][aodv-uu.cc packetFailed] src(0)->now(2)->next(4)->dest(8)
+【aodv-uu.cc packetFailed】rt->hcnt <= MAX_REPAIR_TTL
+【aodv_rreq.c rreq_local_repair】
+[25.38]fxj_: starting local_repair. Breakpoint: 2, unreachable next hop: 4, destination: 8
+[25.39]fxj_: node 3 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 3 send nb_tbl to node 2, containing 6 valid neighbors. (0, 2, 6, 4, 5, 1, )
+[25.39]fxj_: node 0 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 0 send nb_tbl to node 2, containing 3 valid neighbors. (2, 3, 1, )
+[25.39]fxj_: node 6 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 6 send nb_tbl to node 2, containing 6 valid neighbors. (2, 3, 9, 4, 7, 5, )
+[25.39]fxj_: node 3 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 3 send nb_tbl to node 2, containing 6 valid neighbors. (0, 2, 6, 4, 5, 1, )
+[25.39]fxj_: node 0 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 0 send nb_tbl to node 2, containing 3 valid neighbors. (2, 3, 1, )
+[25.39]fxj_: node 6 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 6 send nb_tbl to node 2, containing 6 valid neighbors. (2, 3, 9, 4, 7, 5, )
+[25.39]fxj_: node 3 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 3 send nb_tbl to node 2, containing 6 valid neighbors. (0, 2, 6, 4, 5, 1, )
+[25.39]fxj_: node 0 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 0 send nb_tbl to node 2, containing 3 valid neighbors. (2, 3, 1, )
+[25.39]fxj_: node 6 recvd Hello(N=1) from node 2
+[25.39]fxj_:node 6 send nb_tbl to node 2, containing 6 valid neighbors. (2, 3, 9, 4, 7, 5, )
+[25.40][3->3] 2 rrep received from 3
+[25.40]fxj_: 2 recvd nb_tbl from 3, begin searching...
+       valid neighbors: 6. (0, 2, 6, 0, 0, 0, )
+[25.40][3->3] 2 rrep received from 3
+[25.40]fxj_: 2 recvd nb_tbl from 3, begin searching...
+       valid neighbors: 6. (0, 2, 6, 0, 0, 0, )
+[25.40][0->0] 2 rrep received from 0
+[25.40]fxj_: 2 recvd nb_tbl from 0, begin searching...
+       valid neighbors: 3. (2, 3, 1, )
+[25.40][0->0] 2 rrep received from 0
+[25.40]fxj_: 2 recvd nb_tbl from 0, begin searching...
+       valid neighbors: 3. (2, 3, 1, )
+[25.40][0->0] 2 rrep received from 0
+[25.40]fxj_: 2 recvd nb_tbl from 0, begin searching...
+       valid neighbors: 3. (2, 3, 1, )
+[25.41][3->3] 2 rrep received from 3
+[25.41]fxj_: 2 recvd nb_tbl from 3, begin searching...
+       valid neighbors: 6. (0, 2, 6, 0, 0, 0, )
+[25.41][6->6] 2 rrep received from 6
+[25.41]fxj_: 2 recvd nb_tbl from 6, begin searching...
+       valid neighbors: 6. (2, 3, 9, 0, 0, 0, )
+[25.41]fxj_: node 2 sending RReqT to 6 to confirm if 9 is alive...
+[25.41][6->6] 2 rrep received from 6
+[25.41]fxj_: 2 recvd nb_tbl from 6, begin searching...
+       valid neighbors: 6. (2, 3, 9, 0, 0, 0, )
+[25.41]fxj_: node 2 sending RReqT to 6 to confirm if 9 is alive...
+[25.41][6->6] 2 rrep received from 6
+[25.41]fxj_: 2 recvd nb_tbl from 6, begin searching...
+       valid neighbors: 6. (2, 3, 9, 0, 0, 0, )
+[25.41]fxj_: node 2 sending RReqT to 6 to confirm if 9 is alive...
+[25.41][9->8]0 6 rreq received from 2
+fxj: rreq->t=1, rreq->a=0
+[25.41]fxj_: 6 recvd rreqT from 2 to comfirm if 9 is alive..
+[25.41]fxj_: node 6 sending RReqA to 9 to confirm if it is alive...
+[25.41][9->8]2 6 rreq received from 2
+fxj: rreq->t=1, rreq->a=0
+[25.41]fxj_: 6 recvd rreqT from 2 to comfirm if 9 is alive..
+[25.41]fxj_: node 6 sending RReqA to 9 to confirm if it is alive...
+【packet-input.cc processPacket】fwd_rt && (fwd_rt->flags & RT_REPAIR)
+【aodv_rreq.c rreq_local_repair】
+[25.42][9->8]1 6 rreq received from 2
+fxj: rreq->t=1, rreq->a=0
+[25.42]fxj_: 6 recvd rreqT from 2 to comfirm if 9 is alive..
+[25.42]fxj_: node 6 sending RReqA to 9 to confirm if it is alive...
+[25.43][2->8]2 9 rreq received from 6
+fxj: rreq->t=0, rreq->a=1
+[25.43]fxj_: 9 recvd rreqA from 6 to comfirm if im alive, try to fix 2 to 8 via moi..
+send_RRepA
+[25.44][2->8] 6 rrep received from 9
+[25.44]fxj_: 6 comfirmed 9 's alive...
+[25.44][9->8] 2 rrep received from 6
+[25.44]fxj_: 2 recved 6's conform -> 9 finally to 8.. ! !
+[25.44]fxj_: 2 will forwar to 6 -> 8 finally to 8...
+[25.44]fxj_: 2 is sending all cached packets to dst 8 via 6...A SUCCESSFUL REPAIR ! !
+[25.44][8->8] 6 rrep received from 2
+[25.44]fxj_: 6 will create a forward rt  8 -> 8 ! !
+[25.51][0->8]3 3 rreq received from 0
+[25.51][0->8]3 0->3 rreq: weight(0.580000)
+[25.51][0->8]3 0->3 rreq update: cost(0.580000) weight(0.580000) channel(1)
+[25.51][0->8]3 3 rreq forward BROADCAST
+[25.51][0->8]3 2 rreq received from 0
+[25.51][0->8]3 0->2 rreq: weight(0.803889)
+[25.51][0->8]3 0->2 rreq update: cost(0.803889) weight(0.803889) channel(2)
+[25.51][0->8]3 0->2 rreq update [cost_flag]: oldweight(0.462037) newweight(0.803889) channel(2)
+[25.51][0->8]3 2 rreq forward BROADCAST
+[25.51][0->8]3 1 rreq received from 0
+[25.51][0->8]3 0->1 rreq: weight(0.576667)
+[25.51][0->8]3 0->1 rreq update: cost(0.576667) weight(0.576667) channel(2)
+[25.51][0->8]3 1 rreq forward BROADCAST
+[25.51][0->8]3 3 rreq received from 0
+[25.51][0->8]3 2 rreq received from 0
+[25.51][0->8]3 1 rreq received from 0
+[25.52][0->8]3 2 rreq received from 3
+[25.52][0->8]3 3 rreq received from 1
+[25.52][0->8]3 0 rreq received from 1
+[25.52][0->8]3 3 rreq received from 1
+[25.52][0->8]3 0 rreq received from 1
+[25.52][0->8]3 5 rreq received from 1
+[25.52][0->8]3 1->5 rreq: weight(0.576667)
+[25.52][0->8]3 1->5 rreq insert: cost(0.656667) weight(0.576667) channel(0)
+[25.52][0->8]3 5 rreq forward BROADCAST
+[25.52][0->8]3 10 rreq received from 1
+[25.52][0->8]3 1->10 rreq: weight(0.576667)
+[25.52][0->8]3 1->10 rreq insert: cost(0.615000) weight(0.576667) channel(2)
+[25.52][0->8]3 10 rreq forward BROADCAST
+[25.52][0->8]3 3 rreq received from 2
+[25.52][0->8]3 0 rreq received from 2
+[25.52][0->8]3 6 rreq received from 2
+[25.52][0->8]3 2->6 rreq: weight(0.656667)
+[25.52][0->8]3 2->6 rreq update: cost(0.656667) weight(0.656667) channel(2)
+[25.52][0->8]3 2->6 rreq update [cost_flag]: oldweight(1.000000) newweight(0.656667) channel(2)
+[25.52][0->8]3 6 rreq forward BROADCAST
+[25.53][0->8]3 3 rreq received from 1
+[25.53][0->8]3 0 rreq received from 1
+[25.53][0->8]3 5 rreq received from 1
+[25.53][0->8]3 10 rreq received from 1
+[25.53][0->8]3 2 rreq received from 3
+[25.53][0->8]3 1 rreq received from 3
+[25.53][0->8]3 0 rreq received from 3
+[25.53][0->8]3 6 rreq received from 3
+[25.53][0->8]3 5 rreq received from 3
+[25.53][0->8]3 3 rreq received from 2
+[25.53][0->8]3 0 rreq received from 2
+[25.53][0->8]3 6 rreq received from 2
+[25.53][0->8]3 5 rreq received from 10
+[25.53][0->8]3 1 rreq received from 10
+[25.53][0->8]3 8 rreq received from 10
+[25.53][0->8]3 10->8 rreq: weight(0.576667)
+[25.53][0->8]3 10->8 rreq update: cost(0.600000) weight(0.576667) channel(2)
+[25.53][0->8]3 7 rreq received from 6
+[25.53][0->8]3 6->7 rreq: weight(0.656667)
+[25.53][0->8]3 6->7 rreq update: cost(0.845556) weight(0.656667) channel(0)
+[25.53][0->8]3 6->7 rreq update [cost_flag]: oldweight(0.462037) newweight(0.656667) channel(0)
+[25.53][0->8]3 7 rreq forward BROADCAST
+[25.53][0->8]3 9 rreq received from 6
+[25.53][0->8]3 6->9 rreq: weight(0.656667)
+[25.53][0->8]3 6->9 rreq update: cost(0.793333) weight(0.656667) channel(2)
+[25.53][0->8]3 6->9 rreq update [cost_flag]: oldweight(1.000000) newweight(0.656667) channel(2)
+[25.53][0->8]3 9 rreq forward BROADCAST
+[25.53][0->8]3 5 rreq received from 6
+[25.53][0->8]3 3 rreq received from 6
+[25.53][0->8]3 2 rreq received from 6
+[25.53][0->8]3 7 rreq received from 6
+[25.53][0->8]3 9 rreq received from 6
+[25.53][0->8]3 5 rreq received from 6
+[25.53][0->8]3 3 rreq received from 6
+[25.53][0->8]3 2 rreq received from 6
+[25.53][0->8]3 5 rreq received from 10
+[25.53][0->8]3 1 rreq received from 10
+[25.53][0->8]3 8 rreq received from 10
+[25.53][0->8]3 10 rreq received from 5
+[25.53][0->8]3 6 rreq received from 5
+[25.53][0->8]3 1 rreq received from 5
+[25.53][0->8]3 8 rreq received from 5
+[25.53][0->8]3 3 rreq received from 5
+[25.53][0->8]3 9 rreq received from 5
+[25.53][0->8]3 10 rreq received from 5
+[25.53][0->8]3 6 rreq received from 5
+[25.53][0->8]3 1 rreq received from 5
+[25.53][0->8]3 8 rreq received from 5
+[25.53][0->8]3 3 rreq received from 5
+[25.53][0->8]3 9 rreq received from 5
+[25.54][0->8]3 3 rreq received from 0
+[25.54][0->8]3 2 rreq received from 0
+[25.54][0->8]3 1 rreq received from 0
+[25.54][0->8]3 7 rreq received from 6
+[25.54][0->8]3 9 rreq received from 6
+[25.54][0->8]3 5 rreq received from 6
+[25.54][0->8]3 3 rreq received from 6
+[25.54][0->8]3 2 rreq received from 6
+[25.54][0->8]3 10 rreq received from 5
+[25.54][0->8]3 6 rreq received from 5
+[25.54][0->8]3 1 rreq received from 5
+[25.54][0->8]3 8 rreq received from 5
+[25.54][0->8]3 3 rreq received from 5
+[25.54][0->8]3 9 rreq received from 5
+[25.54][0->8] 10 rrep received from 8
+[25.54][0->8] 10<-8 rrep update: cost(0.000000) weight(0.576667) channel(2)
+[25.54][0->8] 10<-8 rrep update change: oldweight(1.000000) newweight(0.576667) channel(2)
+[25.54][0->8] 10 rrep forward 1
+[25.54][0->8]3 5 rreq received from 10
+[25.54][0->8]3 1 rreq received from 10
+[25.54][0->8]3 8 rreq received from 10
+[25.54][0->8]3 6 rreq received from 9
+[25.54][0->8]3 7 rreq received from 9
+[25.54][0->8]3 8 rreq received from 9
+[25.54][0->8]3 9->8 rreq: weight(0.656667)
+[25.54][0->8]3 9->8 rreq update: cost(0.847222) weight(0.656667) channel(1)
+[25.54][0->8]3 5 rreq received from 9
+[25.54][0->8]3 6 rreq received from 9
+[25.54][0->8]3 7 rreq received from 9
+[25.54][0->8]3 8 rreq received from 9
+[25.54][0->8]3 5 rreq received from 9
+[25.55][0->8] 1 rrep received from 10
+[25.55][0->8] 1<-10 rrep insert: cost(0.000000) weight(0.576667) channel(2)
+[25.55][0->8] 1 rrep forward 0
+[25.55][0->8] 9 rrep received from 8
+[25.55][0->8] 9<-8 rrep update: cost(0.000000) weight(0.656667) channel(1)
+[25.55][0->8] 9<-8 rrep update change: oldweight(1.000000) newweight(0.656667) channel(1)
+[25.55][0->8] 9 rrep forward 6
+[25.55][0->8]3 6 rreq received from 9
+[25.55][0->8]3 7 rreq received from 9
+[25.55][0->8]3 8 rreq received from 9
+[25.55][0->8]3 5 rreq received from 9
+[25.55][0->8]3 6 rreq received from 7
+[25.55][0->8]3 9 rreq received from 7
+[25.55][0->8]3 6 rreq received from 7
+[25.55][0->8]3 9 rreq received from 7
+[25.55][0->8] 0 rrep received from 1
+[25.55][0->8] 0<-1 rrep update: cost(0.000000) weight(0.576667) channel(0)
+[25.55][0->8] 0<-1 rrep update change: oldweight(0.462037) newweight(0.576667) channel(0)
+[0->8 connected]
+[25.55][0->8] 6 rrep received from 9
+[25.55][0->8] 6<-9 rrep update: cost(0.000000) weight(0.656667) channel(2)
+[25.55][0->8] 6<-9 rrep update change: oldweight(1.000000) newweight(0.656667) channel(2)
+[25.55][0->8] 6 rrep forward 2
+[25.56][0->8]3 6 rreq received from 7
+[25.56][0->8]3 9 rreq received from 7
+[25.56][0->8] 2 rrep received from 6
+[25.56][0->8] 2<-6 rrep update: cost(0.000000) weight(0.656667) channel(2)
+[25.56][0->8] 2<-6 rrep update change: oldweight(0.462037) newweight(0.656667) channel(2)
+[25.56][0->8] 2 rrep forward 0
+[25.56][0->8] 0 rrep received from 2
+[25.56][0->8] 0<-2 rrep update: cost(0.000000) weight(0.656667) channel(0)
+[25.56][0->8] 0<-2 rrep update change: oldweight(0.576667) newweight(0.656667) channel(0)
+[0->8 connected]
+[25.57] recv_num / send_num = 0.992325
+[25.57] lose data package 7 times
+[25.57] max using time: 0.312046(s)
+[25.57]average using time = 0.022(s)
+[25.81] recv_num / send_num = 0.992366
+[25.81] lose data package 7 times
+[25.81] max using time: 0.312046(s)
+[25.81]average using time = 0.022(s)
+[26.08] recv_num / send_num = 0.992408
+[26.08] lose data package 7 times
+[26.08] max using time: 0.312046(s)
+[26.08]average using time = 0.022(s)
+[26.31] recv_num / send_num = 0.992449
+[26.31] lose data package 7 times
+[26.31] max using time: 0.312046(s)
+[26.31]average using time = 0.022(s)
+[26.58] recv_num / send_num = 0.992489
+[26.58] lose data package 7 times
+[26.58] max using time: 0.312046(s)
+[26.58]average using time = 0.022(s)
+[26.81] recv_num / send_num = 0.992529
+[26.81] lose data package 7 times
+[26.81] max using time: 0.312046(s)
+[26.81]average using time = 0.022(s)
+[27.08] recv_num / send_num = 0.992569
+[27.08] lose data package 7 times
+[27.08] max using time: 0.312046(s)
+[27.08]average using time = 0.022(s)
+[27.31] recv_num / send_num = 0.992608
+[27.31] lose data package 7 times
+[27.31] max using time: 0.312046(s)
+[27.31]average using time = 0.022(s)
+[27.58] recv_num / send_num = 0.992647
+[27.58] lose data package 7 times
+[27.58] max using time: 0.312046(s)
+[27.58]average using time = 0.022(s)
+[27.81] recv_num / send_num = 0.992685
+[27.81] lose data package 7 times
+[27.81] max using time: 0.312046(s)
+[27.81]average using time = 0.022(s)
+[28.08] recv_num / send_num = 0.992723
+[28.08] lose data package 7 times
+[28.08] max using time: 0.312046(s)
+[28.08]average using time = 0.022(s)
+[28.31] recv_num / send_num = 0.992761
+[28.31] lose data package 7 times
+[28.31] max using time: 0.312046(s)
+[28.31]average using time = 0.022(s)
+[28.58] recv_num / send_num = 0.992798
+[28.58] lose data package 7 times
+[28.58] max using time: 0.312046(s)
+[28.58]average using time = 0.022(s)
+[28.81] recv_num / send_num = 0.992835
+[28.81] lose data package 7 times
+[28.81] max using time: 0.312046(s)
+[28.81]average using time = 0.022(s)
+[29.08] recv_num / send_num = 0.992872
+[29.08] lose data package 7 times
+[29.08] max using time: 0.312046(s)
+[29.08]average using time = 0.022(s)
+[29.31] recv_num / send_num = 0.992908
+[29.31] lose data package 7 times
+[29.31] max using time: 0.312046(s)
+[29.31]average using time = 0.022(s)
+[29.58] recv_num / send_num = 0.992944
+[29.58] lose data package 7 times
+[29.58] max using time: 0.312046(s)
+[29.58]average using time = 0.022(s)
+[29.81] recv_num / send_num = 0.992979
+[29.81] lose data package 7 times
+[29.81] max using time: 0.312046(s)
+[29.81]average using time = 0.022(s)
+[30.08] recv_num / send_num = 0.993014
+[30.08] lose data package 7 times
+[30.08] max using time: 0.312046(s)
+[30.08]average using time = 0.022(s)
+[30.31] recv_num / send_num = 0.993049
+[30.31] lose data package 7 times
+[30.31] max using time: 0.312046(s)
+[30.31]average using time = 0.022(s)
+[30.58] recv_num / send_num = 0.993083
+[30.58] lose data package 7 times
+[30.58] max using time: 0.312046(s)
+[30.58]average using time = 0.022(s)
+[30.81] recv_num / send_num = 0.993117
+[30.81] lose data package 7 times
+[30.81] max using time: 0.312046(s)
+[30.81]average using time = 0.022(s)
+[31.08] recv_num / send_num = 0.993151
+[31.08] lose data package 7 times
+[31.08] max using time: 0.312046(s)
+[31.08]average using time = 0.022(s)
+[31.31] recv_num / send_num = 0.993184
+[31.31] lose data package 7 times
+[31.31] max using time: 0.312046(s)
+[31.31]average using time = 0.022(s)
+[31.58] recv_num / send_num = 0.993217
+[31.58] lose data package 7 times
+[31.58] max using time: 0.312046(s)
+[31.58]average using time = 0.022(s)
+[31.81] recv_num / send_num = 0.993250
+[31.81] lose data package 7 times
+[31.81] max using time: 0.312046(s)
+[31.81]average using time = 0.022(s)
+[32.08] recv_num / send_num = 0.993282
+[32.08] lose data package 7 times
+[32.08] max using time: 0.312046(s)
+[32.08]average using time = 0.021(s)
+[32.31] recv_num / send_num = 0.993314
+[32.31] lose data package 7 times
+[32.31] max using time: 0.312046(s)
+[32.31]average using time = 0.021(s)
+[32.58] recv_num / send_num = 0.993346
+[32.58] lose data package 7 times
+[32.58] max using time: 0.312046(s)
+[32.58]average using time = 0.021(s)
+[32.81] recv_num / send_num = 0.993377
+[32.81] lose data package 7 times
+[32.81] max using time: 0.312046(s)
+[32.81]average using time = 0.021(s)
+[33.08] recv_num / send_num = 0.993409
+[33.08] lose data package 7 times
+[33.08] max using time: 0.312046(s)
+[33.08]average using time = 0.021(s)
+[33.31] recv_num / send_num = 0.993440
+[33.31] lose data package 7 times
+[33.31] max using time: 0.312046(s)
+[33.31]average using time = 0.021(s)
+[33.58] recv_num / send_num = 0.993470
+[33.58] lose data package 7 times
+[33.58] max using time: 0.312046(s)
+[33.58]average using time = 0.021(s)
+[33.81] recv_num / send_num = 0.993500
+[33.81] lose data package 7 times
+[33.81] max using time: 0.312046(s)
+[33.81]average using time = 0.021(s)
+[34.08] recv_num / send_num = 0.993530
+[34.08] lose data package 7 times
+[34.08] max using time: 0.312046(s)
+[34.08]average using time = 0.021(s)
+[34.31] recv_num / send_num = 0.993560
+[34.31] lose data package 7 times
+[34.31] max using time: 0.312046(s)
+[34.31]average using time = 0.021(s)
+[34.58] recv_num / send_num = 0.993590
+[34.58] lose data package 7 times
+[34.58] max using time: 0.312046(s)
+[34.58]average using time = 0.021(s)
+[34.81] recv_num / send_num = 0.993619
+[34.81] lose data package 7 times
+[34.81] max using time: 0.312046(s)
+[34.81]average using time = 0.021(s)
+[35.08] recv_num / send_num = 0.993648
+[35.08] lose data package 7 times
+[35.08] max using time: 0.312046(s)
+[35.08]average using time = 0.021(s)
+[35.31] recv_num / send_num = 0.993677
+[35.31] lose data package 7 times
+[35.31] max using time: 0.312046(s)
+[35.31]average using time = 0.021(s)
+[35.59] recv_num / send_num = 0.993705
+[35.59] lose data package 7 times
+[35.59] max using time: 0.312046(s)
+[35.59]average using time = 0.021(s)
+[35.81] recv_num / send_num = 0.993733
+[35.81] lose data package 7 times
+[35.81] max using time: 0.312046(s)
+[35.81]average using time = 0.021(s)
+[36.08] recv_num / send_num = 0.993761
+[36.08] lose data package 7 times
+[36.08] max using time: 0.312046(s)
+[36.08]average using time = 0.021(s)
+[36.31] recv_num / send_num = 0.993789
+[36.31] lose data package 7 times
+[36.31] max using time: 0.312046(s)
+[36.31]average using time = 0.021(s)
+[36.58] recv_num / send_num = 0.993816
+[36.58] lose data package 7 times
+[36.58] max using time: 0.312046(s)
+[36.58]average using time = 0.021(s)
+[36.81] recv_num / send_num = 0.993843
+[36.81] lose data package 7 times
+[36.81] max using time: 0.312046(s)
+[36.81]average using time = 0.021(s)
+[37.09] recv_num / send_num = 0.993870
+[37.09] lose data package 7 times
+[37.09] max using time: 0.312046(s)
+[37.09]average using time = 0.021(s)
+[37.31] recv_num / send_num = 0.993897
+[37.31] lose data package 7 times
+[37.31] max using time: 0.312046(s)
+[37.31]average using time = 0.021(s)
+[37.58] recv_num / send_num = 0.993924
+[37.58] lose data package 7 times
+[37.58] max using time: 0.312046(s)
+[37.58]average using time = 0.021(s)
+[37.81] recv_num / send_num = 0.993950
+[37.81] lose data package 7 times
+[37.81] max using time: 0.312046(s)
+[37.81]average using time = 0.021(s)
+[38.08] recv_num / send_num = 0.993976
+[38.08] lose data package 7 times
+[38.08] max using time: 0.312046(s)
+[38.08]average using time = 0.021(s)
+[38.31] recv_num / send_num = 0.994002
+[38.31] lose data package 7 times
+[38.31] max using time: 0.312046(s)
+[38.31]average using time = 0.021(s)
+[38.58] recv_num / send_num = 0.994027
+[38.58] lose data package 7 times
+[38.58] max using time: 0.312046(s)
+[38.58]average using time = 0.021(s)
+[38.81] recv_num / send_num = 0.994053
+[38.81] lose data package 7 times
+[38.81] max using time: 0.312046(s)
+[38.81]average using time = 0.021(s)
+[39.07] recv_num / send_num = 0.994078
+[39.07] lose data package 7 times
+[39.07] max using time: 0.312046(s)
+[39.07]average using time = 0.021(s)
+[39.31] recv_num / send_num = 0.994103
+[39.31] lose data package 7 times
+[39.31] max using time: 0.312046(s)
+[39.31]average using time = 0.021(s)
+[39.58] recv_num / send_num = 0.994128
+[39.58] lose data package 7 times
+[39.58] max using time: 0.312046(s)
+[39.58]average using time = 0.021(s)
+[39.81] recv_num / send_num = 0.994152
+[39.81] lose data package 7 times
+[39.81] max using time: 0.312046(s)
+[39.81]average using time = 0.021(s)

@@ -20,7 +20,7 @@ set val(nm) 1 ;# number of types of messages
 set val(nc) 3 ;# number of channels
 set val(ni) 3 ;# number of interfaces, <= number of channels
 set pktsize 1000 ;# packet size in bytes
-set pktrate 0.1 ;# packet rate in seconds
+set pktrate 0.05 ;# packet rate in seconds
 set filename try_yrb ;# trace file name
 puts "Ad-Hoc Wireless Network in Chain Topologies - $val(nn) Nodes, $val(nc) Channels, $val(ni) Interfaces"
 #======================================
@@ -215,13 +215,12 @@ $cbr($i) attach-agent $udp($i)
 $cbr($i) set packetSize_ $pktsize
 $cbr($i) set interval_ $pktrate
 $ns_ at 1.0 "$cbr($i) start"
-$ns_ at 40.0 "$cbr($i) stop"
+$ns_ at 22.0 "$cbr($i) stop"
 puts "Setup CBR Application over UDP connection"
 
-$ns_ at 10 "$n(13) setdest 963 544 1200"
-$ns_ at 15 "$n(3) setdest 1155 549 1200"
-$ns_ at 20.0 "$n(6) setdest 873 522 1200"
-#$ns_ at 13.0 "$n(8) setdest 1027 480 800"
+$ns_ at 10 "$n(13) setdest 995 542 1200"
+$ns_ at 18 "$n(13) setdest 100 100 1200"
+$ns_ at 25 "$n(4) setdest 100 100 800"
 
 
 #======================================
