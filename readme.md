@@ -6,9 +6,101 @@
 
 集成文档：[腾讯文档 | 集成报告_第2组](https://docs.qq.com/doc/DTVhwdXNiQUVGYmlT)
 
+## 宏定义
+
+```c++
+/*是否打印printf内容 */
+#define GCY_OUT 1
+#define CYO_OUT 1
+#define YRB_OUT 1
+#define FXJ_OUT 
+#define GLO_OUT 
+
+/* 链路cost取值范围和归一化 */
+#define COST_LOW 0.0
+#define COST_HIGH 3.0
+#define cost_normalize(x) ((x - COST_LOW) / (COST_HIGH - COST_LOW))
+
+/* cost寻路和快速修复的开关 */
+/* 用来跑tcl验证时区分原AODV协议和我们的策略 */
+#define USE_YRB 1
+#define YRB_ALONE 0 //YRB_ALONE=1时第三单元独立，不使用二单元cost值
+#define USE_FXJ
+/* end yrb */
+```
+
+
+
 ## 验证场景
 
-### 单元初步验证场景
+### TCL脚本
+
+#### 一二单元
+
+```
+
+    目录: D:\GitWareHouse\WirelessSystem\wireless_network_hw\documents\tcl
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                                                                    
+-a----        2021/12/28     17:03           6427 test_eight.tcl                                                       
+-a----        2021/12/28     17:03           8076 test_galaxy.tcl                                                      
+-a----        2021/12/28     17:03           6121 test_move.tcl                                                        
+-a----        2021/12/28     17:03           6888 test_nine.tcl                                                        
+-a----        2021/12/28     17:03           6007 test_six.tcl
+```
+
+
+
+#### 三单元
+
+```
+
+    目录: D:\GitWareHouse\WirelessSystem\wireless_network_hw\documents\tcl
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                                                      
+-a----        2021/12/29     10:59           7244 try_yrb.tcl                                                          
+-a----        2021/12/29     10:59           7014 yrb1.tcl                                                             
+-a----        2021/12/29     10:54           5423 yrb2.tcl                                                             
+-a----        2021/12/29     11:11           7206 yr
+```
+
+
+
+#### 四单元
+
+```
+
+    目录: D:\GitWareHouse\WirelessSystem\wireless_network_hw\documents\tcl
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+-a----        2021/12/29     11:01           6344 fxj.tcl                                                              
+-a----        2021/12/29     11:01           6273 fxj_circ.tcl                                                         
+-a----        2021/12/29     11:01           6345 test_all_1.tcl      
+```
+
+#### 集成
+
+```
+
+    目录: D:\GitWareHouse\WirelessSystem\wireless_network_hw\documents\tcl
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+-a----        2021/12/29     11:01           6995 test_all.tcl    
+
+-a----        2021/12/29     11:01          85950 test_all_out.txt  
+```
+
+
+
+### 集成初步验证
 
 脚本在`documents/try_yrb.tcl`
 
